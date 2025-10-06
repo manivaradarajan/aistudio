@@ -1,0 +1,32 @@
+{
+  "timeZone": "America/Los_Angeles",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/documents",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "https://www.googleapis.com/auth/presentations.readonly"
+  ],
+  "addOns": {
+    "common": {
+      "name": "AI Assistant ✨",
+      "logoUrl": "https://www.gstatic.com/images/icons/material/system/2x/psychology_alt_black_24dp.png",
+      "layoutProperties": {
+        "primaryColor": "#4285F4",
+        "secondaryColor": "#FFFFFF"
+      }
+    },
+    "docs": {
+      "homepageTrigger": {
+        "runFunction": "onDocsHomepage"
+      }
+    }
+  },
+  "urlFetchWhitelist": [
+    "https://generativelanguage.googleapis.com/",
+    "https://www.googleapis.com/"
+  ]
+}
