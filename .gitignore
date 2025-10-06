@@ -1,0 +1,14 @@
+# Python specific
+__pycache__/
+*.pyc
+.venv/
+/python/venv/
+/python/.env
+
+# Google API credentials - NEVER COMMIT THESE
+/python/credentials.json
+/python/token.json
+
+# OS specific
+.DS_Store
+Thumbs.db

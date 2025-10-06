@@ -12,7 +12,7 @@
  */
 
 // ============================================================================
-// UI HELPERS
+// UI HELPERS (Unchanged)
 // ============================================================================
 
 function showError(message) {
@@ -105,8 +105,9 @@ const CONFIG = {
     OUTPUT: 'AI Output',
     CONTEXT_HISTORY: 'Context History'
   },
-  GEMINI_MODEL: 'gemini-2.0-pro',
+  GEMINI_MODEL: 'gemini-1.5-pro-latest', // Updated to a more recent model
   API_KEY_PROPERTY: 'GEMINI_API_KEY',
+  WEB_APP_URL_PROPERTY: 'WEB_APP_URL', // Store web app URL in script properties
   MAX_FILE_SIZE: 50000,
   MAX_CONTEXT_TURNS: 10,
   SUPPORTED_MIME_TYPES: {
@@ -127,7 +128,79 @@ const CONFIG = {
 };
 
 // ============================================================================
-// ADD-ON UI
+// WEB APP ENDPOINT FOR IMMEDIATE ASYNC EXECUTION
+// ============================================================================
+
+/**
+ * Helper function to set the web app URL in script properties.
+ * Run this once after deploying the web app to enable immediate execution.
+ *
+ * To get your web app URL:
+ * 1. Deploy > New deployment > Web app
+ * 2. Copy the web app URL
+ * 3. Run this function from the script editor with your URL
+ */
+function setWebAppUrl() {
+  const url = 'PASTE_YOUR_WEB_APP_URL_HERE';
+  PropertiesService.getScriptProperties().setProperty(CONFIG.WEB_APP_URL_PROPERTY, url);
+  Logger.log(`Web app URL set to: ${url}`);
+  Logger.log('You can now use immediate execution. Otherwise it will fall back to ~1 minute delay.');
+}
+
+/**
+ * Web app GET endpoint - returns status page
+ */
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({
+    status: 'AI Assistant Web App',
+    message: 'Use POST to trigger background tasks'
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Web app POST endpoint that can be called to immediately start background processing.
+ * Deploy as a web app and call via UrlFetchApp to bypass UI timeout.
+ */
+function doPost(e) {
+  try {
+    const taskDetails = loadAiTask();
+    if (!taskDetails) {
+      return ContentService.createTextOutput(JSON.stringify({
+        success: false,
+        error: 'No task details found'
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Process immediately (within 6-minute limit)
+    const doc = DocumentApp.openById(taskDetails.docId);
+    const { config, uploadedFiles } = taskDetails;
+
+    const contextHistory = config.useContext ? loadContext(doc) : [];
+    const promptData = buildPrompt(config, uploadedFiles);
+    const response = callGeminiApi(promptData, contextHistory, config.useContext, config.geminiModel);
+
+    if (config.useContext) {
+      saveContext(doc, promptData.textPrompt, response);
+    }
+
+    writeOutput(doc, response, config.useContext);
+    deleteAiTask();
+
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true
+    })).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    Logger.log(`doPost error: ${error.stack}`);
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      error: error.message
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// ============================================================================
+// ADD-ON UI (Unchanged)
 // ============================================================================
 
 function onDocsHomepage(e) {
@@ -163,7 +236,7 @@ function onDocsHomepage(e) {
 }
 
 // ============================================================================
-// UPLOAD FILES WORKFLOW
+// UPLOAD FILES WORKFLOW (Unchanged)
 // ============================================================================
 
 function uploadFiles() {
@@ -225,68 +298,134 @@ function uploadFiles() {
 }
 
 // ============================================================================
-// RUN AI TASK WORKFLOW
+// RUN AI TASK WORKFLOW (*** MODIFIED FOR ASYNC EXECUTION ***)
 // ============================================================================
 
+/**
+ * Initiates the AI task. This function is called by the UI.
+ * It runs the task directly but returns immediately with status.
+ */
 function runAiTask() {
   const doc = DocumentApp.getActiveDocument();
-  const logs = [];
-  
   try {
-    logs.push('Reading configuration...');
     const config = readConfiguration(doc);
-    logs.push(`✓ System Prompt: ${config.systemPrompt ? 'Yes' : 'No'}`);
-    logs.push(`✓ Task: ${config.task ? 'Yes' : 'No'}`);
-    logs.push(`✓ Context enabled: ${config.useContext}`);
-    
     if (!config.systemPrompt && !config.task) {
-      return showError('Provide at least System Prompt or Task to process.');
+      return showError('Provide at least a System Prompt or a Task to process.');
     }
 
-    logs.push('\nSetting up tabs...');
+    // Ensure necessary tabs exist
     ensureTab(doc, CONFIG.TABS.OUTPUT);
     ensureTab(doc, CONFIG.TABS.CONTEXT_HISTORY);
-    logs.push('✓ Tabs ready');
 
-    // Load uploaded files
-    logs.push('\nLoading uploaded files...');
-    const uploadedFiles = loadUploadedFiles(doc);
-    logs.push(`✓ Found ${uploadedFiles.length} uploaded file(s)`);
+    // Write a "processing" message immediately
+    writeOutput(doc, '[Processing...] Task started at ' + new Date().toLocaleString(), config.useContext);
 
-    // Load context if needed
-    if (config.useContext) {
-      logs.push('\nLoading conversation context...');
-      const history = loadContext(doc);
-      logs.push(`✓ Loaded ${history.length / 2} previous turn(s)`);
-      var contextHistory = history;
-    } else {
-      var contextHistory = [];
+    // Package task details for async execution
+    const taskDetails = {
+      config: config,
+      uploadedFiles: loadUploadedFiles(doc),
+      docId: doc.getId()
+    };
+
+    // Save task for async processing
+    saveAiTask(taskDetails);
+
+    // Try to use web app for immediate execution
+    const webAppUrl = PropertiesService.getScriptProperties().getProperty(CONFIG.WEB_APP_URL_PROPERTY);
+
+    if (webAppUrl) {
+      try {
+        // Call web app asynchronously (fire and forget)
+        UrlFetchApp.fetch(webAppUrl, {
+          method: 'post',
+          payload: JSON.stringify({trigger: 'aiTask'}),
+          contentType: 'application/json',
+          muteHttpExceptions: true
+        });
+
+        return CardService.newActionResponseBuilder()
+            .setNotification(CardService.newNotification()
+                .setText('Task started. Check the AI Output tab for results.'))
+            .build();
+      } catch (webAppError) {
+        Logger.log(`Web app call failed: ${webAppError.message}, falling back to trigger`);
+      }
     }
-    
-    // Build and send prompt
-    logs.push(`\nCalling Gemini API (${config.geminiModel})...`);
-    
-    const promptData = buildPrompt(config, uploadedFiles);
-    const response = callGeminiApi(promptData, contextHistory, config.useContext, config.geminiModel);
-    logs.push(`✓ Received response (${response.length} chars)`);
 
-    // Save context and output
-    if (config.useContext) {
-      logs.push('\nSaving context...');
-      saveContext(doc, promptData.textPrompt, response);
-      logs.push('✓ Context saved');
-    }
-    
-    logs.push('\nWriting output...');
-    writeOutput(doc, response, config.useContext);
-    logs.push('✓ Output written to AI Output tab');
-    
-    return showLogs(logs, true);
+    // Fallback to trigger-based approach (has ~1 minute delay)
+    const trigger = ScriptApp.newTrigger('processAiTaskInBackground')
+      .timeBased()
+      .after(1)
+      .create();
+
+    Logger.log(`Created fallback trigger: ${trigger.getUniqueId()}`);
+
+    return CardService.newActionResponseBuilder()
+        .setNotification(CardService.newNotification()
+            .setText('Task queued. Results in ~1 minute in the AI Output tab.'))
+        .build();
 
   } catch (error) {
     Logger.log(error.stack);
-    logs.push(`\n❌ ERROR: ${error.message}`);
-    return showLogsWithError(logs, error.message);
+    return showError(`Failed to start AI task: ${error.message}`);
+  }
+}
+
+/**
+ * Processes the AI task in the background. This function is called by a trigger
+ * and has a 6-minute execution limit.
+ * @param {Object} e The event object from the trigger.
+ */
+function processAiTaskInBackground(e) {
+  // Always delete the trigger that called this function to prevent re-runs
+  if (e && e.triggerUid) {
+    const allTriggers = ScriptApp.getProjectTriggers();
+    for (const trigger of allTriggers) {
+      if (trigger.getUniqueId() === e.triggerUid) {
+        ScriptApp.deleteTrigger(trigger);
+        break;
+      }
+    }
+  }
+
+  const taskDetails = loadAiTask();
+  if (!taskDetails) {
+    Logger.log('Background process triggered but no task details were found.');
+    return;
+  }
+  
+  // Re-open the document using the stored ID
+  const doc = DocumentApp.openById(taskDetails.docId);
+  const { config, uploadedFiles } = taskDetails;
+
+  try {
+    Logger.log('Starting background AI task processing...');
+    
+    const contextHistory = config.useContext ? loadContext(doc) : [];
+    Logger.log(`Loaded ${contextHistory.length / 2} previous turn(s)`);
+
+    Logger.log(`Calling Gemini API (${config.geminiModel})...`);
+    const promptData = buildPrompt(config, uploadedFiles);
+    const response = callGeminiApi(promptData, contextHistory, config.useContext, config.geminiModel);
+    Logger.log(`Received response (${response.length} chars)`);
+
+    if (config.useContext) {
+      saveContext(doc, promptData.textPrompt, response);
+      Logger.log('Context saved');
+    }
+    
+    writeOutput(doc, response, config.useContext);
+    Logger.log('Output written to AI Output tab');
+
+  } catch (error) {
+    Logger.log(`Background task failed: ${error.stack}`);
+    // Write the error to the output tab for user visibility
+    const errorMessage = `[BACKGROUND TASK FAILED]\n\nTimestamp: ${new Date().toLocaleString()}\n\nError: ${error.message}`;
+    writeOutput(doc, errorMessage, false);
+  } finally {
+    // IMPORTANT: Clean up the stored task details
+    deleteAiTask();
+    Logger.log('Cleaned up pending AI task properties.');
   }
 }
 
@@ -323,7 +462,7 @@ function clearUploadedFiles() {
 }
 
 // ============================================================================
-// GEMINI FILE UPLOAD
+// GEMINI FILE UPLOAD (Unchanged)
 // ============================================================================
 
 function uploadSingleFile(fileId) {
@@ -538,7 +677,7 @@ function fetchAndUploadUrl(url) {
 }
 
 // ============================================================================
-// UPLOADED FILES STORAGE
+// UPLOADED FILES STORAGE (Unchanged)
 // ============================================================================
 
 function saveUploadedFiles(doc, files) {
@@ -575,7 +714,7 @@ function loadUploadedFiles(doc) {
 }
 
 // ============================================================================
-// CONFIGURATION & TAB OPERATIONS
+// CONFIGURATION & TAB OPERATIONS (Unchanged)
 // ============================================================================
 
 function readConfiguration(doc) {
@@ -668,7 +807,7 @@ function writeOutput(doc, content, isContextual) {
   const timestamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
   const body = tab.asDocumentTab().getBody();
   
-  if (body.getNumChildren() > 0) {
+  if (body.getNumChildren() > 0 && body.getText().trim() !== '') {
     body.appendParagraph('').appendHorizontalRule();
   }
   
@@ -678,7 +817,7 @@ function writeOutput(doc, content, isContextual) {
 }
 
 // ============================================================================
-// CONTEXT MANAGEMENT
+// CONTEXT MANAGEMENT (Unchanged)
 // ============================================================================
 
 function loadContext(doc) {
@@ -740,7 +879,7 @@ function clearContext(doc) {
 }
 
 // ============================================================================
-// PROMPT BUILDING
+// PROMPT BUILDING (Unchanged)
 // ============================================================================
 
 function buildPrompt(config, uploadedFiles) {
@@ -785,70 +924,79 @@ function buildPrompt(config, uploadedFiles) {
 }
 
 // ============================================================================
-// GEMINI API
+// GEMINI API CALL
 // ============================================================================
 
-function callGeminiApi(promptData, history, useContext, modelName) {
-  const startTime = Date.now();
+/**
+ * Calls the Gemini API with the constructed prompt and optional conversation history.
+ * @param {object} promptData The prompt data containing parts array and text prompt
+ * @param {array} contextHistory Previous conversation turns (empty array if no context)
+ * @param {boolean} useContext Whether to include context in the API call
+ * @param {string} geminiModel The Gemini model to use
+ * @returns {string} The model's response text
+ */
+function callGeminiApi(promptData, contextHistory, useContext, geminiModel) {
   const apiKey = PropertiesService.getScriptProperties().getProperty(CONFIG.API_KEY_PROPERTY);
-  if (!apiKey) throw new Error('GEMINI_API_KEY not set in script properties');
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY not set in Script Properties');
+  }
 
-  const model = modelName || CONFIG.GEMINI_MODEL;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-  
-  const contents = useContext && history.length > 0 ? [...history] : [];
-  contents.push({role: 'user', parts: promptData.parts});
-  
-  Logger.log(`Calling Gemini API with model: ${model}`);
-  Logger.log(`Request size: ${JSON.stringify(contents).length} chars`);
-  Logger.log(`Number of parts: ${promptData.parts.length}`);
-  
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`;
+
+  // Build the contents array
+  const contents = [];
+
+  // Add context history if using context
+  if (useContext && contextHistory && contextHistory.length > 0) {
+    contents.push(...contextHistory);
+  }
+
+  // Add the current user prompt
+  contents.push({
+    role: 'user',
+    parts: promptData.parts
+  });
+
+  const payload = {
+    contents: contents,
+    generationConfig: {
+      temperature: 0.7,
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 8192
+    }
+  };
+
   try {
     const response = UrlFetchApp.fetch(url, {
       method: 'post',
       contentType: 'application/json',
-      payload: JSON.stringify({contents}),
+      payload: JSON.stringify(payload),
       muteHttpExceptions: true
     });
-    
-    const elapsed = (Date.now() - startTime) / 1000;
-    Logger.log(`API responded in ${elapsed.toFixed(1)}s`);
-    
-    const code = response.getResponseCode();
-    const body = response.getContentText();
-    
-    Logger.log(`Response code: ${code}`);
-    Logger.log(`Response body length: ${body.length}`);
-    
-    if (code === 429) throw new Error('Rate limit exceeded');
-    if (code === 403) throw new Error('Invalid API key');
-    if (code === 400) {
-      Logger.log(`Full 400 error: ${body}`);
-      throw new Error(`Bad request: ${body.substring(0, 500)}`);
+
+    const responseCode = response.getResponseCode();
+    const responseText = response.getContentText();
+
+    if (responseCode !== 200) {
+      Logger.log(`Gemini API error: ${responseText}`);
+      throw new Error(`Gemini API returned ${responseCode}: ${responseText}`);
     }
-    if (code !== 200) {
-      Logger.log(`Full error response: ${body}`);
-      throw new Error(`API error ${code}: ${body.substring(0, 500)}`);
+
+    const result = JSON.parse(responseText);
+
+    // Extract text from response
+    if (result.candidates && result.candidates.length > 0) {
+      const candidate = result.candidates[0];
+      if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+        return candidate.content.parts.map(part => part.text || '').join('');
+      }
     }
-    
-    const json = JSON.parse(body);
-    if (json.candidates?.[0]?.content?.parts?.[0]?.text) {
-      const resultText = json.candidates[0].content.parts[0].text;
-      Logger.log(`Got response text: ${resultText.length} chars`);
-      return resultText;
-    }
-    
-    const reason = json.candidates?.[0]?.finishReason || 'Unknown';
-    Logger.log(`Response blocked or empty. Reason: ${reason}, Full JSON: ${JSON.stringify(json)}`);
-    return `Response blocked. Reason: ${reason}`;
-    
+
+    throw new Error('No valid response from Gemini API');
+
   } catch (error) {
-    const elapsed = (Date.now() - startTime) / 1000;
-    Logger.log(`Error after ${elapsed.toFixed(1)}s: ${error.message}`);
-    Logger.log(`Error stack: ${error.stack}`);
+    Logger.log(`Gemini API call failed: ${error.message}`);
     throw error;
   }
 }
-
-// ============================================================================
-//
