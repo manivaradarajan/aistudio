@@ -26,7 +26,7 @@ cp .env.example .env
 4. Create OAuth 2.0 credentials:
    - Credentials → Create Credentials → OAuth client ID
    - Application type: Web application
-   - Authorized redirect URIs: `http://localhost:5000/oauth2callback`
+   - Authorized redirect URIs: `http://localhost:8080/oauth2callback`
 5. Copy Client ID and Client Secret to `.env`
 
 ### 3. Get Gemini API Key
@@ -48,18 +48,18 @@ python -c "import secrets; print(secrets.token_hex(32))"
 python app.py
 ```
 
-Visit http://localhost:5000
+Visit http://localhost:8080
 
 ### 6. Test the Flow
 
-1. Go to http://localhost:5000/auth to authenticate
+1. Go to http://localhost:8080/auth to authenticate
 2. Create a test Google Doc with tabs:
    - "Task" tab with content: "Summarize this"
    - "Input" tab with content: "Your input text here"
 3. Call the API:
 
 ```bash
-curl -X POST http://localhost:5000/process/YOUR_DOC_ID
+curl -X POST http://localhost:8080/process/YOUR_DOC_ID
 ```
 
 ## Deploy to Cloud Run

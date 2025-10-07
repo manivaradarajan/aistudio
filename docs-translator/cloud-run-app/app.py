@@ -1,15 +1,26 @@
 """
 AI Assistant Cloud Run App
 Session-based OAuth for Google Docs integration with Gemini API
+Uses the new google-genai SDK (pip install google-genai)
 """
 
 import os
 import json
+import tempfile
+import time
+import io
+import re
 from flask import Flask, request, jsonify, session, redirect, url_for
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
-import google.generativeai as genai
+from googleapiclient.http import MediaIoBaseDownload
+from google import genai
+from google.genai import types
+from datetime import datetime
+
+# Allow HTTP for local development (remove in production)
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -26,14 +37,24 @@ CLIENT_CONFIG = {
         'client_secret': os.environ.get('GOOGLE_CLIENT_SECRET'),
         'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
         'token_uri': 'https://oauth2.googleapis.com/token',
-        'redirect_uris': [os.environ.get('REDIRECT_URI', 'http://localhost:5000/oauth2callback')]
+        'redirect_uris': [os.environ.get('REDIRECT_URI', 'http://localhost:8080/oauth2callback')]
     }
 }
 
-# Gemini Configuration
-genai.configure(api_key=os.environ.get('GEMINI_API_KEY'))
+# Gemini Configuration - NEW SDK
+gemini_client = None  # Lazy-loaded
 
 GEMINI_MODEL = 'gemini-1.5-pro-latest'
+
+def get_gemini_client():
+    """Get or create Gemini client (lazy initialization)"""
+    global gemini_client
+    if gemini_client is None:
+        api_key = os.environ.get('GEMINI_API_KEY')
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY environment variable is not set")
+        gemini_client = genai.Client(api_key=api_key)
+    return gemini_client
 
 TAB_NAMES = {
     'SYSTEM_PROMPT': 'System Prompt',
@@ -65,8 +86,9 @@ def auth():
     )
 
     authorization_url, state = flow.authorization_url(
-        access_type='online',  # Session-only, no refresh token
-        include_granted_scopes='true'
+        access_type='offline',
+        include_granted_scopes='false',
+        prompt='consent'
     )
 
     session['state'] = state
@@ -97,7 +119,6 @@ def oauth2callback():
         'scopes': credentials.scopes
     }
 
-    # Redirect to the doc_id if stored
     doc_id = session.get('pending_doc_id')
     if doc_id:
         return redirect(url_for('process_task', doc_id=doc_id))
@@ -109,7 +130,6 @@ def oauth2callback():
 def process_task(doc_id):
     """Main endpoint: Read doc, call Gemini, write results"""
 
-    # Check authentication
     if 'credentials' not in session:
         session['pending_doc_id'] = doc_id
         return jsonify({
@@ -118,28 +138,59 @@ def process_task(doc_id):
         }), 401
 
     try:
-        # Build credentials from session
         credentials = Credentials(**session['credentials'])
 
-        # Read document
         docs_service = build('docs', 'v1', credentials=credentials)
-        doc = docs_service.documents().get(documentId=doc_id).execute()
+        drive_service = build('drive', 'v3', credentials=credentials)
 
-        # Parse tabs
+        request_obj = docs_service.documents().get(documentId=doc_id)
+        request_obj.uri = request_obj.uri + '&includeTabsContent=true'
+        doc = request_obj.execute()
+
+        print(f"DEBUG: Document title: {doc.get('title')}")
+
         config = parse_document_tabs(doc)
 
         if not config['system_prompt'] and not config['task']:
             return jsonify({'error': 'Provide at least a System Prompt or Task'}), 400
 
-        # Build prompt
         prompt_text = build_prompt(config)
 
-        # Call Gemini
-        model = genai.GenerativeModel(config.get('gemini_model', GEMINI_MODEL))
-        response = model.generate_content(prompt_text)
+        already_uploaded = parse_uploaded_files_tracking(config.get('uploaded_files_tracking', ''))
+
+        gemini_files = []
+        new_uploads = []
+        if config.get('input_files'):
+            try:
+                gemini_files, new_uploads = upload_files_to_gemini(
+                    config['input_files'],
+                    already_uploaded,
+                    drive_service
+                )
+                # Update the Uploaded Files tab immediately after successful upload
+                if new_uploads:
+                    update_uploaded_files_tab(docs_service, doc_id, new_uploads, doc)
+            except Exception as e:
+                print(f"ERROR: File upload failed: {str(e)}")
+                import traceback
+                print(traceback.format_exc())
+                return jsonify({'error': f'File upload failed: {str(e)}'}), 500
+
+        # Build content list (prompt + files)
+        content_parts = [prompt_text]
+        for gfile in gemini_files:
+            content_parts.append(types.Part.from_uri(file_uri=gfile.uri, mime_type=gfile.mime_type))
+
+        print(f"DEBUG: Sending to Gemini: {len(content_parts)} items (1 text prompt + {len(gemini_files)} files)")
+
+        response = get_gemini_client().models.generate_content(
+            model=config.get('gemini_model', GEMINI_MODEL),
+            contents=content_parts
+        )
         result_text = response.text
 
-        # Write output back to doc
+        print(f"DEBUG: Gemini output ({len(result_text)} chars)")
+
         write_output_to_doc(docs_service, doc_id, result_text, doc)
 
         return jsonify({
@@ -149,6 +200,9 @@ def process_task(doc_id):
         })
 
     except Exception as e:
+        import traceback
+        print(f"ERROR: {str(e)}")
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 
@@ -160,27 +214,47 @@ def parse_document_tabs(doc):
         'task': '',
         'parameters': {},
         'input': '',
+        'input_files': [],
+        'uploaded_files_tracking': '',
         'gemini_model': GEMINI_MODEL
     }
 
+    print(f"DEBUG: Processing {len(tabs)} document tabs")
+
     for tab in tabs:
         title = tab.get('tabProperties', {}).get('title', '')
+        print(f"DEBUG: Tab title: '{title}'")
 
-        # Get text content from tab
         content_elements = tab.get('documentTab', {}).get('body', {}).get('content', [])
         text = extract_text_from_elements(content_elements)
 
         if title == TAB_NAMES['SYSTEM_PROMPT']:
+            print(f"DEBUG: Found System Prompt tab, length: {len(text)}")
             config['system_prompt'] = text
         elif title == TAB_NAMES['TASK']:
+            print(f"DEBUG: Found Task tab, length: {len(text)}")
             config['task'] = text
         elif title == TAB_NAMES['PARAMETERS']:
+            print(f"DEBUG: Found Parameters tab, length: {len(text)}")
             config['parameters'] = parse_parameters(text)
             if 'GEMINI_MODEL' in config['parameters']:
                 config['gemini_model'] = config['parameters']['GEMINI_MODEL']
         elif title == TAB_NAMES['INPUT']:
+            print(f"DEBUG: Found Input tab, length: {len(text)}")
             config['input'] = text
+            config['input_files'] = extract_file_urls(content_elements)
+            print(f"DEBUG: Found {len(config['input_files'])} files in Input tab")
+        elif title == TAB_NAMES['UPLOADED_FILES']:
+            print(f"DEBUG: Found Uploaded Files tracking tab, length: {len(text)}")
+            config['uploaded_files_tracking'] = text
+        elif title == TAB_NAMES['OUTPUT']:
+            print(f"DEBUG: Found AI Output tab (will write results here)")
+        elif title == TAB_NAMES['CONTEXT_HISTORY']:
+            print(f"DEBUG: Found Context History tab")
+        else:
+            print(f"DEBUG: Skipping tab '{title}' (not a configuration tab)")
 
+    print(f"DEBUG: Configuration loaded - Task: {len(config['task'])} chars, System Prompt: {len(config['system_prompt'])} chars, Input files: {len(config['input_files'])}")
     return config
 
 
@@ -196,6 +270,37 @@ def extract_text_from_elements(elements):
     return ''.join(text).strip()
 
 
+def extract_file_urls(elements):
+    """Extract file URLs from document elements"""
+    urls = []
+
+    for element in elements:
+        if 'paragraph' in element:
+            para = element['paragraph']
+            para_elements = para.get('elements', [])
+
+            for elem in para_elements:
+                if 'textRun' in elem:
+                    text_run = elem['textRun']
+                    content = text_run.get('content', '')
+
+                    text_style = text_run.get('textStyle', {})
+                    link = text_style.get('link', {})
+                    url = link.get('url', '')
+
+                    if url:
+                        urls.append(url)
+                        print(f"DEBUG: Found linked URL: {url}")
+                    elif 'drive.google.com' in content or content.startswith('http'):
+                        urls.append(content.strip())
+                        print(f"DEBUG: Found plain text URL: {content.strip()}")
+
+                if 'inlineObjectElement' in elem:
+                    print(f"DEBUG: Found embedded file (inlineObjectElement)")
+
+    return urls
+
+
 def parse_parameters(text):
     """Parse key:value parameters from text"""
     params = {}
@@ -204,6 +309,122 @@ def parse_parameters(text):
             key, value = line.split(':', 1)
             params[key.strip()] = value.strip()
     return params
+
+
+def parse_uploaded_files_tracking(tracking_text):
+    """Parse the Uploaded Files tab to get already-uploaded Gemini file URIs"""
+    tracking = {}
+    for line in tracking_text.strip().split('\n'):
+        if '|' in line:
+            parts = line.split('|')
+            if len(parts) >= 2:
+                drive_id = parts[0].strip()
+                gemini_uri = parts[1].strip()
+                tracking[drive_id] = gemini_uri
+                print(f"DEBUG: Found tracked file: {drive_id} -> {gemini_uri}")
+    return tracking
+
+
+def upload_files_to_gemini(file_urls, already_uploaded_tracking, drive_service):
+    """Download Google Drive files and upload to Gemini"""
+    gemini_files = []
+    new_uploads = []
+
+    for url in file_urls:
+        print(f"DEBUG: Processing file URL: {url}")
+
+        file_id = None
+        if 'drive.google.com' in url:
+            match = re.search(r'/file/d/([a-zA-Z0-9_-]+)', url)
+            if not match:
+                match = re.search(r'[?&]id=([a-zA-Z0-9_-]+)', url)
+            if match:
+                file_id = match.group(1)
+
+        if not file_id:
+            print(f"ERROR: Could not extract file ID from URL: {url}")
+            raise Exception(f"Could not extract file ID from URL: {url}")
+
+        print(f"DEBUG: Extracted Drive file ID: {file_id}")
+
+        # Check if already uploaded
+        if file_id in already_uploaded_tracking:
+            gemini_uri = already_uploaded_tracking[file_id]
+            print(f"DEBUG: File already uploaded, using existing: {gemini_uri}")
+            try:
+                gemini_file = get_gemini_client().files.get(name=gemini_uri)
+                gemini_files.append(gemini_file)
+                continue
+            except Exception as e:
+                print(f"DEBUG: Error retrieving existing file {gemini_uri}, will re-upload: {str(e)}")
+
+        # Download and upload
+        try:
+            file_metadata = drive_service.files().get(
+                fileId=file_id,
+                fields='name,mimeType'
+            ).execute()
+            
+            file_name = file_metadata.get('name', f'file_{file_id}')
+            mime_type = file_metadata.get('mimeType', '')
+            
+            print(f"DEBUG: File name: {file_name}, MIME type: {mime_type}")
+
+            # Download file from Drive to memory
+            request_obj = drive_service.files().get_media(fileId=file_id)
+            file_content = io.BytesIO()
+            downloader = MediaIoBaseDownload(file_content, request_obj)
+            
+            done = False
+            while not done:
+                status, done = downloader.next_chunk()
+            
+            file_content.seek(0)
+            
+            print(f"DEBUG: Downloaded file to memory, uploading to Gemini: {file_name}")
+            
+            # Write to temp file for upload (Gemini SDK requires file path)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f'_{file_name}') as temp_file:
+                temp_file.write(file_content.read())
+                temp_path = temp_file.name
+            
+            # Upload to Gemini using NEW SDK
+            print(f"DEBUG: Uploading to Gemini from temp file: {temp_path}")
+            gemini_file = get_gemini_client().files.upload(file=temp_path)
+            
+            # Clean up temp file immediately
+            try:
+                os.unlink(temp_path)
+                print(f"DEBUG: Cleaned up temp file")
+            except Exception as e:
+                print(f"WARNING: Could not delete temp file: {e}")
+            
+            # Wait for file to be processed
+            print(f"DEBUG: Waiting for Gemini to process file...")
+            while gemini_file.state == 'PROCESSING':
+                print(f"DEBUG: File state: {gemini_file.state}")
+                time.sleep(2)
+                gemini_file = get_gemini_client().files.get(name=gemini_file.name)
+            
+            if gemini_file.state == 'FAILED':
+                raise Exception(f"Gemini file processing failed: {gemini_file.state}")
+            
+            gemini_files.append(gemini_file)
+            print(f"DEBUG: Successfully uploaded to Gemini: {gemini_file.name} (state: {gemini_file.state})")
+
+            new_uploads.append({
+                'drive_id': file_id,
+                'gemini_uri': gemini_file.name,
+                'display_name': gemini_file.display_name
+            })
+
+        except Exception as e:
+            print(f"ERROR: Error uploading file {file_id}: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
+            raise Exception(f"Failed to upload file {file_name}: {str(e)}")
+
+    return gemini_files, new_uploads
 
 
 def build_prompt(config):
@@ -222,53 +443,112 @@ def build_prompt(config):
     return '\n\n'.join(parts)
 
 
+def update_uploaded_files_tab(docs_service, doc_id, new_uploads, doc):
+    """Append new upload tracking info to Uploaded Files tab"""
+    if not new_uploads:
+        print("DEBUG: No new uploads to track")
+        return
+
+    tabs = doc.get('tabs', [])
+    uploaded_files_tab_id = None
+
+    print(f"DEBUG: Looking for '{TAB_NAMES['UPLOADED_FILES']}' tab")
+
+    for tab in tabs:
+        tab_title = tab.get('tabProperties', {}).get('title')
+        if tab_title == TAB_NAMES['UPLOADED_FILES']:
+            uploaded_files_tab_id = tab.get('tabProperties', {}).get('tabId')
+            print(f"DEBUG: Found uploaded files tab with ID: {uploaded_files_tab_id}")
+            break
+
+    if not uploaded_files_tab_id:
+        print(f"DEBUG: No '{TAB_NAMES['UPLOADED_FILES']}' tab found")
+        return
+
+    tracking_lines = []
+    for upload in new_uploads:
+        line = f"{upload['drive_id']} | {upload['gemini_uri']} | {upload['display_name']}\n"
+        tracking_lines.append(line)
+
+    tracking_text = ''.join(tracking_lines)
+
+    for tab in tabs:
+        if tab.get('tabProperties', {}).get('tabId') == uploaded_files_tab_id:
+            body = tab.get('documentTab', {}).get('body', {})
+            content_list = body.get('content', [])
+            if content_list:
+                end_index = content_list[-1].get('endIndex', 1)
+
+                requests = [{
+                    'insertText': {
+                        'location': {
+                            'tabId': uploaded_files_tab_id,
+                            'index': end_index - 1
+                        },
+                        'text': tracking_text
+                    }
+                }]
+
+                print(f"DEBUG: Writing {len(new_uploads)} tracking entries to Uploaded Files tab")
+
+                docs_service.documents().batchUpdate(
+                    documentId=doc_id,
+                    body={'requests': requests}
+                ).execute()
+
+                print(f"DEBUG: Successfully updated tracking")
+                return
+
+
 def write_output_to_doc(docs_service, doc_id, content, doc):
     """Write results to AI Output tab"""
-    from datetime import datetime
-
-    # Find or create AI Output tab
     tabs = doc.get('tabs', [])
     output_tab_id = None
 
     for tab in tabs:
-        if tab.get('tabProperties', {}).get('title') == TAB_NAMES['OUTPUT']:
+        tab_title = tab.get('tabProperties', {}).get('title')
+        if tab_title == TAB_NAMES['OUTPUT']:
             output_tab_id = tab.get('tabProperties', {}).get('tabId')
+            print(f"DEBUG: Writing to AI Output tab (ID: {output_tab_id})")
             break
 
-    # If no output tab exists, create one
     if output_tab_id is None:
-        requests = [{
-            'createNamedRange': {
-                'name': 'output_tab_placeholder',
-                'range': {
-                    'startIndex': 1,
-                    'endIndex': 2
-                }
-            }
-        }]
-        # For now, we'll append to the main doc
-        # TODO: Handle tab creation properly
-        output_tab_id = None
+        print(f"WARNING: No '{TAB_NAMES['OUTPUT']}' tab found, writing to first tab")
+        if tabs:
+            output_tab_id = tabs[0].get('tabProperties', {}).get('tabId')
 
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     output_text = f"\n\n{'='*50}\n{timestamp}\n{'='*50}\n{content}\n"
 
-    # Append to document
-    requests = [{
-        'insertText': {
-            'location': {
-                'index': 1
-            },
-            'text': output_text
-        }
-    }]
+    if output_tab_id:
+        for tab in tabs:
+            if tab.get('tabProperties', {}).get('tabId') == output_tab_id:
+                body = tab.get('documentTab', {}).get('body', {})
+                content_list = body.get('content', [])
+                if content_list:
+                    end_index = content_list[-1].get('endIndex', 1)
 
-    docs_service.documents().batchUpdate(
-        documentId=doc_id,
-        body={'requests': requests}
-    ).execute()
+                    requests = [{
+                        'insertText': {
+                            'location': {
+                                'tabId': output_tab_id,
+                                'index': end_index - 1
+                            },
+                            'text': output_text
+                        }
+                    }]
+
+                    docs_service.documents().batchUpdate(
+                        documentId=doc_id,
+                        body={'requests': requests}
+                    ).execute()
+
+                    print(f"DEBUG: Successfully wrote {len(content)} characters to output tab")
+                    return
+
+    print("ERROR: Failed to write output to document")
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
