@@ -103,29 +103,46 @@ class DocumentWriter:
             return
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        separator = '='*50
-        header = f"\n\n{separator}\n{timestamp}\n{separator}\n"
+        header = f"\n\n{timestamp}\n\n"
 
         end_index = DocumentWriter._get_tab_end_index(doc, tab_id)
         if end_index is None:
             print("ERROR: Failed to get end index for output tab")
             return
 
-        # Calculate starting position for content
+        # Calculate starting position for timestamp and content
+        timestamp_start_index = end_index - 1 + 2  # +2 for the two newlines before timestamp
+        timestamp_end_index = timestamp_start_index + len(timestamp)
         content_start_index = end_index - 1 + len(header)
 
         if output_markdown:
             # Write as plain markdown (no conversion)
             output_text = header + content + '\n'
-            requests = [{
-                'insertText': {
-                    'location': {
-                        'tabId': tab_id,
-                        'index': end_index - 1
-                    },
-                    'text': output_text
+            requests = [
+                {
+                    'insertText': {
+                        'location': {
+                            'tabId': tab_id,
+                            'index': end_index - 1
+                        },
+                        'text': output_text
+                    }
+                },
+                # Format timestamp as Heading 1
+                {
+                    'updateParagraphStyle': {
+                        'range': {
+                            'tabId': tab_id,
+                            'startIndex': timestamp_start_index,
+                            'endIndex': timestamp_end_index + 1  # +1 to include paragraph break
+                        },
+                        'paragraphStyle': {
+                            'namedStyleType': 'HEADING_1'
+                        },
+                        'fields': 'namedStyleType'
+                    }
                 }
-            }]
+            ]
             print(f"DEBUG: Writing {len(content)} characters as markdown to output tab")
         else:
             # Convert markdown to Google Docs formatting
@@ -160,6 +177,21 @@ class DocumentWriter:
                     # Add formatting requests
                     requests.extend(formatting_requests)
 
+                    # Add Heading 1 style to timestamp
+                    requests.append({
+                        'updateParagraphStyle': {
+                            'range': {
+                                'tabId': tab_id,
+                                'startIndex': timestamp_start_index,
+                                'endIndex': timestamp_end_index + 1  # +1 to include paragraph break
+                            },
+                            'paragraphStyle': {
+                                'namedStyleType': 'HEADING_1'
+                            },
+                            'fields': 'namedStyleType'
+                        }
+                    })
+
                     print(f"DEBUG: Writing {len(plain_text)} characters with "
                           f"{len(formatting_requests)} formatting requests to output tab")
 
@@ -184,6 +216,13 @@ class DocumentWriter:
         ).execute()
         print(f"DEBUG: Successfully wrote output to tab")
 
+        # Refetch document to get updated state before updating TOC
+        try:
+            updated_doc = docs_service.documents().get(documentId=doc_id).execute()
+            DocumentWriter._ensure_table_of_contents(docs_service, doc_id, updated_doc, tab_id)
+        except Exception as e:
+            print(f"WARNING: Failed to update table of contents: {str(e)}")
+
     @staticmethod
     def _find_tab_id(doc: Dict, tab_name: str) -> Optional[str]:
         """Find tab ID by name"""
@@ -206,6 +245,96 @@ class DocumentWriter:
                 if content_list:
                     return content_list[-1].get('endIndex', 1)
         return None
+
+    @staticmethod
+    def _get_tab_start_index(doc: Dict, tab_id: str) -> Optional[int]:
+        """Get start index for a specific tab"""
+        tabs = doc.get('tabs', [])
+        for tab in tabs:
+            if tab.get('tabProperties', {}).get('tabId') == tab_id:
+                body = tab.get('documentTab', {}).get('body', {})
+                content_list = body.get('content', [])
+                if content_list:
+                    return content_list[0].get('startIndex', 1)
+        return None
+
+    @staticmethod
+    def _ensure_table_of_contents(docs_service, doc_id: str, doc: Dict, tab_id: str) -> None:
+        """
+        Ensure there's a table of contents at the beginning of the tab.
+        If one doesn't exist, create it. If it exists, update it.
+        """
+        # Get the tab's start index
+        start_index = DocumentWriter._get_tab_start_index(doc, tab_id)
+        if start_index is None:
+            print("ERROR: Could not find start index for tab")
+            return
+
+        # Check if TOC already exists by looking at the first few content elements
+        tabs = doc.get('tabs', [])
+        has_toc = False
+        toc_end_index = None
+
+        for tab in tabs:
+            if tab.get('tabProperties', {}).get('tabId') == tab_id:
+                body = tab.get('documentTab', {}).get('body', {})
+                content_list = body.get('content', [])
+
+                # Check first few elements for TOC
+                for element in content_list[:5]:  # Check first 5 elements
+                    if 'tableOfContents' in element:
+                        has_toc = True
+                        toc_end_index = element.get('endIndex')
+                        print(f"DEBUG: Found existing TOC ending at index {toc_end_index}")
+                        break
+                break
+
+        if has_toc:
+            # Delete and recreate TOC to update it
+            print(f"DEBUG: Updating existing TOC")
+            requests = [
+                {
+                    'deleteContentRange': {
+                        'range': {
+                            'tabId': tab_id,
+                            'startIndex': start_index,
+                            'endIndex': toc_end_index
+                        }
+                    }
+                },
+                {
+                    'insertTableOfContents': {
+                        'location': {
+                            'tabId': tab_id,
+                            'index': start_index
+                        }
+                    }
+                }
+            ]
+        else:
+            # Create new TOC
+            print(f"DEBUG: Creating new TOC at start of tab")
+            requests = [
+                {
+                    'insertTableOfContents': {
+                        'location': {
+                            'tabId': tab_id,
+                            'index': start_index
+                        }
+                    }
+                }
+            ]
+
+        try:
+            docs_service.documents().batchUpdate(
+                documentId=doc_id,
+                body={'requests': requests}
+            ).execute()
+            print(f"DEBUG: Successfully updated table of contents")
+        except Exception as e:
+            print(f"ERROR: Failed to update TOC: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
 
 
 class StreamingDocumentWriter:
@@ -231,8 +360,7 @@ class StreamingDocumentWriter:
             return 0
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        separator = '='*50
-        header = f"\n\n{separator}\n{timestamp}\n{separator}\n"
+        header = f"\n\n{timestamp}\n\n"
         status_message = "⏳ Waiting for response from Gemini...\n\n"
 
         end_index = DocumentWriter._get_tab_end_index(doc, tab_id)
@@ -240,16 +368,36 @@ class StreamingDocumentWriter:
             print("ERROR: Failed to get end index")
             return 0
 
+        # Calculate timestamp position for formatting
+        timestamp_start_index = end_index - 1 + 2  # +2 for the two newlines before timestamp
+        timestamp_end_index = timestamp_start_index + len(timestamp)
+
         # Write header and status message
-        requests = [{
-            'insertText': {
-                'location': {
-                    'tabId': tab_id,
-                    'index': end_index - 1
-                },
-                'text': header + status_message
+        requests = [
+            {
+                'insertText': {
+                    'location': {
+                        'tabId': tab_id,
+                        'index': end_index - 1
+                    },
+                    'text': header + status_message
+                }
+            },
+            # Format timestamp as Heading 1
+            {
+                'updateParagraphStyle': {
+                    'range': {
+                        'tabId': tab_id,
+                        'startIndex': timestamp_start_index,
+                        'endIndex': timestamp_end_index + 1  # +1 to include paragraph break
+                    },
+                    'paragraphStyle': {
+                        'namedStyleType': 'HEADING_1'
+                    },
+                    'fields': 'namedStyleType'
+                }
             }
-        }]
+        ]
         docs_service.documents().batchUpdate(
             documentId=doc_id,
             body={'requests': requests}
@@ -355,6 +503,13 @@ class StreamingDocumentWriter:
 
             print(f"DEBUG: Progressive streaming complete. Total: {len(total_text)} chars "
                   f"from {chunk_count} API chunks, written in {batch_write_count} batches to doc")
+
+            # Update table of contents after streaming is complete
+            try:
+                updated_doc = docs_service.documents().get(documentId=doc_id).execute()
+                DocumentWriter._ensure_table_of_contents(docs_service, doc_id, updated_doc, tab_id)
+            except Exception as e:
+                print(f"WARNING: Failed to update table of contents: {str(e)}")
 
             return (total_text, len(total_text))
 
