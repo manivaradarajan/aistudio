@@ -149,8 +149,8 @@ class DocumentParser:
                     url = link.get('url', '')
 
                     if url:
-                        urls.append(url)
-                        print(f"DEBUG: Found linked URL: {url}")
+                        urls.append(url.strip())
+                        print(f"DEBUG: Found linked URL: {url.strip()}")
                     elif 'drive.google.com' in content or content.startswith('http'):
                         urls.append(content.strip())
                         print(f"DEBUG: Found plain text URL: {content.strip()}")
@@ -180,14 +180,18 @@ class DocumentParser:
     def parse_uploaded_tracking(tracking_text: str) -> Dict[str, str]:
         """Parse the Uploaded Files tab to get already-uploaded Gemini file URIs"""
         tracking = {}
-        for line in tracking_text.strip().split('\n'):
+        lines = tracking_text.strip().split('\n')
+        print(f"DEBUG: Parsing uploaded tracking, found {len(lines)} lines")
+        for line in lines:
             if '|' in line:
                 parts = line.split('|')
                 if len(parts) >= 2:
                     drive_id = parts[0].strip()
                     gemini_uri = parts[1].strip()
-                    tracking[drive_id] = gemini_uri
-                    print(f"DEBUG: Found tracked file: {drive_id} -> {gemini_uri}")
+                    if drive_id and gemini_uri:  # Only add non-empty entries
+                        tracking[drive_id] = gemini_uri
+                        print(f"DEBUG: Tracked: '{drive_id[:50]}...' -> '{gemini_uri[:50]}...'")
+        print(f"DEBUG: Total tracked entries: {len(tracking)}")
         return tracking
 
     @staticmethod
