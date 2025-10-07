@@ -209,10 +209,15 @@ def process_task(doc_id: str):
         elif streaming_enabled:
             # Use streaming API without chat
             print(f"DEBUG: Using streaming output (no chat)")
-            response_stream = client.models.generate_content_stream(
-                model=model_name,
-                contents=content_parts
-            )
+            generate_config = {
+                'model': model_name,
+                'contents': content_parts
+            }
+            system_prompt = config.get('system_prompt')
+            if system_prompt:
+                generate_config['system_instruction'] = system_prompt
+
+            response_stream = client.models.generate_content_stream(**generate_config)
 
             # Use progressive document writer
             result_text, total_length = StreamingDocumentWriter.write_streaming(
@@ -235,10 +240,15 @@ def process_task(doc_id: str):
         else:
             # Use non-streaming API without chat
             print(f"DEBUG: Using non-streaming output (no chat)")
-            response = client.models.generate_content(
-                model=model_name,
-                contents=content_parts
-            )
+            generate_config = {
+                'model': model_name,
+                'contents': content_parts
+            }
+            system_prompt = config.get('system_prompt')
+            if system_prompt:
+                generate_config['system_instruction'] = system_prompt
+
+            response = client.models.generate_content(**generate_config)
             result_text = response.text
 
             print(f"DEBUG: Gemini output ({len(result_text)} chars)")
