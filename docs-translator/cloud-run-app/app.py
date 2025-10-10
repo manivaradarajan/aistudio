@@ -5,6 +5,7 @@ Session-based OAuth for Google Docs integration with Gemini API
 import os
 from flask import Flask, jsonify, redirect, request, session, url_for
 from google import genai
+from google.genai import types
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
@@ -97,16 +98,17 @@ def process_task(doc_id: str):
 
         prompt_text = PromptBuilder.build(config)
 
-        # Handle file uploads
+        # Handle file uploads and URL processing
         already_uploaded = DocumentParser.parse_uploaded_tracking(
             config.get('uploaded_files_tracking', '')
         )
 
         gemini_files = []
+        webpage_urls = []
         new_uploads = []
         if config.get('input_files'):
             try:
-                gemini_files, new_uploads = FileUploader.upload_files(
+                gemini_files, webpage_urls, new_uploads = FileUploader.upload_files(
                     config['input_files'],
                     already_uploaded,
                     drive_service
@@ -117,13 +119,13 @@ def process_task(doc_id: str):
                         docs_service, doc_id, new_uploads, doc
                     )
             except Exception as e:
-                print(f"ERROR: File upload failed: {str(e)}")
+                print(f"ERROR: File/URL processing failed: {str(e)}")
                 import traceback
                 print(traceback.format_exc())
-                return jsonify({'error': f'File upload failed: {str(e)}'}), 500
+                return jsonify({'error': f'File/URL processing failed: {str(e)}'}), 500
 
-        # Build content list (prompt + files)
-        content_parts = [prompt_text] + gemini_files
+        # Build content list (prompt + files + urls)
+        content_parts = [prompt_text] + gemini_files + webpage_urls
 
         model_name = config.get('gemini_model', GEMINI_MODEL)
         streaming_enabled = config.get('streaming_output', True)
@@ -131,11 +133,16 @@ def process_task(doc_id: str):
         use_chat_api = config.get('use_context', False)
 
         print(f"DEBUG: Sending to Gemini: {len(content_parts)} items "
-              f"({len(gemini_files)} files), model: {model_name}, "
+              f"({len(gemini_files)} files, {len(webpage_urls)} urls), model: {model_name}, "
               f"streaming: {streaming_enabled}, chat: {use_chat_api}")
 
-        # Initialize the model
-        model = genai.GenerativeModel(model_name, system_instruction=system_prompt)
+        # Initialize the model with UrlContext tool if needed
+        tools = [types.Tool(url_context=types.UrlContext())] if webpage_urls else None
+        model = genai.GenerativeModel(
+            model_name,
+            system_instruction=system_prompt,
+            tools=tools
+        )
 
         # Handle chat vs. single-turn
         if use_chat_api:
@@ -155,11 +162,10 @@ def process_task(doc_id: str):
                 print(f"DEBUG: Chat streaming complete. Total length: {total_length} chars")
             else:
                 print("DEBUG: Using chat API without streaming")
-                # Handle potential empty response
                 try:
                     result_text = response.text
                 except ValueError:
-                    result_text = "" # Or handle error appropriately
+                    result_text = ""
                 total_length = len(result_text)
                 print(f"DEBUG: Chat output ({total_length} chars)")
 

@@ -12,8 +12,6 @@ from google import genai
 from googleapiclient.http import MediaIoBaseDownload
 import requests
 
-from .webpage_extractor import WebpageExtractor
-
 
 class FileUploader:
     """Handles file upload operations to Gemini"""
@@ -54,16 +52,19 @@ class FileUploader:
 
     @staticmethod
     def upload_files(file_urls: List[str], already_uploaded: Dict[str, str],
-                    drive_service) -> Tuple[List, List[Dict]]:
+                    drive_service) -> Tuple[List, List[str], List[Dict]]:
         """
         Process URLs - handle Google Drive files, downloadable files, and webpages.
+        Webpages are not uploaded but returned as a separate list for the UrlContext tool.
 
         Returns:
-            Tuple of (gemini_files, new_uploads) where:
-            - gemini_files: List of uploaded file objects
-            - new_uploads: List of upload info dicts for tracking
+            Tuple of (gemini_files, webpage_urls, new_uploads) where:
+            - gemini_files: List of uploaded file objects for non-webpage files
+            - webpage_urls: List of strings for webpage URLs to be handled by UrlContext
+            - new_uploads: List of upload info dicts for tracking newly uploaded files
         """
         gemini_files = []
+        webpage_urls = []
         new_uploads = []
 
         print(f"DEBUG: already_uploaded dict contains {len(already_uploaded)} entries:")
@@ -87,7 +88,6 @@ class FileUploader:
                     try:
                         gemini_file = genai.get_file(name=gemini_uri)
                         gemini_files.append(gemini_file)
-                        # Don't add to new_uploads since it's already tracked
                         continue
                     except Exception as e:
                         print(f"DEBUG: Error retrieving existing file {gemini_uri}, "
@@ -107,26 +107,9 @@ class FileUploader:
                     raise
 
             elif FileUploader.is_webpage_url(url):
-                # Handle webpage URL
-                print(f"DEBUG: Detected webpage URL, extracting content")
-                print(f"DEBUG: Checking if '{url}' is in already_uploaded: {url in already_uploaded}")
-                if url in already_uploaded:
-                    print(f"DEBUG: URL found in tracking, should reuse existing upload")
-                else:
-                    print(f"DEBUG: URL NOT found in tracking, will process as new")
-                try:
-                    gemini_file, upload_info = FileUploader._process_webpage(
-                        url, already_uploaded
-                    )
-                    gemini_files.append(gemini_file)
-                    # Only add to new_uploads if this is actually a new upload
-                    if upload_info is not None:
-                        new_uploads.append(upload_info)
-                except Exception as e:
-                    print(f"ERROR: Error processing webpage {url}: {str(e)}")
-                    import traceback
-                    print(traceback.format_exc())
-                    raise
+                # Handle webpage URL by adding it to a list for the UrlContext tool
+                print(f"DEBUG: Detected webpage URL for UrlContext tool: {url}")
+                webpage_urls.append(url)
 
             else:
                 # Handle downloadable file URL
@@ -145,7 +128,7 @@ class FileUploader:
                     print(traceback.format_exc())
                     raise
 
-        return gemini_files, new_uploads
+        return gemini_files, webpage_urls, new_uploads
 
     @staticmethod
     def _process_new_file(file_id: str, drive_service) -> Tuple:
@@ -201,70 +184,9 @@ class FileUploader:
                 print(f"WARNING: Could not delete temp file: {e}")
 
     @staticmethod
-    def _process_webpage(url: str, already_uploaded: Dict[str, str]) -> Tuple:
-        """
-        Extract webpage content as Markdown and upload to Gemini.
-
-        Args:
-            url: The webpage URL
-            already_uploaded: Dict of already uploaded URLs
-
-        Returns:
-            Tuple of (gemini_file, upload_info or None)
-            upload_info is None when reusing an existing upload
-        """
-        # Check if already uploaded
-        if url in already_uploaded:
-            gemini_uri = already_uploaded[url]
-            print(f"DEBUG: Webpage already uploaded, using existing: {gemini_uri}")
-            try:
-                gemini_file = genai.get_file(name=gemini_uri)
-                # Return None as upload_info to indicate this is not a new upload
-                return gemini_file, None
-            except Exception as e:
-                print(f"DEBUG: Error retrieving existing webpage {gemini_uri}, "
-                      f"will re-fetch: {str(e)}")
-
-        # Extract webpage content as Markdown
-        print(f"DEBUG: Extracting content from webpage: {url}")
-        markdown_content = WebpageExtractor.get_webpage_content(url)
-
-        # Create a temp file with the markdown content
-        parsed_url = urlparse(url)
-        filename = f"webpage_{parsed_url.netloc.replace('.', '_')}.md"
-
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.md', encoding='utf-8') as temp_file:
-            temp_file.write(markdown_content)
-            temp_path = temp_file.name
-
-        try:
-            # Upload to Gemini
-            print(f"DEBUG: Uploading webpage content to Gemini: {filename}")
-            gemini_file = genai.upload_file(path=temp_path, display_name=filename)
-
-            print(f"DEBUG: Successfully uploaded webpage to Gemini: {gemini_file.name} "
-                  f"(state: {gemini_file.state})")
-
-            upload_info = {
-                'drive_id': url,
-                'gemini_uri': gemini_file.name,
-                'display_name': gemini_file.display_name
-            }
-
-            return gemini_file, upload_info
-
-        finally:
-            # Clean up temp file
-            try:
-                os.unlink(temp_path)
-                print(f"DEBUG: Cleaned up temp file")
-            except Exception as e:
-                print(f"WARNING: Could not delete temp file: {e}")
-
-    @staticmethod
     def _process_downloadable_file(url: str, already_uploaded: Dict[str, str]) -> Tuple:
         """
-        Download a file from arbitrary URL and upload to Gemini.
+        Download a file from an arbitrary URL and upload to Gemini.
 
         Args:
             url: The file URL
