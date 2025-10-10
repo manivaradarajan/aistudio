@@ -5,7 +5,6 @@ Session-based OAuth for Google Docs integration with Gemini API
 import os
 from flask import Flask, jsonify, redirect, request, session, url_for
 from google import genai
-from google.genai import types
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
@@ -14,13 +13,16 @@ from src.auth import OAuthHandler
 from src.document_parser import DocumentParser
 from src.document_writer import DocumentWriter, StreamingDocumentWriter
 from src.file_uploader import FileUploader
-from src.gemini_client import GeminiClientManager
+from src.gemini_client import configure_gemini
 from src.prompt_builder import PromptBuilder
 
 
 # Flask Configuration
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
+
+# Configure Gemini at startup
+configure_gemini()
 
 
 # Flask Routes
@@ -121,74 +123,48 @@ def process_task(doc_id: str):
                 return jsonify({'error': f'File upload failed: {str(e)}'}), 500
 
         # Build content list (prompt + files)
-        content_parts = [prompt_text]
-        for gfile in gemini_files:
-            content_parts.append(
-                types.Part.from_uri(file_uri=gfile.uri, mime_type=gfile.mime_type)
-            )
+        content_parts = [prompt_text] + gemini_files
 
         model_name = config.get('gemini_model', GEMINI_MODEL)
         streaming_enabled = config.get('streaming_output', True)
+        system_prompt = config.get('system_prompt')
+        use_chat_api = config.get('use_context', False)
 
         print(f"DEBUG: Sending to Gemini: {len(content_parts)} items "
-              f"(1 text prompt + {len(gemini_files)} files), model: {model_name}, "
-              f"streaming: {streaming_enabled}")
+              f"({len(gemini_files)} files), model: {model_name}, "
+              f"streaming: {streaming_enabled}, chat: {use_chat_api}")
 
-        # Call Gemini API
-        client = GeminiClientManager.get_client()
+        # Initialize the model
+        model = genai.GenerativeModel(model_name, system_instruction=system_prompt)
 
-        # Check if we should use chat API with history
-        use_chat_api = config.get('use_context', False)
-        chat_history = []
-
+        # Handle chat vs. single-turn
         if use_chat_api:
-            # Parse context history into structured format
             chat_history = DocumentParser.parse_context_history(
                 config.get('context_history', '')
             )
             print(f"DEBUG: Using chat API with {len(chat_history)} history entries")
-
-            # Use chat API with history
-            # Extract system prompt for chat API
-            system_prompt = config.get('system_prompt')
-
-            # Create chat session with history & system prompt
-            chat_config = {
-                'model': model_name,
-                'history': chat_history
-            }
-            if system_prompt:
-                chat_config['system_instruction'] = system_prompt
-
-            chat = client.chats.create(**chat_config)
+            chat = model.start_chat(history=chat_history)
+            response = chat.send_message(content_parts, stream=streaming_enabled)
 
             if streaming_enabled:
-                print(f"DEBUG: Using chat API with streaming")
-                # Send message with streaming
-                response_stream = chat.send_message_stream(content_parts)
-
+                print("DEBUG: Using chat API with streaming")
                 result_text, total_length = StreamingDocumentWriter.write_streaming(
-                    docs_service,
-                    doc_id,
-                    doc,
-                    response_stream,
+                    docs_service, doc_id, doc, response,
                     output_markdown=config.get('output_markdown', False)
                 )
-
                 print(f"DEBUG: Chat streaming complete. Total length: {total_length} chars")
             else:
-                print(f"DEBUG: Using chat API without streaming")
-                # Send message without streaming
-                response = chat.send_message(content_parts)
-                result_text = response.text
-
-                print(f"DEBUG: Chat output ({len(result_text)} chars)")
+                print("DEBUG: Using chat API without streaming")
+                # Handle potential empty response
+                try:
+                    result_text = response.text
+                except ValueError:
+                    result_text = "" # Or handle error appropriately
+                total_length = len(result_text)
+                print(f"DEBUG: Chat output ({total_length} chars)")
 
                 DocumentWriter.write_output(
-                    docs_service,
-                    doc_id,
-                    result_text,
-                    doc,
+                    docs_service, doc_id, result_text, doc,
                     output_markdown=config.get('output_markdown', False)
                 )
 
@@ -200,74 +176,43 @@ def process_task(doc_id: str):
             return jsonify({
                 'status': 'success',
                 'doc_id': doc_id,
-                'result_length': len(result_text) if not streaming_enabled else total_length,
+                'result_length': total_length,
                 'output_format': 'markdown' if config.get('output_markdown') else 'formatted',
                 'streaming': streaming_enabled,
                 'chat_mode': True
             })
+        else:
+            # Single-turn generation
+            response = model.generate_content(content_parts, stream=streaming_enabled)
 
-        elif streaming_enabled:
-            # Use streaming API without chat
-            print(f"DEBUG: Using streaming output (no chat)")
-            generate_config = {
-                'model': model_name,
-                'contents': content_parts
-            }
-            system_prompt = config.get('system_prompt')
-            if system_prompt:
-                generate_config['system_instruction'] = system_prompt
+            if streaming_enabled:
+                print("DEBUG: Using streaming output (no chat)")
+                result_text, total_length = StreamingDocumentWriter.write_streaming(
+                    docs_service, doc_id, doc, response,
+                    output_markdown=config.get('output_markdown', False)
+                )
+                print(f"DEBUG: Streaming write complete. Total length: {total_length} chars")
+            else:
+                print("DEBUG: Using non-streaming output (no chat)")
+                try:
+                    result_text = response.text
+                except ValueError:
+                    result_text = ""
+                total_length = len(result_text)
+                print(f"DEBUG: Gemini output ({total_length} chars)")
 
-            response_stream = client.models.generate_content_stream(**generate_config)
-
-            # Use progressive document writer
-            result_text, total_length = StreamingDocumentWriter.write_streaming(
-                docs_service,
-                doc_id,
-                doc,
-                response_stream,
-                output_markdown=config.get('output_markdown', False)
-            )
-
-            print(f"DEBUG: Streaming write complete. Total length: {total_length} chars")
+                DocumentWriter.write_output(
+                    docs_service, doc_id, result_text, doc,
+                    output_markdown=config.get('output_markdown', False)
+                )
 
             return jsonify({
                 'status': 'success',
                 'doc_id': doc_id,
                 'result_length': total_length,
                 'output_format': 'markdown' if config.get('output_markdown') else 'formatted',
-                'streaming': True
-            })
-        else:
-            # Use non-streaming API without chat
-            print(f"DEBUG: Using non-streaming output (no chat)")
-            generate_config = {
-                'model': model_name,
-                'contents': content_parts
-            }
-            system_prompt = config.get('system_prompt')
-            if system_prompt:
-                generate_config['system_instruction'] = system_prompt
-
-            response = client.models.generate_content(**generate_config)
-            result_text = response.text
-
-            print(f"DEBUG: Gemini output ({len(result_text)} chars)")
-
-            # Write results to document
-            DocumentWriter.write_output(
-                docs_service,
-                doc_id,
-                result_text,
-                doc,
-                output_markdown=config.get('output_markdown', False)
-            )
-
-            return jsonify({
-                'status': 'success',
-                'doc_id': doc_id,
-                'result_length': len(result_text),
-                'output_format': 'markdown' if config.get('output_markdown') else 'formatted',
-                'streaming': False
+                'streaming': streaming_enabled,
+                'chat_mode': False
             })
 
     except Exception as e:

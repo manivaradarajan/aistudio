@@ -5,14 +5,13 @@ import io
 import os
 import re
 import tempfile
-import time
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
+from google import genai
 from googleapiclient.http import MediaIoBaseDownload
 import requests
 
-from .gemini_client import GeminiClientManager
 from .webpage_extractor import WebpageExtractor
 
 
@@ -66,7 +65,6 @@ class FileUploader:
         """
         gemini_files = []
         new_uploads = []
-        client = GeminiClientManager.get_client()
 
         print(f"DEBUG: already_uploaded dict contains {len(already_uploaded)} entries:")
         for key, value in already_uploaded.items():
@@ -87,7 +85,7 @@ class FileUploader:
                     gemini_uri = already_uploaded[file_id]
                     print(f"DEBUG: Drive file already uploaded, using existing: {gemini_uri}")
                     try:
-                        gemini_file = client.files.get(name=gemini_uri)
+                        gemini_file = genai.get_file(name=gemini_uri)
                         gemini_files.append(gemini_file)
                         # Don't add to new_uploads since it's already tracked
                         continue
@@ -98,7 +96,7 @@ class FileUploader:
                 # Download and upload new file from Drive
                 try:
                     gemini_file, upload_info = FileUploader._process_new_file(
-                        file_id, drive_service, client
+                        file_id, drive_service
                     )
                     gemini_files.append(gemini_file)
                     new_uploads.append(upload_info)
@@ -118,7 +116,7 @@ class FileUploader:
                     print(f"DEBUG: URL NOT found in tracking, will process as new")
                 try:
                     gemini_file, upload_info = FileUploader._process_webpage(
-                        url, already_uploaded, client
+                        url, already_uploaded
                     )
                     gemini_files.append(gemini_file)
                     # Only add to new_uploads if this is actually a new upload
@@ -135,7 +133,7 @@ class FileUploader:
                 print(f"DEBUG: Detected downloadable file URL")
                 try:
                     gemini_file, upload_info = FileUploader._process_downloadable_file(
-                        url, already_uploaded, client
+                        url, already_uploaded
                     )
                     gemini_files.append(gemini_file)
                     # Only add to new_uploads if this is actually a new upload
@@ -150,7 +148,7 @@ class FileUploader:
         return gemini_files, new_uploads
 
     @staticmethod
-    def _process_new_file(file_id: str, drive_service, client) -> Tuple:
+    def _process_new_file(file_id: str, drive_service) -> Tuple:
         """Download from Drive and upload to Gemini"""
         # Get file metadata
         file_metadata = drive_service.files().get(
@@ -173,25 +171,15 @@ class FileUploader:
         file_content.seek(0)
         print(f"DEBUG: Downloaded file to memory, uploading to Gemini: {file_name}")
 
-        # Write to temp file for upload (Gemini SDK requires file path)
+        # Write to temp file for upload
         with tempfile.NamedTemporaryFile(delete=False, suffix=f'_{file_name}') as temp_file:
             temp_file.write(file_content.read())
             temp_path = temp_file.name
 
         try:
-            # Upload to Gemini
+            # Upload to Gemini (this is now a synchronous call)
             print(f"DEBUG: Uploading to Gemini from temp file: {temp_path}")
-            gemini_file = client.files.upload(file=temp_path)
-
-            # Wait for file to be processed
-            print(f"DEBUG: Waiting for Gemini to process file...")
-            while gemini_file.state == 'PROCESSING':
-                print(f"DEBUG: File state: {gemini_file.state}")
-                time.sleep(2)
-                gemini_file = client.files.get(name=gemini_file.name)
-
-            if gemini_file.state == 'FAILED':
-                raise Exception(f"Gemini file processing failed: {gemini_file.state}")
+            gemini_file = genai.upload_file(path=temp_path, display_name=file_name)
 
             print(f"DEBUG: Successfully uploaded to Gemini: {gemini_file.name} "
                   f"(state: {gemini_file.state})")
@@ -213,28 +201,24 @@ class FileUploader:
                 print(f"WARNING: Could not delete temp file: {e}")
 
     @staticmethod
-    def _process_webpage(url: str, already_uploaded: Dict[str, str], client) -> Tuple:
+    def _process_webpage(url: str, already_uploaded: Dict[str, str]) -> Tuple:
         """
         Extract webpage content as Markdown and upload to Gemini.
 
         Args:
             url: The webpage URL
             already_uploaded: Dict of already uploaded URLs
-            client: Gemini client
 
         Returns:
             Tuple of (gemini_file, upload_info or None)
             upload_info is None when reusing an existing upload
         """
-        # Create a URL-based identifier for tracking
-        url_hash = str(hash(url))
-
         # Check if already uploaded
         if url in already_uploaded:
             gemini_uri = already_uploaded[url]
             print(f"DEBUG: Webpage already uploaded, using existing: {gemini_uri}")
             try:
-                gemini_file = client.files.get(name=gemini_uri)
+                gemini_file = genai.get_file(name=gemini_uri)
                 # Return None as upload_info to indicate this is not a new upload
                 return gemini_file, None
             except Exception as e:
@@ -256,17 +240,7 @@ class FileUploader:
         try:
             # Upload to Gemini
             print(f"DEBUG: Uploading webpage content to Gemini: {filename}")
-            gemini_file = client.files.upload(file=temp_path, config={'display_name': filename})
-
-            # Wait for file to be processed
-            print(f"DEBUG: Waiting for Gemini to process file...")
-            while gemini_file.state == 'PROCESSING':
-                print(f"DEBUG: File state: {gemini_file.state}")
-                time.sleep(2)
-                gemini_file = client.files.get(name=gemini_file.name)
-
-            if gemini_file.state == 'FAILED':
-                raise Exception(f"Gemini file processing failed: {gemini_file.state}")
+            gemini_file = genai.upload_file(path=temp_path, display_name=filename)
 
             print(f"DEBUG: Successfully uploaded webpage to Gemini: {gemini_file.name} "
                   f"(state: {gemini_file.state})")
@@ -288,14 +262,13 @@ class FileUploader:
                 print(f"WARNING: Could not delete temp file: {e}")
 
     @staticmethod
-    def _process_downloadable_file(url: str, already_uploaded: Dict[str, str], client) -> Tuple:
+    def _process_downloadable_file(url: str, already_uploaded: Dict[str, str]) -> Tuple:
         """
         Download a file from arbitrary URL and upload to Gemini.
 
         Args:
             url: The file URL
             already_uploaded: Dict of already uploaded URLs
-            client: Gemini client
 
         Returns:
             Tuple of (gemini_file, upload_info or None)
@@ -306,7 +279,7 @@ class FileUploader:
             gemini_uri = already_uploaded[url]
             print(f"DEBUG: File already uploaded, using existing: {gemini_uri}")
             try:
-                gemini_file = client.files.get(name=gemini_uri)
+                gemini_file = genai.get_file(name=gemini_uri)
                 # Return None as upload_info to indicate this is not a new upload
                 return gemini_file, None
             except Exception as e:
@@ -337,17 +310,7 @@ class FileUploader:
         try:
             # Upload to Gemini
             print(f"DEBUG: Uploading downloaded file to Gemini: {filename}")
-            gemini_file = client.files.upload(file=temp_path)
-
-            # Wait for file to be processed
-            print(f"DEBUG: Waiting for Gemini to process file...")
-            while gemini_file.state == 'PROCESSING':
-                print(f"DEBUG: File state: {gemini_file.state}")
-                time.sleep(2)
-                gemini_file = client.files.get(name=gemini_file.name)
-
-            if gemini_file.state == 'FAILED':
-                raise Exception(f"Gemini file processing failed: {gemini_file.state}")
+            gemini_file = genai.upload_file(path=temp_path, display_name=filename)
 
             print(f"DEBUG: Successfully uploaded file to Gemini: {gemini_file.name} "
                   f"(state: {gemini_file.state})")
