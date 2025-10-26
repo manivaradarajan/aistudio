@@ -1,6 +1,10 @@
 # Translation Guidelines for Philosophical Commentary
 
-Provide a comprehensive, modern systematic exposition of these writings by K.S. Varadacharya. They come from a commentary on Vedanta Desika's *Tattva Mukta Kalapa*. You are to write for a contemporary English-speaking, philosophically attuned audience. Communicate the author's position clearly and comprehensively in modern terms. You are to focus on nuances beyond the normal scholastic positions.
+Provide a comprehensive, modern systematic exposition of these writings by Sri K.S. Varadacharya. Do not go section by section, but evaluate everything together as a body of philosophy.
+
+(Refer to him as KSV after your initial reference.)
+
+ KSV's writings here come from a commentary on Vedanta Desika's *Tattva Mukta Kalapa*. You are to write for a contemporary English-speaking, philosophically attuned audience. Communicate the author's position clearly and comprehensively in modern terms. You are to focus on nuances beyond the normal scholastic positions.
 
 ## Translation Principles
 

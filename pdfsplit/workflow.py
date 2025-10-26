@@ -4,9 +4,13 @@ import os
 import logging
 from pathlib import Path
 import sys
+import time
+import threading
+import itertools
 from typing import Dict, Any, List, Union
 
 import google.generativeai as genai
+from google.api_core import exceptions
 
 from aksharamukha import transliterate
 from dotenv import load_dotenv
@@ -21,6 +25,35 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 OUTPUT_DIR = Path("output")
+
+
+# --- Spinner Class ---
+class Spinner:
+    def __init__(self, message="Processing..."):
+        self.spinner_cycle = itertools.cycle(["-", "\\", "|", "/"])
+        self.delay = 0.1
+        self.running = False
+        self.spinner_thread = None
+        self.message = message
+
+    def _spinner_task(self):
+        while self.running:
+            sys.stdout.write(f"\r{next(self.spinner_cycle)} {self.message}")
+            sys.stdout.flush()
+            time.sleep(self.delay)
+        sys.stdout.write("\r" + " " * (len(self.message) + 3) + "\r") # Clear spinner
+        sys.stdout.flush()
+
+    def start(self):
+        self.running = True
+        self.spinner_thread = threading.Thread(target=self._spinner_task)
+        self.spinner_thread.daemon = True
+        self.spinner_thread.start()
+
+    def stop(self):
+        self.running = False
+        if self.spinner_thread and self.spinner_thread.is_alive():
+            self.spinner_thread.join()
 
 
 # --- Helper Functions ---
@@ -92,17 +125,24 @@ def handle_extract_text_step(step: Dict, config: Dict, prefix: str, input_pdf: P
     
     if is_stale(output_path, [input_pdf, prompt_path], force):
         logging.info(f"Uploading '{input_pdf.name}' and generating text with '{prompt_path.name}'.")
-        try:
-            model = genai.GenerativeModel(config['model'])
-            file_handle = genai.upload_file(path=str(input_pdf))
-            context['initial_file_handle'] = file_handle
-            logging.info(f"File uploaded successfully. Context handle stored.")
-            response = model.generate_content([prompt_path.read_text(encoding='utf-8'), file_handle])
-            output_path.write_text(response.text, encoding='utf-8')
-            logging.info(f"--> Saved output to: {output_path}")
-        except Exception as e:
-            logging.error(f"Gemini API call failed: {e}")
-            raise
+        model = genai.GenerativeModel(config['model'])
+        file_handle = genai.upload_file(path=str(input_pdf))
+        context['initial_file_handle'] = file_handle
+        logging.info(f"File uploaded successfully. Context handle stored.")
+        
+        while True:
+            try:
+                response = model.generate_content([prompt_path.read_text(encoding='utf-8'), file_handle])
+                output_path.write_text(response.text, encoding='utf-8')
+                logging.info(f"--> Saved output to: {output_path}")
+                break
+            except exceptions.ResourceExhausted as e:
+                delay = e.retry_delay if hasattr(e, 'retry_delay') else 30
+                logging.warning(f"Gemini API quota exceeded. Retrying in {delay} seconds... Error: {e}")
+                time.sleep(delay)
+            except Exception as e:
+                logging.error(f"An unexpected error occurred during Gemini API call: {e}")
+                raise
     else:
         logging.info(f"Skipping step. Using cached file: {output_path}")
     return output_path
@@ -168,9 +208,19 @@ def handle_chat_step(step: Dict, config: Dict, prefix: str, input_path: Path, co
                 message_parts.append(context['initial_file_handle'])
 
             logging.info(f"Sending prompt '{turn_prompt_path.name}' to chat session.")
-            response = chat_session.send_message(message_parts)
-            output_path.write_text(response.text, encoding='utf-8')
-            logging.info(f"--> Saved turn output to: {output_path}")
+            while True:
+                try:
+                    response = chat_session.send_message(message_parts)
+                    output_path.write_text(response.text, encoding='utf-8')
+                    logging.info(f"--> Saved turn output to: {output_path}")
+                    break
+                except exceptions.ResourceExhausted as e:
+                    delay = e.retry_delay if hasattr(e, 'retry_delay') else 30
+                    logging.warning(f"Gemini API quota exceeded. Retrying in {delay} seconds... Error: {e}")
+                    time.sleep(delay)
+                except Exception as e:
+                    logging.error(f"An unexpected error occurred during Gemini API call: {e}")
+                    raise
         else:
             logging.info(f"Skipping turn. Using cached file: {output_path}")
         
