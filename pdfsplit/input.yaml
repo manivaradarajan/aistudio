@@ -1,0 +1,65 @@
+# === Global Configuration ===
+# These settings apply to the entire run.
+
+pdf_file: tmk-sarvankasa.pdf
+
+# The Gemini model to use for all generative steps.
+model: gemini-2.5-pro
+
+# === Page Ranges ===
+# A list of sections to extract from the PDF. Each item is processed by the full workflow below.
+page_ranges:
+  # The dictionary format allows for adding a custom suffix to all generated filenames.
+  - page_range: 50-51
+    suffix: vastuni-vikalpa-ayogaat
+  - page_range: 56-58
+    suffix: dravya-adravya-vibhaga
+  - page_range: 94-96
+    suffix: upadana-upadeya-abheda
+  - page_range: 178-181
+    suffix: sarire-aham-pratyaya
+  - page_range: 185-199
+    suffix: dharma-dharmi-jnanayoh-svarupam
+  - page_range: 199-203
+    suffix: atmanah-jnana-svaruptvam
+  - page_range: 206-210
+    suffix: atmanah-pratyaktvam
+  - page_range: 217-223
+    suffix: bhaskara-mata-nirasa
+  - page_range: 360-364
+    suffix: muktasya-sarvam-anukulam
+  - page_range: 467-478
+    suffix: ekasyaiva-nimittopadanatvam
+  - page_range: 478-482
+    suffix: brahmanah-saviseshatvam-sarva-sammatam
+  # The simple string format can be used if no custom suffix is needed.
+  # - '26'
+
+# === Dynamic Workflow Definition ===
+# Defines the sequence of steps to run for each page range.
+# The output of one step automatically becomes the input for the next.
+workflow:
+  # Step 1: Extract text from the split PDF using Gemini's OCR capabilities.
+  - type: extract_text_from_pdf
+    prompt: prompt-transcribe.txt
+    output_suffix: transcribe
+
+  # Step 2: Convert the script from one writing system to another.
+  - type: convert_script
+    from: "Devanagari"
+    to: "IAST"
+    output_suffix: roman
+
+  # Step 3: Begin a stateful, multi-turn chat session with the model.
+  - type: chat
+    turns:
+      # Turn 1: The model receives the input from the previous step (roman text)
+      # and the file context from the initial PDF extraction.
+      - prompt: prompt.txt
+        output_suffix: "" # An empty suffix is recommended for clarity
+        output_extension: ".md"
+
+      # Turn 2: This turn maintains the full context of the conversation.
+      - prompt: prompt-modern.txt
+        output_suffix: "modern"
+        output_extension: ".md"

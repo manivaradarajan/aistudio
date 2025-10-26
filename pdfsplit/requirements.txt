@@ -1,0 +1,5 @@
+PyYAML
+pypdf
+google-generativeai
+aksharamukha
+python-dotenv

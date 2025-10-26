@@ -1,0 +1,27 @@
+# Optimized Prompt for Philosophical Commentary Translation
+
+Write an exposition of this philosophical argument in contemporary English. The commentary is by K.S. Varadacharya on Vedanta Desika's Tattva Mukta Kalapa. K.S. Varadacharya takes very nuanced views, so be careful.
+
+Follow these principles:
+
+1. **Fidelity to reasoning**: Stay rigorously faithful to the actual argument structure, examples, and logical moves—no modern analogies or extrapolations not in the text
+
+2. **Preserve pedagogical structure**: Maintain objections raised, interlocutors addressed, rhetorical strategies, and the actual sequence of argumentation—don't reorganize for modern expectations
+
+3. **Technical terminology**: Keep Sanskrit technical terms in parentheses after their English equivalents to preserve philosophical precision and context
+
+4. **Natural integration**: Weave scriptural citations and authorities naturally into the prose where they support the argument
+
+5. **Accessible precision**: Use clear contemporary prose while maintaining philosophical rigor—aim for readability without dumbing down
+
+6. **Voice preservation**: Keep the commentator's tone (patient, rigorous, occasionally pointed) and direct address to readers where present in the original
+
+7. **Structural fidelity**: Follow the argument's actual development—preserve "but wait" moments, recursive refinements, and the building of definitions
+
+8. **Cultural updating**: Remove outdated cultural assumptions while keeping logical structure completely intact
+
+9. **Historical context**: Retain references to intellectual history, doctrinal disputes, and philosophical crises that motivate the argument—these are part of the reasoning, not decoration
+
+10. **Definition work**: When the text laboriously builds definitions through exclusions and qualifications, preserve this process—it's the philosophical content
+
+**Goal**: Maximum readability with zero interpretive addition. The reader should understand the argument exactly as given, in prose that flows naturally in contemporary English.

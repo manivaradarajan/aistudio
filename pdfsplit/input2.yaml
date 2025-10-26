@@ -1,0 +1,29 @@
+# This workflow runs once and does not depend on a specific page range.
+# It gathers existing files from the 'output' directory to create a summary.
+
+# A source PDF is still formally required by the script, but it is not used in this workflow.
+pdf_file: "tmk-sarvankasa.pdf"
+
+# The Gemini model to be used.
+model: "gemini-2.5-pro"
+
+# --- Global Summary Workflow ---
+workflow:
+  # This workflow starts with a chat step that has no initial text input.
+  # Its context comes entirely from the fileset.
+  - type: chat
+    turns:
+      - prompt: "prompt-summarize-collection.txt"
+        output_suffix: "summary"
+        output_extension: ".md"
+        fileset:
+          # This flag tells the script to search the entire 'output' directory
+          # instead of scoping the search to the current prefix.
+          global_search: true
+          
+          # Define which files to include and exclude for the summary.
+          include:
+            - "*.md"
+          exclude:
+            - "*-modern.md"
+            - "*-summary.md"

@@ -1,0 +1,79 @@
+# Exposition of the Argument on Property-Possessor Relations
+
+## The Buddhist Objection to Qualifiers and Substances
+
+The Buddhist thinkers and those who follow them raise this challenge: In ordinary usage like "the ground with a pot on it," we recognize a qualifier-qualified relationship between the pot and ground. But in cases of inseparable existence (apṛthaksiddhi), this relationship cannot be articulated—there's no possessive suffix available in the grammar. The logic that applies to independently existing qualifiers cannot be transferred to inseparably existing ones. Therefore, in expressions like "blue pot," both terms must refer to an undifferentiated unity. Otherwise, we face an impossible choice: Is the blue entity qualified or unqualified? If qualified, is that qualifier itself qualified or unqualified? The first option leads to infinite regress; we must accept the second. Apply this reasoning to blue itself, and we conclude that all reality must be qualifier-free (nirviśeṣa). 
+
+Even in pots, potness (ghaṭatva) cannot be something additional to the pot. Even after traveling far down this road—like the maxim "even after eating garlic, the disease isn't cured"—if we must ultimately accept qualifier-free reality, let's accept it at the pot level itself, by Occam's razor. Otherwise infinite regress is unavoidable. Where inseparable existence obtains, the invariable co-cognition (sahopalaṃbhaniyama) proves non-difference. Talk of difference is merely conceptual, like "Rāhu's head."
+
+The first half-verse summarizes this objection: If a property (dharma) is property-less (nirdharma), how could it be subject to linguistic designation? Properties require a basis for verbal designation. If you say a property gains connection with another property, then that property too stands in such relation—and we have uncontrollable regress.
+
+## The Response: Self-and-Other-Differentiating Capacity
+
+But this objection misses the mark. How do we resolve the apparent dilemmas? Consider: Any property whatsoever, say potness, is indeed qualified (sadharma)—there is simply no such thing as an unqualified entity in the world. Of the two options "property-less or propertied?" the second is established fact. But how do we avoid infinite regress? Upon extremely fine analysis (atimathana), the self-and-other-differentiating capacity (svānyanirvāhakatva) of properties becomes evident.
+
+Here's what this means: If cowness (gotva), which exists inseparably with individual cows, were not mutually differentiated from horseness and other universals, everything would collapse into indistinguishability. All entities must be propertied. Yet this doesn't trigger infinite regress. In the usage "cows and horses," cowness and horseness appear as qualifiers of their respective substances. But cowness and horseness aren't merely distinguished from cows and horses—they are intrinsically distinguished from each other. If they weren't mutually differentiated, how could they serve to differentiate cows from horses?
+
+This yields a principle: universals (jāti), permanent delimiting properties (akhaṇḍopādhi), and the like appear in their own form (svarūpatas), while other entities appear only in some qualified form (kiṃcidrūpeṇa). In the cognition of cows, cowness itself—being different from horseness—also differentiates cows from horses. This is what's meant by "self-and-other-differentiating capacity." It's evident in all experience—how can it be denied?
+
+## The Issue of Abstraction: "Cowness" as a Term
+
+The objection persists: Fine for the word "cow," but what about the word "cowness" itself? Does it designate something qualified or unqualified? If unqualified, we prove qualifier-free entities exist. If qualified, infinite regress returns.
+
+The answer comes in the second half-verse: Even in abstraction-level usage (niṣkarṣaprayoga)—words that designate merely the property itself—cowness still designates something qualified. What is that qualifier? Cowness-ness (gotvātva). But doesn't that restart the regress? Only if cowness-ness is something additional to cowness. But it isn't. Cowness-ness is simply: "being present in all cows while absent from non-cows" (gaveterasamavetatve sati nikhilagosamavetavam). Thus all individual cow-instances appear as qualifiers within cowness. Cowness has cows as its qualifier; cows have cowness as their qualifier. Since these cognitions are distinct, there's no circular dependence.
+
+Therefore when either cowness or an individual cow is designated by its respective word, the entity is qualified in each case. No word designates an utterly qualifier-free entity. This is the meaning of "its qualified aspect" (tasya dharmī viśeṣaḥ)—the qualifier of cowness is the cow-individual itself, functioning as its differentiating property.
+
+## Addressing the Circularity Concern
+
+But wait: In cognition of cow-individuals, cowness appears as a qualifier. At that moment, cowness doesn't appear in the form "cowness-ness" but in its own form (svarūpatas), according to the previously stated principle. However, in cognition generated by the word "cowness"—where cowness is the qualificand—if we accept that cows appear as qualifiers, then cows cannot appear in their own form. We'd have to say cows appear through cowness. Then cowness would appear both as qualificand and as that which delimits its qualifier-hood. Isn't circular dependence unavoidable?
+
+The response: Since cow-individuals are infinite, their appearance as distinct individuals is impossible and unnecessary. Cognition can be fulfilled through cowness as located in a single cow-individual. A single individual's appearance as that particular individual doesn't require appearing through another property. The universal is needed only to cognize multiple individuals, not a single one. Cowness-ness—being "present in all cows while absent from non-cows"—is not something additional; it's merely an articulation of cowness's actual nature. There's no rule that reality must appear exactly as articulated. Therefore no infinite regress.
+
+Moreover, since this is a technical (śāstrīya) mode of discourse, even if it has the form of a tautology—like saying "support-ness is of the nature of support"—there's no defect, just as with conventional properties like "to-be-deposited-ness."
+
+## The Grounding Problem
+
+Another objection: In the usage "cowness exists in cows," for cowness to appear with cows as its locus, cows cannot appear in their own form but must appear through cowness being foregrounded. In that case, when cowness appears in that which possesses cowness, cowness appears at the locus-level—making cowness its own locus. Isn't this self-grounding unavoidable?
+
+Not so. The cow-individual appears precisely as that individual, as already explained, not through foregrounding cowness. Therefore this difficulty doesn't arise.
+
+This reveals that abstraction-level words (niṣkarṣakaśabda) are of two types: those whose primary intent is to designate the qualifier alone, and those whose primary intent is to designate the qualificand alone. In "cowness exists in cows," since multiple cow-individuals appear, and they cannot all appear as distinct individuals, must they appear through foregrounding cowness? No—individuals can appear as individuals through their very individuality. Alternatively, the cognition is fulfilled simply by cows appearing as designated by the word "cow." The meaning is: "cowness exists in what is designated by the word 'cow.'"
+
+## The Metaphysical Status of These Distinctions
+
+In actual fact, all worldly transactions—taking, leaving, and so forth—depend on individuals, never on the universal in isolation. This concern doesn't arise. Indeed, ordinary languages have no word that exclusively designates the universal. When grammarians say in sentences like "The Brahmin endowed with learning and discipline," "The cow is venerable," "The rice is excellent," that the words brahmin, cow, and rice are "universal-primary," they don't mean there's a universal apart from cowness. Just because there's no universal apart from cowness, must cowness itself not exist?
+
+Therefore even in technical discourse, the investigation should conclude with: "cowness-ness simply means being present in all cows while absent from non-cows." When grammarians say "no possessive suffix follows a word ending in the possessive suffix," they're right. Even for the word "cowness-ness," if we object "if cowness-ness were something additional to cowness, infinite regress would follow," this must be understood as a limiting objection (ārōpātmaka), not as describing actual reality. The same applies to support-ness being of the nature of what is supported.
+
+"The pot is on the ground"—this much is ordinary usage. "The pot is to-be-deposited"—this is technical discourse alone. When the word "deposited" itself isn't used in ordinary speech, what need to mention "to-be-deposited-ness" or "to-be-deposited-ness-ness"?
+
+## Against Abandoning Property-Possessor Relations
+
+Should we, from fear of relational incoherence, abandon even the property-possessor relation between pot and ground when we accept quality-qualified relations? The usage "pot-possessing ground" and "blue-formed pot" are equivalent. Words like "blue" designate both quality and qualified, not words like "form." Even the Veda says "he becomes blissful" (ānandī bhavati). Relational difficulties will be addressed in their proper context.
+
+Just because one word might be meaning-empty doesn't mean all words are meaning-empty—that way lies descent into nihilism (śūnyavāda).
+
+---
+
+## Historical and Dialectical Context
+
+This entire discussion addresses an objection raised by Buddhists based on their principle of invariable co-cognition (sahopalaṃbhaniyama): "Non-difference of blue and cognition-of-blue follows from invariable co-cognition"—to quote the Buddhist monk's formula. Very well—but is sound intrinsic to just that cognition? One might equally read: "Non-difference of blue and the word 'blue' follows from invariable co-cognition," where blue means the objective referent. Just as with cognition and object, so with object and word—non-difference arguments are equally rooted in invariable co-cognition. The same with quality and qualified. The conclusion is supposedly establishment, stability, and recognition.
+
+Similarly for soul and Brahman: Since their inseparability has its basis in part-whole relation, one could equally read: "Non-difference of individual soul and supreme soul follows from invariable co-cognition." Or universally: "Non-difference of inseparables follows from invariable co-cognition." Among investigators, invariable co-cognition caused by inseparability is the primary basis for divergent opinions rooted in differences of understanding.
+
+But co-existence contains difference within it—so no expectation of proving non-difference from invariable co-cognition should arise. The objection "If body and embodied soul are inseparable, shouldn't there be coordinate predication like 'blue pot' yielding 'I am human'?" is easily answered—that coordinate predication exists! "I am human" and similar coordinate recognitions are actual experience. If you call this metaphorical usage, examine it in the context of the soul's nature.
+
+If soul and Supreme are inseparable, shouldn't the Supreme appear when one cognizes "I"? Who says it doesn't? "I am Brahman"—this very cognition is authoritative. Therefore "I am Brahman" as direct experience makes natural sense in precisely this metaphysic of body-embodied relation (śarīraśārīribhāva), not in identity theories (svarūpaikyavāda). More on this later.
+
+The Vaibhāṣikas say: In the cognition "blue," blueness alone is the object, not substance. The Sāṃkhyas say: substance alone appears, not quality. Others say: substance qualified by blueness appears. In all these cases, the inseparability of quality and qualified is the foundation. Just so, from the inseparability of individual soul and Supreme Soul arise theories of difference, non-difference, and difference-cum-non-difference (bhedābheda).
+
+Moreover, the entailment goes only one way: where there's co-cognition, there's inseparability—not "where there's inseparability, there's co-cognition." Cognition depends on the assemblage of conditions. Gravity and similar properties are never co-cognized with substance. When the eye grasps a pot, taste and other properties aren't grasped by it. Therefore the objection fails.
+
+Wherever inseparability obtains, such dispute is entirely natural. Then what's the resolution? Inseparability requires both entities to exist. Therefore inseparability itself reveals both difference and co-cognition. The resolution is already established. Everything else is mere verbal proliferation. That's precisely why we aren't difference-cum-non-difference theorists (bhedābhedavādin). Keeping this in mind, the revered Commentators [Rāmānuja] extensively refuted the bhedābheda doctrine in the Reconciliation Chapter (Samanvayādhikaraṇa).
+
+This shows that the statement in the Compendium of All Philosophies (Sarvadarśanasaṃgraha)—"rejected to the level of the Nihilist position by attributing the three mutually contradictory positions of difference, etc."—is mere rhetorical flourish, rooted in failure to understand this doctrine's subtle nature. For all discerning persons, since authoritative transactions must necessarily be maintained, "what fault exceeds abandoning what's established in scripture?" See more in that text.
+
+---
+
+*Having thus stated and resolved another incoherence raised by Buddhists regarding qualifier-qualified relations and similar matters, and since the position accepting qualified entities (saviśeṣavāda) resolves into property-possessor relations (dharmadharmibhāva), the author addresses objections to property-possessor relations themselves through these verses.*

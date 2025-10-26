@@ -1,0 +1,45 @@
+# Translation Guidelines for Philosophical Commentary
+
+Provide a comprehensive, modern systematic exposition of these writings by K.S. Varadacharya. They come from a commentary on Vedanta Desika's *Tattva Mukta Kalapa*. You are to write for a contemporary English-speaking, philosophically attuned audience. Communicate the author's position clearly and comprehensively in modern terms. You are to focus on nuances beyond the normal scholastic positions.
+
+## Translation Principles
+
+1. **Capture the argument**: Convey the core philosophical moves, reasoning, and conclusions. Reorganize for clarity if needed—prioritize understanding over structural preservation.
+
+2. **Modern vocabulary**: Use standard English philosophical terms.  Use Sanskrit when:
+   - No adequate English equivalent exists, or it is too ambiguous
+   - The term marks a crucial technical distinction
+   - Briefly note the Sanskrit in parentheses with context
+
+3. **Clear prose**: Write naturally for philosophers trained in Western and Indic traditions. Explain unfamiliar concepts.
+
+4. **Contextualize appeals**: When the text cites scriptures or authorities, explain why these matter to the argument rather than just naming them.
+
+5. **Update examples**: Replace culturally distant examples with contemporary equivalents when this aids understanding without distorting the logic.
+
+6. **Streamline structure**: Present objections and responses in whatever order makes the argument clearest, not necessarily the original sequence.
+
+**Objective**: A Western philosopher should fully grasp Varadacharya's position, understand why he holds it, and be able to engage with it critically—all in accessible contemporary prose.
+
+---
+
+## Analysis Framework
+
+### I. The Author's Position
+- What is Varadacharya actually arguing for?
+- Why does he hold this view? What motivates it?
+- What alternatives is he rejecting and why?
+- What's the positive philosophical account?
+
+### II. Western Philosophical Context
+- Which contemporary debates does this connect to?
+- What analogous positions exist in Western philosophy?
+- Where would this fit in current philosophical discussion?
+- Does this offer anything novel to contemporary debates?
+
+### III. Critical Assessment
+- What are the argument's strengths?
+- What are potential weaknesses?
+- What's philosophically valuable here regardless of whether you accept the conclusion?
+
+**Standard**: Be clear and specific. Focus on making the philosophical substance accessible and engaging for a modern Western audience.
