@@ -1,72 +1,141 @@
-# PDF Page Extractor
+# PDF Workflow Automation
 
-A simple Python script to extract specific pages or page ranges (e.g., "2-5, 8, 10-12") from a PDF file and save them as a new PDF.
+This repository provides a flexible, YAML-driven Python script (`workflow.py`) for automating PDF processing tasks. It leverages the Google Gemini API for advanced text extraction and conversational AI, alongside other utilities for text manipulation.
 
-This script runs on macOS, Windows, and Linux.
+## Features
 
-## Requirements
+-   **Dynamic Workflow Definition:** Define complex multi-step workflows using a simple YAML configuration.
+-   **PDF Text Extraction:** Extract text from PDFs using the Gemini API, allowing for intelligent content understanding.
+-   **Text Transliteration:** Convert text between various scripts (e.g., Devanagari to Roman) using `aksharamukha`.
+-   **AI Chat Integration:** Engage in multi-turn conversations with the Gemini API, incorporating document content and previous step outputs.
+-   **Content Aggregation:** Combine content from multiple files within a workflow step for comprehensive AI processing.
+-   **Caching Mechanism:** Avoid redundant processing with intelligent caching based on file modification times.
+-   **Per-Page-Range Processing:** Split large PDFs into smaller, manageable sections and process each range independently.
+-   **Global Workflow Execution:** Run workflows on entire PDF documents or general input files.
 
-  * Python 3.x
-  * `pypdf` library
+## Setup
 
-## Installation
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/pdfsplit.git
+    cd pdfsplit
+    ```
 
-Before running the script, you must install the `pypdf` library.
+2.  **Create a virtual environment and install dependencies:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    ```
 
-Open your terminal and run:
+3.  **Google Gemini API Key:**
+    Create a `.env` file in the root directory of the project and add your Gemini API key:
+    ```
+    GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+    ```
+
+## Usage
+
+The main script is `workflow.py`. It takes a YAML configuration file as input, which defines the steps of your processing workflow.
+
+### Running a Workflow
 
 ```bash
-pip install pypdf
+python workflow.py <path_to_your_yaml_config> [--force]
 ```
 
-## How to Use
+-   `<path_to_your_yaml_config>`: Path to your YAML configuration file (e.g., `input.yaml`).
+-   `--force`: Optional flag to force regeneration of all output files, bypassing the caching mechanism.
 
-Save the script as `extract_pages_multi.py`. You can then run it directly from your terminal.
+### Configuration (YAML Examples)
 
-The script requires three arguments:
+Workflows are defined in YAML files. Here are examples of common configurations:
 
-1.  **Input PDF:** The path to the source PDF file you want to extract pages from.
-2.  **Output PDF:** The name you want to give the new, extracted PDF file.
-3.  **Page Ranges:** A string, enclosed in quotes, that specifies which pages to extract.
+#### 1. Per-Page-Range Processing
 
-### Command-Line Syntax
+This mode is ideal for processing specific sections of a PDF. The `page_ranges` section defines how the PDF should be split and processed.
 
-```bash
-python extract_pages_multi.py <input.pdf> <output.pdf> "<page_ranges>"
+```yaml
+pdf_file: tmk-sarvankasa.pdf
+model: gemini-pro-vision # Or gemini-pro for text-only models
+page_ranges:
+  - page_range: "178-181"
+    suffix: "sarire-aham-pratyaya"
+  - page_range: "185-199"
+    suffix: "dharma-dharmi-jnanayoh-svarupam"
+  # ... more page ranges
+workflow:
+  - type: extract_text_from_pdf
+    prompt: prompt-transcribe.txt
+    output_extension: .txt
+    output_suffix: transcribe
+  - type: convert_script
+    from: devanagari
+    to: roman
+    output_extension: .txt
+    output_suffix: roman
+  - type: chat
+    model: gemini-pro # Use a text-only model for chat turns
+    turns:
+      - prompt: prompt-modern.txt
+        output_extension: .md
+        output_suffix: modern
+      - prompt: prompt-summarize-collection.txt
+        output_extension: .md
+        output_suffix: summary
+        fileset:
+          include:
+            - "*-modern.md"
+          exclude: []
+          global_search: false
 ```
 
-### Page Range Format
+**Explanation:**
+-   `pdf_file`: The source PDF to be processed.
+-   `model`: The default Gemini model to use for steps that interact with the API.
+-   `page_ranges`: A list of page ranges. Each item can be a simple string (e.g., `"1-5"`) or an object with `page_range` and `suffix` for more descriptive output filenames.
+-   `workflow`: A list of steps to execute for each page range.
+    -   `extract_text_from_pdf`: Extracts text from the PDF using the specified `prompt` and saves it with the given `output_extension` and `output_suffix`.
+    -   `convert_script`: Transliterates the text from one script (`from`) to another (`to`).
+    -   `chat`: Initiates a multi-turn chat with the Gemini API.
+        -   `turns`: Each item represents a turn in the conversation.
+            -   `prompt`: The prompt file for the current turn.
+            -   `output_extension`, `output_suffix`: For saving the chat response.
+            -   `fileset`: (Optional) Specifies a set of files whose content should be concatenated and provided as additional context to the current chat turn.
+                -   `include`, `exclude`: Glob patterns to select files.
+                -   `global_search`: If `true`, searches across the entire `output` directory; otherwise, searches within the current run's prefixed files.
 
-The page range string is flexible:
+#### 2. Global Workflow Processing
 
-  * **Single pages:** `5`
-  * **A range:** `3-7` (extracts pages 3, 4, 5, 6, and 7)
-  * **A mix:** `"2-5, 8, 10-12"` (extracts pages 2, 3, 4, 5, 8, 10, 11, and 12)
+This mode processes the entire `pdf_file` or runs a general workflow without splitting.
 
-**Note:** You must wrap the page range string in quotes (`" "`) for the terminal to treat it as a single argument.
-
-## Examples
-
-### Example 1: Extract a single range
-
-To extract pages 5 through 10 from `my_report.pdf` and save them as `chapter_1.pdf`:
-
-```bash
-python extract_pages_multi.py my_report.pdf chapter_1.pdf "5-10"
+```yaml
+pdf_file: dravya-adravya.pdf
+run_name: dravya-adravya-full
+model: gemini-pro-vision
+workflow:
+  - type: extract_text_from_pdf
+    prompt: prompt-transcribe.txt
+    output_extension: .txt
+    output_suffix: transcribe
+  # ... other steps as needed
 ```
 
-### Example 2: Extract multiple ranges and single pages
+**Explanation:**
+-   `pdf_file`: The source PDF for the global workflow.
+-   `run_name`: (Optional) A custom prefix for output files. If not provided, the PDF's stem is used.
+-   `model`, `workflow`: Similar to per-page-range processing, but applied to the entire document.
 
-To extract pages 1, 3, 4, 5, and 9 from `manual.pdf` and save them as `manual_subset.pdf`:
+### Example
+
+To run the `input.yaml` workflow:
 
 ```bash
-python extract_pages_multi.py manual.pdf manual_subset.pdf "1, 3-5, 9"
+python workflow.py input.yaml
 ```
 
-### Example 3: Extract non-sequential pages
-
-To extract only the first and last pages (e.g., from a 50-page document) and save as `cover_pages.pdf`:
+To force regeneration:
 
 ```bash
-python extract_pages_multi.py my_document.pdf cover_pages.pdf "1, 50"
+python workflow.py input.yaml --force
 ```
