@@ -1,99 +1,91 @@
-Here is an exposition of the philosophical argument, following the principles you outlined.
-
-### Introduction to the Text
-
-This passage is from the *Tattvamuktākalāpa*, a major work of Viśiṣṭādvaita Vedānta by the 14th-century philosopher Vedānta Deśika. The text is structured as a series of verses (*śloka*) followed by the author's own commentary (*vyākhyā*). This selection also includes a deeper, more speculative commentary known as the *Jīvasaraḥ*.
-
-The argument addresses a sophisticated problem concerning the state of the liberated soul (*mukta*). In Viśiṣṭādvaita, liberation (*mokṣa*) involves the full manifestation of the soul's innate, perfect consciousness, which includes omniscience (*sarvajñatva*). The core question is: If a liberated soul is omniscient, how do they experience a world that is filled with suffering without being affected by it? The argument unfolds in two stages, addressing first the perception of the present world and second, the memory of past suffering.
+Here is an exposition of the philosophical argument, following the specified principles.
 
 ***
 
-### Part 1: The Liberated Soul’s Perception of the World (Verse 64 and Commentary)
+### Exposition of Commentary on *Tattva Mukta Kalapa*, Verses 64-65
 
-**Verse 64:** *[muktasya sarvamanukūlam]* For the liberated soul, everything is favorable. The favorableness (*ānukūlyam*) of the entire universe, which is intrinsically of the nature of Vāsudeva (the ultimate Reality), becomes manifest to the soul at the time of liberation. This happens because the contraction of knowledge caused by worldly existence (*bhavakṛta-jñāna-saṅgocahāneḥ*) is finally removed.
+This section of K.S. Varadacharya’s commentary addresses a profound set of challenges concerning the nature of the liberated state (*mukti*) within the Viśiṣṭādvaita tradition. It begins by clarifying the multifaceted definition of liberation and then confronts two difficult objections regarding how a liberated, omniscient soul can remain blissful while being aware of suffering.
 
-#### The Philosophical Problem
+#### Part 1: The Problem of Perceiving a Suffering World
 
-The commentary begins by setting up a sharp dilemma for the doctrine of omniscience in liberation.
+First, the commentator addresses a foundational query directed at a "devotee delighting in the joy of service (*dāsya-sukha-rasika*)." The objection highlights an apparent contradiction in the Viśiṣṭādvaita concept of liberation (*mokṣa*). How can liberation be simultaneously described as:
+1.  The full manifestation of the self’s true nature (*svarūpa-āvirbhāva*),
+2.  The experience of the infinite bliss of Brahman (*niravadhika-ānanda-brahma-anubhava*),
+3.  A state of eternal service (*sevā-rūpa*), and
+4.  A state of supreme independence (*svātantryam*), as suggested by the scripture, "he becomes his own ruler (*saḥ svarāṭ bhavati*)"?
 
-1.  A liberated soul is said to have knowledge of all things.
-2.  The world we inhabit is a product of the three cosmic qualities (*guṇa*) and is therefore inherently constituted by pleasure, pain, and delusion (*sukha-duḥkha-moha-ātmakam*).
-3.  Therefore, liberated souls must perceive the world's pain and suffering.
+Is your conception of liberation, the objector asks, just a paradoxical mixture of disparate elements?
 
-This leads to an inescapable contradiction:
+The commentator readily agrees: "Yes, it is. What can we do? Those who rely on the cleverness of their own intellect and the force of logic may invent a final human goal (*parama-puruṣārtha*) that satisfies them. But we, as followers of the Vedas (*vaidikāḥ*), do not have the authority to invent such things. We simply accept what the scriptures (*śruti*) tell us."
 
-*   **If they perceive the world’s suffering and are affected by it,** they too would be overcome by sorrow. In that case, their state is not one of perfect bliss, and it cannot be considered true liberation.
-*   **If they perceive the suffering but remain indifferent,** they would be cruel or heartless (*nṛśaṃsāḥ*). This is incompatible with the perfected nature of a liberated soul.
-*   **If they do not perceive the suffering at all,** then they are not omniscient, which contradicts a fundamental tenet of liberation.
-*   **If they perceive suffering but interpret it as happiness,** their knowledge is flawed and erroneous (*anyathājñāna*). A being with flawed knowledge cannot be considered liberated.
+The commentary then harmonizes these elements. The manifestation of the self’s true nature is indeed liberation. This occurs, as scripture states, through "attaining" (*saṃpadyate*) the Supreme Self. The essential nature (*svarūpa*) of the individual self (*jīva*) is to be exclusively subordinate (*śeṣa*) to the Supreme Self (*paramātman*). The commentator pointedly remarks to the objector, "You, however, do not even grasp the secret of your own teacher’s words: 'O Śambhu, even if the distinction [between us] were to cease, I am yours; you are not mine.'" We, on the other hand, do understand this. It is for this reason that we describe the ultimate human goal as one that contains all these meanings. This rich understanding also informs the interpretation of the Brahma Sūtra "And because of the indication of mere equality in enjoyment" (IV.4.21, *bhogamātrasāmyaliṅgācca*), which is explained by analogy with the "prince who was lost and found" (*rājakumāra-nyāya*), affirming that liberation is a rediscovery of one's innate, glorious relationship to Brahman.
 
-The commentator describes this as a situation where "the rope has a noose at both ends" (*ubhayataḥ pāśā rajjuḥ*), a classic no-win scenario.
+Having established this ground, the commentator introduces the main argument of Vedanta Desika’s verse:
 
-#### The Solution: The World’s True Nature
+> **Verse 64:** **[For the liberated soul, everything is favorable].**
+> The inherent favorability (*ānukūlya*) of the entire universe, which has Vāsudeva as its Self, becomes fully manifest at the time of liberation, due to the removal of the contraction of knowledge caused by worldly existence (*bhava*).
 
-The solution lies in a radical re-evaluation of reality from the liberated perspective. The text argues:
+**The Objection Elaborated:**
 
-The intrinsic nature of the entire universe is, in fact, favorable (*ānukūlya*). Why? Because the universe is fundamentally Brahman, or Vāsudeva. This is supported by scripture, such as "All this is indeed Brahman" (*sarvaṃ khalvidaṃ brahma*) and passages from the Mahābhārata stating that the senses, mind, intellect, and all cosmic elements are expressions of Vāsudeva.
+A significant problem arises concerning the liberated soul’s omniscience. If, in the state of liberation (*mukti*), knowledge encompasses all things, then the liberated must be aware of everything in this world. This world, being a product of the three qualities of nature (*triguṇa-kāryatvāt*), is inherently constituted of pleasure, pain, and delusion (*sukha-duḥkha-moha-ātmakam*).
 
-So, why do we experience things as unfavorable and painful? This is not due to the objects themselves but to the state of our consciousness. In the state of bondage (*saṃsāra*), our innate, infinite knowledge is "contracted" or limited by our past actions (*karma*). This **contraction of knowledge (*jñāna-saṅkoca*)** prevents us from seeing the world as it truly is—an expression of Brahman. Instead, we perceive things through the distorted lens of our individual karma, leading to experiences of adversity (*prātikulya*) and suffering (*duḥkha*).
+This leads to a severe dilemma:
+1.  If the liberated perceive this world as it is, they would surely be affected by its pains and delusions themselves.
+2.  If they are aware of the suffering but remain indifferent (*udāsīnāḥ*), they would be cruel (*nṛśaṃsāḥ*) or lack a true understanding of the Self’s presence in all beings (*sārvātmya-jñāna-śūnyāḥ*).
+3.  Just as knowing the blissful Brahman makes one blissful, knowing suffering should make one suffer. If they *don't* know suffering, their omniscience (*sarvajñatva*) is compromised.
+4.  If they perceive suffering *as* pleasure, this would be a form of false knowledge (*anyathājñāna*), which is impossible for a liberated being.
 
-At the moment of liberation (*mukti*), this karma is completely eradicated. With its removal, the contraction of knowledge vanishes. The soul's consciousness expands to its natural, infinite state. From this unobstructed viewpoint, the soul perceives the entire universe in its true form: as the body of Brahman. When everything is perceived as Brahman, the very concept of "unfavorable" or "adverse" becomes meaningless. The perception of universal favorableness (*ānukūlya*) is what naturally arises, and this perception is itself a source of supreme bliss (*sukham*).
+This presents a double-bind (*ubhayataḥpāśā rajjuḥ*), seemingly trapping the doctrine in a contradiction.
 
-Therefore, for the liberated soul, there is not even a trace of suffering, because the cognitive foundation for suffering—the perception of adversity—has been completely eliminated.
+**The Resolution:**
 
-#### Addressing a Counter-Argument
+The commentary resolves this by radically re-framing the nature of reality from the liberated perspective.
 
-An opponent might argue: "This dismisses the universally accepted nature of the world as a mixture of pleasure and pain. Are you denying the reality of suffering altogether, much like a Buddhist who claims 'all is suffering' (*sarvaṃ duḥkham*) denies the reality of pleasure?"
+The entire universe, which has Vāsudeva as its Self (*vāsudevātmakasya jagataḥ*), is *intrinsically* favorable (*ānukūlyam eva svataḥ*). This is its natural, inherent state, even here in the world of bondage (*saṃsāre'pi*). This innate favorability becomes fully manifest (*vyaktim bhajati*) at the time of liberation (*muktikāle*). This happens because the contraction of knowledge caused by karma (*karma-kṛta-jñāna-saṅkocasya*) is completely removed.
 
-The commentator clarifies that this is not a denial of the phenomenal reality experienced by bound souls. The world's nature as a mix of pleasure, pain, and delusion is entirely real *from the perspective of a consciousness conditioned by karma*. The argument is that this is a relative, not an absolute, truth. For a being whose consciousness is no longer limited by karma, such as the liberated soul or God Himself (*paramātman*), this mode of perception does not apply.
+The argument rests on a principle accepted by all and confirmed by experience: suffering arises from cognizing things as unfavorable (*pratikūlatva-jñāna*), while happiness arises from cognizing them as favorable (*anukūlatva-jñāna*). The truth is that this entire world has Brahman as its Self (*brahmātmakam*), as is established by scriptural authorities like, "All this is indeed Brahman" (*sarvaṃ khalvidaṃ brahma* - Chāndogya Up. 3.14.1) and the Mahābhārata which states, "The senses, mind, intellect, existence, energy, strength, and fortitude—they declare all these to be of the nature of Vāsudeva, as are the field (body) and the knower of the field (the self)."
 
-***
+In the state of bondage (*saṃsāra-daśā*), one's knowledge is constricted by karma, preventing one from seeing the world as having Brahman as its Self. This is precisely why one experiences suffering. In liberation, however, with karma completely eradicated, the liberated soul perceives the entire universe as it truly is: having Brahman as its Self. Consequently, the very possibility of perceiving anything as unfavorable (*prātikulyajñānasya eva abhāvāt*) disappears. Since the natural state of things is favorability, only happiness results. Thus, there is not even a trace of suffering.
 
-### Part 2: The Liberated Soul's Memory of Past Suffering (Verse 65 and Commentary)
+**A Counter-Objection:**
 
-Having resolved the issue of perceiving present suffering, a more subtle problem arises concerning memory.
+But wait, the objector might say. Isn't it universally accepted that the world is a mixture of pleasure, pain, and delusion as a product of *prakṛti*'s evolution? If you claim its inherent nature is only pleasurable and that suffering is merely circumstantial (*aupādhikam*), aren't you just presenting a mirror image of the Buddhist who claims "All is suffering" (*sarvaṃ duḥkham*)? Are you not, in effect, denying the world's tri-fold nature of pleasure, pain, and delusion?
 
-**Verse 65:** [The liberated soul] is not pained then [at the time of liberation] by the memory of the former mode of unfavorableness, for even in the past, this [unfavorableness] was caused solely by God’s disfavor (*bhagavannigraha*), which was itself conditioned by one’s own karma.
+**The Refinement:**
 
-#### The New Problem: The Pain of Memory
+The commentator responds: No, the concepts of favorability and unfavorability are relative (*āpekṣike*). The liberated soul (*mukta*) is beyond the three *guṇas* and is trans-worldly (*alaukika*). Indeed, even one who seeks liberation (*mumukṣu*) begins to live as if beyond the world. We do not deny the world's nature as a mix of pleasure, pain, and delusion. The key is that not everything is the same for everyone.
 
-The opponent's follow-up question is this: Even if the liberated soul no longer suffers in the present, they were once bound. They experienced immense suffering, perhaps even in hellish states. As omniscient beings, they must now remember this past.
+The statement in the Yoga Sūtras (2.15), "To the discerning person, all is suffering (*sarvam eva duḥkhaṃ vivekinaḥ*)," uses the particle *eva* ("indeed" or "only") to emphasize the connection, not to exclude everything else. So, while the world has this mixed nature, its perception is contingent on the viewer.
 
-*   If they remember their past suffering, won't that memory itself be a cause of pain in the present?
-*   If they don't remember it, they are not truly omniscient.
-*   If they remember that past suffering as something pleasant, their knowledge is again flawed (*anyathājñāna*).
+If you argue that the liberated soul, in seeing everything as favorable, must be under an illusion (*bhrānti*), that is incorrect. The world's nature as pleasure, pain, and delusion is defined *from the perspective of the bound soul* (*saṃsāri-jīva-dṛṣṭyā*), not from the perspective of the liberated. If it were otherwise, then the Supreme Self (*paramātman*), who is also omniscient, would inevitably have to experience suffering, which is absurd. It is universally accepted that pleasure and pain are rooted in karma. Since the liberated have no karma, the possibility of suffering does not arise for them.
 
-How can the soul be free if it is haunted by the memory of its own past agonies?
+#### Part 2: The Problem of Remembering Past Suffering
 
-#### The Solution: Understanding the True Cause
+The argument now advances to a more personal and difficult challenge.
 
-The solution hinges on the qualitative difference in knowledge between a bound soul and a liberated one. The liberated soul, being omniscient, doesn't just remember the *event* of suffering; it understands its *ultimate cause* with perfect clarity.
+> **Verse 65:** That liberated soul will not suffer at that time from the knowledge of the way in which things were previously unfavorable, because even in the past, this [unfavorability] was caused exclusively by God’s displeasure, which was itself conditioned by that soul’s own karma.
 
-The text explains that the liberated soul now knows that its past suffering was **not an intrinsic property of the objects or situations it encountered.** Rather, the suffering was exclusively caused by a specific causal chain:
-1.  The soul’s own negative actions (*svakarma*).
-2.  These actions incurred divine disfavor or justice (*bhagavannigraha*).
-3.  This divine disfavor was the direct cause of the experience of suffering.
+**The New Objection:**
 
-In liberation, the root causes—both the karma and the resulting divine disfavor—are entirely gone. The soul’s memory is now simply a piece of data, devoid of its former power to cause pain.
+Even if we grant the previous points, the liberated souls were once bound. In that state, they may have experienced hell and other forms of suffering. In their now-omniscient state, do they remember this past suffering or not?
 
-The commentary provides a powerful analogy:
+This creates another dilemma:
+1.  If they do not remember, their omniscience is incomplete.
+2.  If they do remember, the memory of that past suffering will inevitably cause them pain now.
+3.  If they remember that past suffering as something favorable, it constitutes false knowledge (*anyathājñāna*), which is impossible for a liberated soul.
 
-> A person suffering from jaundice experiences sweet milk as tasting bitter. After they are cured, they remember that the milk once tasted bitter. Does that memory cause them to experience a bitter taste now? Of course not. They simply understand, "Ah, that bitterness I experienced was a result of my illness." They recall it as a fact without re-living the unpleasant sensation.
+What is the resolution (*kaḥ samādhiḥ*) to this?
 
-Similarly, the liberated soul remembers its past suffering but simultaneously perceives its cause (the "illness" of karma) as having been completely eradicated. This comprehensive knowledge transforms the memory from a potential source of pain into a mere fact of a past, transcended state. In this way, the soul's omniscience, far from being a liability, becomes the very medicine that heals it from the potential pain of memory.
+**The Final Resolution:**
 
-The section concludes with a cautionary note, advising that these topics are beyond mere intellectual speculation (*kākadantaparīkṣā* – "the examination of a crow's teeth," a proverb for useless inquiry) and are properly understood through grace and dedicated practice.
+Vedanta Desika’s verse provides the answer. The liberated soul (*eṣaḥ*) does not become afflicted with suffering (*na duḥkhyet*) at the time of liberation (*tadānīm*) due to the memory (*dhiyā*) of the sequence of past unfavorability (*prācīnaḥ yaḥ prātikūlyasya kramaḥ*).
 
-***
+Why not? Because even in the past (*prāgapi*), the fact that things were a cause of suffering was not due to their intrinsic nature. Rather, it was caused *exclusively* by God’s punitive justice or displeasure (*bhagavat-nigraha*), which in turn was conditioned by one’s own sinful karma (*svakarma-upādhi-kṛta*).
 
-### Deeper Reflections from the *Jīvasaraḥ*
+The liberated souls, being omniscient, know this complete truth. They understand that the cause of their past suffering was not inherent in the objects or events themselves, but was rooted in their own sinful actions (*svakṛta-pāpa-mūlaka*) which prompted God’s displeasure. In the state of liberation, causes like divine displeasure no longer exist. Therefore, even with the full knowledge of past suffering, it does not produce any new suffering.
 
-The *Jīvasaraḥ* appendix pushes the inquiry into more esoteric territory, critiquing simplistic understandings of liberation (*mokṣa*). It argues that terms like "attainment" (*saṃpatti*) and "dissolution" (*laya*) are far more complex than they appear.
+The commentator provides a powerful analogy: a person suffering from a bile disorder (*pittadoṣa*) experiences the taste of milk as bitter. After being cured, they may remember this experience, thinking, "Ah, that bitter taste was caused by my illness." But do they re-experience the bitter taste merely by remembering it? Of course not.
 
-1.  **The Ambiguity of "Attainment" (*saṃpatti*):** The text notes that scriptures speak of "attaining" Brahman in deep sleep, fainting, and death. Yet, these are not liberation because karma remains, and the soul returns to worldly existence. What, then, makes the final attainment of liberation in a "specific place" (*deśaviśeṣa*), like the divine realm of Vaikuṇṭha, qualitatively different?
+In the same way, for the liberated, their very omniscience (*sarvajñatva*) becomes the medicine (*auṣadha*) that cures them of all forms of suffering. Therefore, there is never any possibility of pain for the liberated.
 
-2.  **Critique of Linear, Spatial Liberation:** The commentary questions the traditional, almost mythological, depiction of liberation as a journey: the soul leaves the body, all karma is destroyed upon crossing the river Virajā, it receives a non-material body, and finally achieves complete liberation upon ascending the divine couch (*paryaṅka*). The author asks: if all bondage is gone after crossing the river, why is there a waiting period? What is the soul's status in this intermediate stage? This suggests that liberation may not be a series of discrete events but a profound, progressive unfolding.
-
-3.  **A More Fluid Analogy: The River and the Ocean:** A better model, the text suggests, is that of a great river merging with the ocean. The merger is not an instantaneous event that occurs precisely at the river's mouth. For a certain distance, the river water gradually takes on the ocean's salinity. The process is one of progressive permeation. Similarly, the soul's dissolution (*laya*) into the "ocean of nectar" that is Brahman is not a single, abrupt event but a gradual, all-encompassing absorption. This explains the scriptural descriptions of stages within liberation and the use of multiple terms for the perfected state ("one who is without desire, who is freed from desire, whose desires are fulfilled, whose only desire is the Self").
-
-This deeper reflection serves as a warning against overly simplistic or literal interpretations of spiritual states. It emphasizes the profound, almost incomprehensible depth of the final state of liberation, which defies easy categorization and can only be hinted at through analogy.
+The commentator concludes this section with a pastoral warning. All these objections are merely a web of speculation (*kevala-buddhi-kṛta-kalpanā-jāla-mātram*) born from our current unfamiliarity with the true nature of liberation. They are addressed for the sake of those with simple minds, in keeping with the principle, "one should not cause confusion in the minds of the ignorant" (*na buddhibhedaṃ janayet*). Those who wish for their own welfare should stay far away from such useless inquiries—like "examining a crow’s teeth" (*kākadanta-parīkṣā*). Instead, the steadfast should focus on the path of spiritual practice, meditating only on what is auspicious. These intricate arguments are offered for the benefit of those who have been deluded by rationalists (*haitukaiḥ*), not for true devotees (*bhakta-janān*).
