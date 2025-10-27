@@ -4,8 +4,7 @@
 pdf_file: tmk-sarvankasa.pdf
 
 # The Gemini model to use for all generative steps.
-#model: gemini-2.5-pro
-model: gemini-2.5-flash
+model: gemini-2.5-pro
 
 # === Page Ranges ===
 # A list of sections to extract from the PDF. Each item is processed by the full workflow below.
@@ -31,6 +30,8 @@ page_ranges:
     suffix: bhaskara-mata-nirasa
   - page_range: 235-240
     suffix: jivotpatti-nityatvam-ca
+  - page_range: 348-354
+    suffix: brahmanubhava
   - page_range: 360-364
     suffix: muktasya-sarvam-anukulam
   - page_range: 467-478

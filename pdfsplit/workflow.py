@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from pypdf import PdfReader, PdfWriter
 from pdf_utils import split_pdf
 import yaml
+from tqdm import tqdm
 
 # --- Configuration ---
 logging.basicConfig(
@@ -125,6 +126,8 @@ def handle_extract_text_step(step: Dict, config: Dict, prefix: str, input_pdf: P
     
     if is_stale(output_path, [input_pdf, prompt_path], force):
         logging.info(f"Uploading '{input_pdf.name}' and generating text with '{prompt_path.name}'.")
+        spinner = Spinner("Generating text from PDF...")
+        spinner.start()
         model = genai.GenerativeModel(config['model'])
         file_handle = genai.upload_file(path=str(input_pdf))
         context['initial_file_handle'] = file_handle
@@ -134,13 +137,16 @@ def handle_extract_text_step(step: Dict, config: Dict, prefix: str, input_pdf: P
             try:
                 response = model.generate_content([prompt_path.read_text(encoding='utf-8'), file_handle])
                 output_path.write_text(response.text, encoding='utf-8')
+                spinner.stop()
                 logging.info(f"--> Saved output to: {output_path}")
                 break
             except exceptions.ResourceExhausted as e:
+                spinner.stop()
                 delay = e.retry_delay if hasattr(e, 'retry_delay') else 30
                 logging.warning(f"Gemini API quota exceeded. Retrying in {delay} seconds... Error: {e}")
                 time.sleep(delay)
             except Exception as e:
+                spinner.stop()
                 logging.error(f"An unexpected error occurred during Gemini API call: {e}")
                 raise
     else:
@@ -208,17 +214,22 @@ def handle_chat_step(step: Dict, config: Dict, prefix: str, input_path: Path, co
                 message_parts.append(context['initial_file_handle'])
 
             logging.info(f"Sending prompt '{turn_prompt_path.name}' to chat session.")
+            spinner = Spinner(f"Running chat turn {i+1}...")
+            spinner.start()
             while True:
                 try:
                     response = chat_session.send_message(message_parts)
                     output_path.write_text(response.text, encoding='utf-8')
+                    spinner.stop()
                     logging.info(f"--> Saved turn output to: {output_path}")
                     break
                 except exceptions.ResourceExhausted as e:
+                    spinner.stop()
                     delay = e.retry_delay if hasattr(e, 'retry_delay') else 30
                     logging.warning(f"Gemini API quota exceeded. Retrying in {delay} seconds... Error: {e}")
                     time.sleep(delay)
                 except Exception as e:
+                    spinner.stop()
                     logging.error(f"An unexpected error occurred during Gemini API call: {e}")
                     raise
         else:
@@ -277,7 +288,7 @@ def main(yaml_path: str, force_regeneration: bool):
             if not source_pdf_path.exists():
                 raise FileNotFoundError(f"Source PDF not found: {source_pdf_path}")
 
-            for item in config["page_ranges"]:
+            for item in tqdm(config["page_ranges"], desc="Processing page ranges"):
                 if isinstance(item, dict):
                     page_range_str, custom_suffix = str(item['page_range']), item.get('suffix')
                 else:
