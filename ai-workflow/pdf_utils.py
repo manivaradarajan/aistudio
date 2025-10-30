@@ -14,7 +14,7 @@ def split_pdf(source_pdf_path: Path, page_range_str: str, output_dir: Path) -> P
 
     Args:
         source_pdf_path: Path to the source PDF file.
-        page_range_str: A string representing the page range (e.g., '1-5', '10').
+        page_range_str: A string representing the page range (e.g., '1-5', '10', '35,36-38').
         output_dir: The directory to save the new PDF file.
 
     Returns:
@@ -26,15 +26,21 @@ def split_pdf(source_pdf_path: Path, page_range_str: str, output_dir: Path) -> P
         reader = PdfReader(str(source_pdf_path))
         writer = PdfWriter()
         
-        pages = page_range_str.split('-')
-        start_page = int(pages[0]) - 1
-        end_page = int(pages[-1]) - 1
+        page_numbers = set()
+        for part in page_range_str.split(','):
+            if '-' in part:
+                start, end = map(int, part.split('-'))
+                for i in range(start, end + 1):
+                    page_numbers.add(i)
+            else:
+                page_numbers.add(int(part))
 
-        if start_page < 0 or end_page >= len(reader.pages):
-            raise IndexError(f"Page range '{page_range_str}' is out of bounds for PDF with {len(reader.pages)} pages.")
-
-        for i in range(start_page, end_page + 1):
-            writer.add_page(reader.pages[i])
+        for page_num in sorted(list(page_numbers)):
+            page_index = page_num - 1
+            if 0 <= page_index < len(reader.pages):
+                writer.add_page(reader.pages[page_index])
+            else:
+                raise IndexError(f"Page number {page_num} is out of bounds for PDF with {len(reader.pages)} pages.")
 
         output_filename = f"{source_pdf_path.stem}-{page_range_str}.pdf"
         output_path = output_dir / output_filename
