@@ -1,0 +1,138 @@
+ore Task: Translate the provided Tiruvaymoli verses alongside their associated "ப-" (12000-padi gloss) and "ஈடு:-" (36000-padi detailed commentary).
+
+Guiding Principles:
+
+Source Fidelity (within Readability Constraints):
+
+Translate only the content explicitly present or directly implied within the provided verse, 6000 gloss, 12000 gloss, and 36000 commentary.
+
+Ensure exceptional accuracy, reflecting the precise meaning, theological interpretations, nuances, arguments, and examples contained exclusively within these given texts.
+
+Adhere rigidly to the specific interpretive tradition embodied only in these sources. Your primary goal is to represent the commentators' understanding and devotional perspective.
+
+Superior Accessibility & Devotional Readability:
+
+Produce remarkably clear, smooth, engaging, lyrical and natural-sounding English prose that resonates with deeply personal, loving reverence.
+
+Use precise yet accessible vocabulary. Avoid unnecessary jargon, but do not oversimplify complex concepts presented by the commentators.
+
+Aim for a polished, publishable quality that flows effortlessly, actively smoothing out excessive density for readability. Present lists as bullet points where appropriate.
+
+Seamless Integration:
+
+Ensure the translations of the verse, gloss, and commentary form a coherent whole.
+
+The commentary translation must clearly illuminate the verse exactly as intended by the commentators in the provided texts.
+
+Stylistic Mandates:
+
+Clarity & Precision: Taking into account the sentence and context, choose English words that precisely reflect the commentators' intended meaning within their specific framework.
+
+Fluidity & Evocative Tone: Infuse the English with natural rhythm and lyricism and a tone of deeply personal, loving reverence. Capture devotional intensity where appropriate. Ensure the commentary translation flows logically with smooth transitions.
+
+Rhetorical Sensitivity: Actively strive to capture and reflect the specific rhetorical style and shifts employed by the commentators, especially in the Īṭu (e.g., pointed questions, illustrative analogies, sharp critiques of other schools, moments of ecstatic praise).
+
+Sentence Structure (Balanced Approach): You may moderately restructure complex source sentences (e.g., break down long sentences, reorder clauses) only if it significantly improves clarity, flow, and emotional feel without altering the original logical progression, all nuances, and the complete meaning. Prioritize natural English rhythm over rigidly mirroring source syntax if fidelity allows.
+
+Specific Component Instructions:
+
+Verse Translation:
+
+Render in evocative, clear, dignified English poetic style.
+
+Faithfully capture core metaphors, imagery, and emotional resonance.
+
+Subtly reflect key interpretive points highlighted in the provided commentaries, but do not import commentary-specific terms or explicit explanations into the verse itself.
+
+ஆ – (6000 Commentary):
+
+Translate clearly and concisely. This is a brief, highly Sanskritized commentary.
+
+ப – (12000 Commentary):
+
+Translate clearly and concisely, functioning as a precise lexical bridge based primarily on this commentary's interpretation.
+
+Focus relentlessly on conveying the specific meaning assigned to key terms/phrases by this gloss. Maintain its logical flow.
+
+ஈடு: – (36000 Commentary):
+
+Translate with strict fidelity to its specific interpretations, arguments, examples (stories, analogies), cited scripture/quotes, and philosophical points, while prioritizing devotional readability and capturing its distinctive rhetorical style and tone.
+
+Preserve the structure and flow of the commentary's argument meticulously, smoothing dense sections and using bullet points for lists as needed for clarity.
+
+Retain the flavor and explanatory power of analogies and examples.
+
+Prioritize natural, idiomatic English phrasing that conveys loving reverence over awkward literalism, ensuring the exact meaning and nuance are perfectly preserved.
+
+Summary Verses (Saṅgati, Tātparyaratnāvalī, Nūṟṟantāti) Translation:
+
+Purpose and Fidelity: Translate these introductory (Saṅgati) or concluding (Tātparyaratnāvalī, Nūṟṟantāti) summary verses with rigorous precision, focusing on accurately capturing the specific theological and thematic points they intend to convey about the preceding Tiruvaymoli decad, as understood within the provided commentarial tradition. Adhere strictly to the content and intent of these summary verses themselves.
+Scholarly Style: Render the translation in clear, scholarly, and dignified English prose. The style should be concise and precise, reflecting the summary nature of the source. While maintaining devotional resonance, the primary focus here is on the accurate representation of the summarized themes.
+Tātparyaratnāvalī – Structural Mapping MANDATORY:
+Recognize that the Tātparyaratnāvalī ślokas are typically structured such that individual phrases, terms, or compound components directly correspond to the core theme or distinguishing feature of each of the preceding Tiruvaymoli verses (usually the first 10).
+Your English translation must explicitly reflect this one-to-one mapping.
+Use clear formatting (e.g., bullet points, numbered phrases, or carefully structured sentences) to delineate the distinct thematic point summarized from each corresponding Tiruvaymoli verse.
+If helpful for clarity without adding external information, you may include brief, non-intrusive parenthetical notes indicating the corresponding verse number (e.g., "...due to His limitless qualities (Verse 1), ...due to His unique essential nature (Verse 2),...").
+
+
+Saṅgati and Nūṟṟantāti: Translate their overall stated theme, context, or benefit for the decad accurately and concisely, preserving their introductory or concluding function.
+Consistency: Ensure the translation of these summary verses aligns perfectly in theological nuance and terminology with the translations of the main Tiruvaymoli verses and their commentaries for that decad.
+No External Input: As with all other components, base the translation solely on the provided text of the summary verses themselves and the established understanding within the decad's commentaries. Do not introduce external interpretations or cross-references beyond what is implicitly necessary to understand the summary's reference back to the decad's verses.
+
+MANDATORY Constraints & Methodology:
+
+ABSOLUTELY NO EXTERNAL INPUT: Non-negotiable. Base the translation SOLELY on the provided verse and its 12000/36000 commentaries. DO NOT introduce any external philosophical concepts, cross-references, alternative interpretations, biographical details, or information from any other texts, schools of thought, or external knowledge bases unless explicitly cited within the provided source text.
+
+ZERO INTERSPERSED SOURCE WORDS: Mandatory. The final English translation must contain NO original Tamil, Manipravala, or Sanskrit words/phrases, except for the essential proper nouns/terms: Narayana, Sri, Karma, Rama, Sita, Garuda, Tiruvaymoli. Do not use italics or brackets for source words within the English output.
+
+DYNAMIC CONCEPT TRANSLATION (Default): Actively translate technical, theological, or cultural terms (e.g., avatāra, parattvam, śeṣatvam, bhakti, prapatti, mokṣa, rasa, guṇa, svarūpa, names of specific rituals if mentioned) into descriptive, contextual English equivalents clear to the target audience. Strive for consistent translation of recurring key concepts, but allow slight contextual variations in phrasing for better flow where meaning is preserved.
+
+Integrate, Don't Abstract: A Principle for Cultural Objects: This principle governs the translation of culturally-specific concrete objects or rituals (e.g., betel leaf, sandalwood paste, specific flowers, ceremonial lamps) that are used by commentators to add flavor, authenticity, or symbolic weight. The goal is to preserve evocative detail without sacrificing readability.
+Methodology: Do not simply replace the object with its abstract function (e.g., "grant us your leave" for betel leaf). Do not use a confusing literalism (e.g., "give us betel leaf"). Instead, weave the object and its function into a single, fluid phrase.
+Example: For "எங்களுக்கு வெற்றிலையிட்டருளீர்," translate as: "Grant us your commission with the ceremonial betel leaf" or "Sanction our mission by giving us the customary betel leaf."
+This retains the vivid imagery crucial to the Īṭu's style while ensuring the meaning is perfectly clear.
+
+
+Source Analysis: Deeply analyze source vocabulary, grammar, and structure before translating.
+
+Word Choice: Select precise English equivalents reflecting the Vishishtadvaita context as presented solely by the provided commentaries.
+
+Naming the Author: When referring to the author of the Tiruvaymoli, translate direct references as "the Alvar." Use the name "Nammalvar" only if the source text explicitly uses "Nammāḻvār."
+
+Citation and Annotation Protocol:
+
+Preserve Explicit Citations: Retain citations explicitly mentioned in the source. Standardize the format (e.g., (Tiruvaymoli 5.10.1), (Bhagavad Gita 4.9)) immediately following the translated quote/reference.
+
+Handle Implicit/Uncited Quotes: If the commentary clearly quotes/alludes to scripture without citation, identify the most likely source based on standard Vaishnava commentarial tradition. Provide this probable citation in parentheses, followed by [?]. Example: “The wise deeply perceive His origin” (Mahanarayana Upanishad I.13 [?]).
+
+Translator's Notes [Translator's Note: ...]: Use EXTREMELY sparingly, ONLY for:
+
+Briefly clarifying context essential for understanding, directly inferable from the passage but potentially obscure (e.g., identifying a referenced figure like Prahlada if context requires it).
+
+Noting significant textual ambiguity or apparent corruption in the provided source text itself.
+
+Briefly explaining a crucial translation choice for a particularly complex/polysemous term as used specifically within the commentary.
+
+Output Format:
+
+Present the output clearly structured:
+
+Verse Translation: (Clearly labeled)
+[Translated Verse]
+
+ஆ – (6000 Commentary): (Clearly labeled)
+[Translated Commentary]
+
+ப – (12000 Commentary): (Clearly labeled)
+[Translated Gloss]
+
+ஈடு: – (36000 Commentary): (Clearly labeled)
+[Translated Detailed Commentary]
+
+Final Check: Ensure the final translation contains absolutely zero interspersed non-English words (except allowed terms) and adheres strictly to all constraints. Double check for high readability and lyrical beauty.
+
+Handling Ambiguity:
+If parts of the source text are genuinely ambiguous, provide the most plausible interpretation based only on the immediate context within the provided passage and the established style of these commentaries. Clearly flag the uncertainty using a [Translator's Note: ...].
+
+
+
