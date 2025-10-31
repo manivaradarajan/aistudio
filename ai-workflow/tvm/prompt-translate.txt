@@ -4,7 +4,7 @@ Guiding Principles:
 
 Source Fidelity (within Readability Constraints):
 
-Translate only the content explicitly present or directly implied within the provided verse, 6000 gloss, 12000 gloss, and 36000 commentary.
+Translate only the content explicitly present or directly implied within the provided verse, 6000 commentary, 9000 commentary, 12000 gloss, 24000 commentary, and 36000 commentary, and when present the Dramidopanisad Sangati, Dramidopanisad Tatparya Ratnavali, and Tiruvaymoli Nurrandadi.
 
 Ensure exceptional accuracy, reflecting the precise meaning, theological interpretations, nuances, arguments, and examples contained exclusively within these given texts.
 
@@ -46,13 +46,27 @@ Subtly reflect key interpretive points highlighted in the provided commentaries,
 
 ஆ – (6000 Commentary):
 
-Translate clearly and concisely. This is a brief, highly Sanskritized commentary.
+Translate accurately, clearly and concisely. This is a brief, highly Sanskritized commentary.
+
+ஒ - (9000 Commentary):
+
+Translate accurately, clearly and concisely. This is a slightly longer commentary.
 
 ப – (12000 Commentary):
 
-Translate clearly and concisely, functioning as a precise lexical bridge based primarily on this commentary's interpretation.
+Translate accurately, clearly and concisely, functioning as a precise lexical bridge based primarily on this commentary's interpretation.
 
 Focus relentlessly on conveying the specific meaning assigned to key terms/phrases by this gloss. Maintain its logical flow.
+
+இ - (24000 Commentary)
+
+Translate with strict fidelity to its specific interpretations, arguments, examples (stories, analogies), cited scripture/quotes, and philosophical points, while prioritizing devotional readability and capturing its distinctive rhetorical style and tone.
+
+Preserve the structure and flow of the commentary's argument meticulously, smoothing dense sections and using bullet points for lists as needed for clarity.
+
+Retain the flavor and explanatory power of analogies and examples.
+
+Prioritize natural, idiomatic English phrasing that conveys loving reverence over awkward literalism, ensuring the exact meaning and nuance are perfectly preserved.
 
 ஈடு: – (36000 Commentary):
 
@@ -123,8 +137,14 @@ Verse Translation: (Clearly labeled)
 ஆ – (6000 Commentary): (Clearly labeled)
 [Translated Commentary]
 
+ஒ - (9000 Commentary): (Clearly labeled)
+[Translated Commentary]
+
 ப – (12000 Commentary): (Clearly labeled)
 [Translated Gloss]
+
+இ - (24000 Commentary): Clearly labeled)
+[Translated Detailed Commentary]
 
 ஈடு: – (36000 Commentary): (Clearly labeled)
 [Translated Detailed Commentary]

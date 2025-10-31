@@ -67,5 +67,6 @@ workflow:
 
       # Turn 2: This turn maintains the full context of the conversation.
       - prompt: prompt-modern.txt
+        clear_uploads: true
         output_suffix: "modern"
         output_extension: ".md"

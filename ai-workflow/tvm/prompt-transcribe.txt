@@ -1,1 +1,71 @@
-Transcribe the Tamil and Manipravala. Use numbered Tamil subscripts for Grantha and Devanagari characters according to mahaprana convention.
+Final Unified Transcription Prompt and Hermetic Ruleset
+
+Your task is to transcribe the provided text, strictly following the rules below. The output must be plain Unicode text, switching between Tamil (Manipravala) and Devanagari as specified.
+
+I. General Transcription Principles
+
+Script: Use only the Unicode Tamil script (vowels, consonants, and signs) for Mode A transcription.
+
+Segmentation: Transcribe words as they appear segmented in the source text.
+
+Pure Tamil: Standard Tamil vocabulary is transcribed using standard orthography.
+
+II. Sanskrit Transcription Modes
+
+The transcription must switch between two modes depending on the text context:
+
+Mode A: Tamil/Manipravala (Prose, Commentary, Integrated Sanskrit Words)
+
+This mode is used for all narrative text, commentary, and Sanskrit words integrated into the Tamil flow.
+
+Mode B: Devanagari (Full Sanskrit Quotes/Ślokas)
+
+This mode is used only when transcribing a full Sanskrit quoted phrase or Śloka cited inline (typically marked by quotation marks, parentheses, or explicit sourcing in the original text). These phrases must be rendered entirely in Devanagari script (Unicode).
+
+III. Rules for Mode A: Tamil/Manipravala
+
+For Mode A (Tamil/Manipravala), the following rules for Grantha and subscripts apply:
+
+A. Dedicated Non-Tamil Phonemes (Grantha/Standard Representation)
+
+The following seven sounds must be represented by their dedicated Unicode Tamil/Grantha equivalents. Do not use numbered subscripts for these seven letters.
+
+ஸ (Sa - dental sibilant)
+
+ஶ (Śa - palatal sibilant)
+
+ஷ (Ṣa - retroflex sibilant)
+
+ஹ (Ha - aspirate)
+
+ஜ (Ja - plain stop)
+
+க்ஷ (Kṣa)
+
+ஜ்ஞ (Jña)
+
+B. Specialized Consonants (Numbered Subscript System)
+
+For Sanskrit sounds that require representation as Mahapranas or specific consonants not covered by the list above, use the nearest Tamil consonant and append the specified numbered subscript.
+
+Sanskrit Sound	Roman	Tamil Base	Subscript	Example (Ghana)	Example (Dharma)
+ख्	Kh	க	2	துஃக₂ம்	-
+घ	Gh	க	3	க₃ணம்	-
+ङ	ṅ	ங	1	ஸங்க₃தி₁	-
+छ	Chh	ச	2	ச₂த்ரம்	-
+झ	Jh	ஜ	3	ஜ₃ஷம்	-
+ट	Ṭ	ட	1	டீ₁கா	-
+ठ	Ṭh	ட	2	ட₂ாகுர	-
+ढ	Ḍh	ட	3	ட₃ம்	-
+ண	ṇ	1	ண	1	புண்ய¹ம்
+थ	Th	த	2	அ₂ர்த்₂த₂ம்	-
+द	D	த	3	தி₃நம்	-
+ध	Dh	த	4	-	த₄ர்மம்
+भ	Bh	ப	3	ப₄க்தி	-
+म	M	1 (Anusvāra)	ம	1	நமா₁ன்
+
+(Note: Use standard Tamil letters for unvoiced, unaspirated stops (k, c, ṭ, t, p) unless a subscript is specified.)
+
+TASK COMMAND:
+
+Transcribe the provided source text (Pages 1, 2, and 3), strictly adhering to all rules specified in Sections I, II, and III.

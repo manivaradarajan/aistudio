@@ -3,13 +3,15 @@
 
 pdf_file: Idu_04.pdf
 
-# The Gemini model to use for all generative steps.
+# The Gemini model to use for all generative steps unless overridden.
 model: gemini-2.5-pro
 
 # === Page Ranges ===
 # A list of sections to extract from the PDF. Each item is processed by the full workflow below.
 page_ranges:
   # The dictionary format allows for adding a custom suffix to all generated filenames.
+  #- page_range: 76-78
+  #  suffix: 4.3.0
   #- page_range: 85-89
   #  suffix: 4.3.3
   #- page_range: 89,91,93-94
@@ -22,10 +24,10 @@ page_ranges:
   #  suffix: 4.3.7
   #- page_range: 104-106
   #  suffix: 4.3.8
-  - page_range: 107-109
-    suffix: 4.3.9
-  - page_range: 109-111
-    suffix: 4.3.10
+  #- page_range: 107-109
+  #  suffix: 4.3.9
+  # - page_range: 109-111
+  #   suffix: 4.3.10
   - page_range: 111-113
     suffix: 4.3.11
 
@@ -37,12 +39,15 @@ workflow:
   - type: extract_text_from_pdf
     prompt: prompt-transcribe.txt
     output_suffix: transcribe
+    #model: gemini-flash-latest
 
   # Step 2: Begin a stateful, multi-turn chat session with the model.
   - type: chat
     turns:
-      # Turn 1: The model receives the input from the previous step (roman text)
-      # and the file context from the initial PDF extraction.
-      - prompt: prompt-translate.txt
-        output_suffix: "" # An empty suffix is recommended for clarity
-        output_extension: ".md"
+     # Turn 1: The model receives the input from the previous step (roman text)
+     # and the file context from the initial PDF extraction.
+     - prompt: prompt-translate.txt
+       clear_uploads: true
+       output_suffix: "" # An empty suffix is recommended for clarity
+       output_extension: ".md"
+
