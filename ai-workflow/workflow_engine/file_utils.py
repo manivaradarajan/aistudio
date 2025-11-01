@@ -104,3 +104,23 @@ def split_pdf(source_pdf_path: Path, page_range_str: str, output_dir: Path) -> P
     except Exception as e:
         logging.error(f"Failed to split PDF '{source_pdf_path.name}': {e}")
         raise
+
+def compress_pdf(pdf_path: Path):
+    """Compresses a PDF in-place using the pikepdf library."""
+    try:
+        import pikepdf
+    except ImportError:
+        logging.warning(
+            "Cannot compress PDF: The 'pikepdf' library is not installed. "
+            "Please run: pip install pikepdf"
+        )
+        return
+
+    logging.info(f"Compressing {pdf_path.name} with pikepdf...")
+    try:
+        with pikepdf.open(pdf_path, allow_overwriting_input=True) as pdf:
+            # Saving with these options helps to reduce the file size.
+            pdf.save(pdf_path, recompress_flate=True, object_stream_mode=pikepdf.ObjectStreamMode.generate)
+        logging.info("Compression complete.")
+    except Exception as e:
+        logging.error(f"Failed to compress {pdf_path.name}: {e}")

@@ -11,7 +11,7 @@ import logging
 import sys
 from pathlib import Path
 
-from workflow_engine.file_utils import split_pdf
+from workflow_engine.file_utils import split_pdf, compress_pdf
 
 def main():
     """Main function to parse arguments and call the PDF splitter."""
@@ -23,7 +23,7 @@ def main():
     )
 
     parser = argparse.ArgumentParser(
-        description="A tool to split a page range from a PDF file.",
+        description="A tool to split a page range from a PDF file. Output is compressed by default.",
         formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument("source_pdf", help="The path to the source PDF file.")
@@ -40,6 +40,12 @@ def main():
         "--output-directory",
         default='.',
         help="The directory to save the output file (defaults to the current directory)."
+    )
+    parser.add_argument(
+        "--no-compress",
+        dest="compress",
+        action="store_false",
+        help="Do not compress the output PDF. Compression is enabled by default."
     )
     
     args = parser.parse_args()
@@ -65,6 +71,10 @@ def main():
             
             logging.info(f"Suffix provided. Renaming output to: {final_path.name}")
             temp_output_path.rename(final_path)
+
+        # By default, compress the output PDF.
+        if args.compress:
+            compress_pdf(final_path)
 
         logging.info(f"\nSuccessfully created split PDF: {final_path}")
 

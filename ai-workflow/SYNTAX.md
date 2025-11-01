@@ -18,6 +18,7 @@ step_definitions:
 # Global configuration settings for the entire run
 pdf_file: my_document.pdf
 model: gemini-2.5-pro
+compress_split_pdfs: true # Optional: Compress split PDFs with pikepdf
 run_name: my-global-run # Used as a prefix in global mode
 
 # Defines the sequence of processing steps

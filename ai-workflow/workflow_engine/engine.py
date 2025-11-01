@@ -6,7 +6,7 @@ from pypdf import PdfReader
 from tqdm import tqdm
 
 from . import handlers
-from .file_utils import is_stale, split_pdf, OUTPUT_DIR
+from .file_utils import is_stale, split_pdf, compress_pdf, OUTPUT_DIR
 
 def handle_run_if_step(step: Dict, config: Dict, prefix: str, current_input_path: Path, workflow_context: Dict, force_regeneration: bool) -> Path:
     """
@@ -125,6 +125,10 @@ def _process_page_ranges(config: Dict, source_pdf_path: Path, force_regeneration
                 temp_split_path = split_pdf(source_pdf_path, page_range_str, OUTPUT_DIR)
                 if temp_split_path != initial_input_path:
                     temp_split_path.rename(initial_input_path)
+                
+                # If compression is enabled in the config, compress the new PDF chunk.
+                if config.get('compress_split_pdfs', False):
+                    compress_pdf(initial_input_path)
             else:
                 logging.info(f"Using cached split PDF: {initial_input_path}")
             
