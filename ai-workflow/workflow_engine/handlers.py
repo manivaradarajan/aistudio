@@ -32,7 +32,7 @@ def handle_extract_text_step(step: Dict, config: Dict, prefix: str, input_pdf: P
             spinner.stop()
 
         prompt_parts = [prompt_path.read_text(encoding='utf-8'), file_handle]
-        response_text = _call_gemini_api(model, prompt_parts, "Generating text from PDF...")
+        response_text = _call_gemini_api(model, prompt_parts, "Extracting text from PDF...")
         
         output_path.write_text(response_text, encoding='utf-8')
         logging.info(f"--> Saved output to: {output_path}")

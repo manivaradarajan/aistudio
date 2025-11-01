@@ -18,38 +18,38 @@ defaults:
 # === Page Ranges ===
 # The workflow will run for each of the page ranges defined here.
 page_ranges:
-  - page_range: 76-78
+  - page_range: 76-78  
     suffix: 4.3.0
-  # - page_range: 85-89
-  #   suffix: 4.3.3
-  # - page_range: 89,91,93-94
-  #   suffix: 4.3.4
-  # - page_range: 95-98
-  #   suffix: 4.3.5
-  # - page_range: 98-101
-  #   suffix: 4.3.6
-  # - page_range: 102-104
-  #   suffix: 4.3.7
-  # - page_range: 104-106
-  #   suffix: 4.3.8
-  # - page_range: 107-109
-  #   suffix: 4.3.9
-  # - page_range: 109-111
-  #   suffix: 4.3.10
-  # - page_range: 111-113
-  #   suffix: 4.3.11
+  - page_range: 78-82
+    suffix: 4.3.1
+  - page_range: 82-85
+    suffix: 4.3.2
+  - page_range: 85-89
+    suffix: 4.3.3
+  - page_range: 89,91,93-94
+    suffix: 4.3.4
+  - page_range: 95-98
+    suffix: 4.3.5
+  - page_range: 98-101
+    suffix: 4.3.6
+  - page_range: 102-104
+    suffix: 4.3.7
+  - page_range: 104-106
+    suffix: 4.3.8
+  - page_range: 107-109
+    suffix: 4.3.9
+  - page_range: 109-111
+    suffix: 4.3.10
+  - page_range: 111-113
+    suffix: 4.3.11
 
 # === Dynamic Workflow Definition ===
 workflow:
   # Step 1: Extract text from the PDF.
-  # This step automatically uses the defaults defined above: a model override
-  # and the 'transcribe' output suffix.
   - type: extract_text_from_pdf
     prompt: prompt-transcribe.txt
 
   # Step 2: Translate the text using a single-turn chat.
-  # This uses the simplified chat syntax and inherits the default settings
-  # for 'output_extension' and 'clear_uploads'.
   - type: chat
     prompt: prompt-translate.txt
     # We still specify an empty suffix to prevent one from being generated.

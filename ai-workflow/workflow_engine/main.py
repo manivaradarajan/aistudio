@@ -11,10 +11,11 @@ from .gemini_utils import get_gemini_api_key
 from .file_utils import OUTPUT_DIR
 
 # --- Configuration ---
+# Basic logging configuration. The tqdm context manager will handle
+# redirecting output to be compatible with the progress bar.
 logging.basicConfig(
     level=logging.INFO,
     format="[%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)]
 )
 
 def main():

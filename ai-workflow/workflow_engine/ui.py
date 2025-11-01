@@ -3,6 +3,7 @@ import time
 import threading
 import itertools
 
+
 class Spinner:
     """A simple spinner class to show progress for long-running operations."""
     def __init__(self, message="Processing..."):

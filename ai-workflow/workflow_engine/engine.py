@@ -116,16 +116,16 @@ def _process_page_ranges(config: Dict, source_pdf_path: Path, force_regeneration
             page_range_str, custom_suffix = str(item['page_range']), item.get('suffix')
         else:
             page_range_str, custom_suffix = str(item), None
-        
-        prefix = f"{source_pdf_path.stem}-{page_range_str}-{custom_suffix}" if custom_suffix else f"{source_pdf_path.stem}-{page_range_str}"
-        logging.info(f"\n{'='*60}\n--- Starting processing for page range: {page_range_str} (Prefix: {prefix}) ---\n{'='*60}")
+            
+            prefix = f"{source_pdf_path.stem}-{page_range_str}-{custom_suffix}" if custom_suffix else f"{source_pdf_path.stem}-{page_range_str}"
+            logging.info(f"\n{'='*60}\n--- Starting processing for page range: {page_range_str} (Prefix: {prefix}) ---\n{'='*60}")
 
-        initial_input_path = OUTPUT_DIR / f"{prefix}.pdf"
-        if is_stale(initial_input_path, [source_pdf_path], force=force_regeneration):
-            temp_split_path = split_pdf(source_pdf_path, page_range_str, OUTPUT_DIR)
-            if temp_split_path != initial_input_path:
-                temp_split_path.rename(initial_input_path)
-        else:
-            logging.info(f"Using cached split PDF: {initial_input_path}")
-        
-        run_workflow(config, prefix, initial_input_path, force_regeneration)
+            initial_input_path = OUTPUT_DIR / f"{prefix}.pdf"
+            if is_stale(initial_input_path, [source_pdf_path], force=force_regeneration):
+                temp_split_path = split_pdf(source_pdf_path, page_range_str, OUTPUT_DIR)
+                if temp_split_path != initial_input_path:
+                    temp_split_path.rename(initial_input_path)
+            else:
+                logging.info(f"Using cached split PDF: {initial_input_path}")
+            
+            run_workflow(config, prefix, initial_input_path, force_regeneration)
