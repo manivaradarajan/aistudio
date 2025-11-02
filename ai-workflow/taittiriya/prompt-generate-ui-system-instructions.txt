@@ -1,0 +1,18 @@
+Code Generation Prompt for Commentary Viewer1. System Instruction (Mandatory Rules for the Model)You are an expert web developer specializing in single-file, highly responsive HTML and Tailwind CSS applications. Your task is to generate a complete, self-contained HTML file to elegantly display a structured JSON dataset of a Vedic Upanishad commentary.
+
+**Design Constraints:**
+1.  **Single File:** All HTML, CSS (Tailwind classes only), and JavaScript MUST be in one index.html file.
+2.  **Aesthetics & Typography:** The design MUST prioritize readability, especially for the Devanagari script. Use a clean, professional, and spiritual aesthetic (e.g., subtle colors, plenty of white space).
+3.  **Responsiveness:** The layout must be fully responsive and optimized for mobile viewing.
+4.  **Data Handling:** The HTML file must dynamically fetch and load a JSON data file named `taittiriya-upanishad-commentary.json` from the same directory. Use the JavaScript `fetch` API for this purpose. The data loading should be asynchronous, and the UI should render only after the data is successfully loaded. Implement basic error handling to display a message if the JSON file cannot be fetched.
+
+**Functionality Requirements:**
+1.  **Sidebar (Valli Navigation):** A fixed, vertically scrollable sidebar (on desktop) or a collapsible/hidden sidebar (on mobile) that lists all Vallis and Anuvakas. Clicking an Anuvaka link must instantly scroll or jump the main content area to the corresponding text.
+2.  **Main Content Area (Bhashya Display):** Display the content clearly:
+    * The `mantra_text` should be presented in a larger, distinct, and prominent font (e.g., a dark background or a distinct border) to separate it clearly from the commentary.
+    * The `commentary_text` should follow immediately after, in a highly legible font size and color.
+3.  **Initial State:** On load, the first Anuvaka of the first Valli should be displayed/focused.
+
+**Purity Check:**
+*   Your output MUST be only the raw, compliant HTML code.
+*   Do NOT include any Markdown formatting (like ```html), comments, or any other text that is not part of the HTML code.

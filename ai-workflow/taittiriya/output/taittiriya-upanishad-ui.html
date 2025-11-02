@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taittiriya Upanishad with Commentary</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fdf6e3;
+            --container-bg: #fff;
+            --text-color: #586e75;
+            --header-color: #268bd2;
+            --mantra-bg: #eee8d5;
+            --border-color: #d3cbb7;
+            --commentary-text: #657b83;
+            --hover-color: #073642;
+            --error-color: #dc322f;
+        }
+
+        body {
+            font-family: 'Noto Serif', serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: var(--container-bg);
+            padding: 2rem 3rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            min-height: 80vh;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--header-color);
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        details {
+            margin-bottom: 1.5rem;
+            border-left: 3px solid transparent;
+            padding-left: 1rem;
+            transition: border-left 0.3s ease;
+        }
+
+        details[open] {
+            border-left-color: var(--header-color);
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 700;
+            list-style: none; /* Hide default marker */
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        summary::-webkit-details-marker {
+            display: none; /* For Chrome */
+        }
+        
+        summary::before {
+            content: '▶';
+            color: var(--header-color);
+            margin-right: 0.75rem;
+            display: inline-block;
+            transition: transform 0.2s ease-in-out;
+            font-size: 0.8em;
+            position: absolute;
+            left: -1.2rem;
+            top: 50%;
+            transform: translateY(-50%) rotate(0deg);
+        }
+
+        details[open] > summary::before {
+            transform: translateY(-50%) rotate(90deg);
+        }
+
+        summary:hover {
+            color: var(--hover-color);
+        }
+
+        .valli-summary {
+            font-size: 1.8rem;
+            font-family: 'Noto Sans Devanagari', sans-serif;
+        }
+
+        .anuvaka-summary {
+            font-size: 1.4rem;
+            margin-top: 1rem;
+            color: #839496;
+            font-family: 'Noto Sans Devanagari', sans-serif;
+        }
+        
+        .anuvaka-content {
+            padding: 1rem 0 1rem 1.75rem; /* Indent content */
+            border-left: 1px dashed var(--border-color);
+            margin-left: 5px;
+        }
+
+        .mantra {
+            background-color: var(--mantra-bg);
+            padding: 1.5rem;
+            border-radius: 6px;
+            border-left: 5px solid var(--header-color);
+            margin-bottom: 1.5rem;
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            font-size: 1.25rem;
+            line-height: 2.2;
+            color: var(--hover-color);
+            text-align: center;
+        }
+
+        .commentary {
+            font-family: 'Noto Serif', serif;
+            color: var(--commentary-text);
+            text-align: justify;
+            font-size: 1.1rem;
+            white-space: pre-wrap; /* Preserve line breaks from JSON */
+            padding: 0 0.5rem;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            background-color: #fdd;
+            border: 1px solid var(--error-color);
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .valli-summary {
+                font-size: 1.5rem;
+            }
+            .anuvaka-summary {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>तैत्तिरीयोपनिषत् भाष्यम्</h1>
+        <main id="content-container">
+            <p>Loading commentary...</p>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('content-container');
+            const dataUrl = 'taittiriya-upanishad-commentary.json';
+
+            const renderError = (message) => {
+                container.innerHTML = `<div class="error-message">
+                    <strong>Error Loading Data</strong><br>
+                    ${message}
+                </div>`;
+            };
+
+            const renderData = (data) => {
+                if (!data || !Array.isArray(data)) {
+                    renderError("The loaded data is not in the expected format.");
+                    return;
+                }
+                
+                // Clear loading message
+                container.innerHTML = ''; 
+
+                data.forEach((valli, valliIndex) => {
+                    const valliDetails = document.createElement('details');
+                    // Open the first Valli by default
+                    if (valliIndex === 0) {
+                        valliDetails.open = true;
+                    }
+
+                    const valliSummary = document.createElement('summary');
+                    valliSummary.className = 'valli-summary';
+                    valliSummary.textContent = `${valli.valli_name} (${valli.valli_number})`;
+                    valliDetails.appendChild(valliSummary);
+
+                    valli.anuvakas.forEach(anuvaka => {
+                        const anuvakaDetails = document.createElement('details');
+                        
+                        const anuvakaSummary = document.createElement('summary');
+                        anuvakaSummary.className = 'anuvaka-summary';
+                        anuvakaSummary.textContent = `अनुवाकः ${anuvaka.anuvaka_number}`;
+                        anuvakaDetails.appendChild(anuvakaSummary);
+                        
+                        const anuvakaContent = document.createElement('div');
+                        anuvakaContent.className = 'anuvaka-content';
+
+                        const mantraDiv = document.createElement('div');
+                        mantraDiv.className = 'mantra';
+                        mantraDiv.textContent = anuvaka.mantra_text;
+                        anuvakaContent.appendChild(mantraDiv);
+                        
+                        if (anuvaka.commentary_text && anuvaka.commentary_text.trim() !== '') {
+                            const commentaryDiv = document.createElement('div');
+                            commentaryDiv.className = 'commentary';
+                            commentaryDiv.textContent = anuvaka.commentary_text;
+                            anuvakaContent.appendChild(commentaryDiv);
+                        }
+                        
+                        anuvakaDetails.appendChild(anuvakaContent);
+                        valliDetails.appendChild(anuvakaDetails);
+                    });
+
+                    container.appendChild(valliDetails);
+                });
+            };
+
+            fetch(dataUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    renderData(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching or parsing data:', error);
+                    renderError(`Could not load '${dataUrl}'. Please ensure the file exists in the same directory and you are running a local web server. See browser console for details.`);
+                });
+        });
+    </script>
+
+</body>
+</html>

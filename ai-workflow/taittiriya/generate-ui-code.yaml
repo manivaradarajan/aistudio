@@ -1,0 +1,12 @@
+# === Global Configuration ===
+# These settings apply to the entire run unless overridden below.
+model: gemini-2.5-pro
+run_name: "taittiriya-upanishad-ui"
+
+# === Dynamic Workflow Definition ===
+workflow:
+  - type: chat
+    prompt: "prompt-generate-ui-task.txt"
+    system_prompt: "prompt-generate-ui-system-instructions.txt"
+    output_extension: ".html"
+    input_file: "output/taittiriya-upanishad-commentary.json"

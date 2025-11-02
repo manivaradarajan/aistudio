@@ -79,7 +79,10 @@ def handle_chat_step(step: Dict, config: Dict, prefix: str, input_path: Path, co
     history = []
     logging.info("Initialized chat history.")
     
-    current_chat_input_path = input_path
+    if 'input_file' in step:
+        current_chat_input_path = Path(step['input_file'])
+    else:
+        current_chat_input_path = input_path
 
     if 'turns' in step:
         turns = step['turns']
@@ -93,11 +96,16 @@ def handle_chat_step(step: Dict, config: Dict, prefix: str, input_path: Path, co
         output_path = _get_output_path(prefix, turn)
         
         dependencies = [current_chat_input_path, turn_prompt_path]
+        if 'system_prompt' in turn:
+            dependencies.append(Path(turn['system_prompt']))
         fileset_content = ""
         
         turn_files = []
         if 'fileset' in turn:
-            turn_files.extend(_gather_files(turn['fileset'], OUTPUT_DIR, prefix))
+            fileset_config = turn['fileset']
+            base_dir_name = fileset_config.get('base_dir', '.')
+            base_dir = Path(base_dir_name)
+            turn_files.extend(_gather_files(fileset_config, base_dir, prefix))
 
         if 'context_files' in turn:
             fileset_id = turn['context_files']
@@ -118,6 +126,9 @@ def handle_chat_step(step: Dict, config: Dict, prefix: str, input_path: Path, co
         if current_chat_input_path.suffix == '.pdf':
             input_text = ""
             logging.info("Chat turn started with a PDF as input; using empty text as base.")
+        elif not current_chat_input_path.is_file():
+            input_text = ""
+            logging.info("No valid input file provided or path is a directory; using empty text as base.")
         else:
             input_text = current_chat_input_path.read_text(encoding='utf-8')
 
@@ -168,8 +179,8 @@ def handle_gather_files_step(step: Dict, context: Dict, prefix: str):
     fileset_id = step['id']
     logging.info(f"Gathering files for fileset with ID: '{fileset_id}'")
     
-    base_dir_name = step.get('base_dir', 'output')
-    base_dir = OUTPUT_DIR if base_dir_name == 'output' else Path('.')
+    base_dir_name = step.get('base_dir', '.')
+    base_dir = Path(base_dir_name)
 
     gathered_files = _gather_files(step, base_dir, prefix)
     context[fileset_id] = gathered_files
