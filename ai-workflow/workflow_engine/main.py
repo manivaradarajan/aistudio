@@ -46,8 +46,10 @@ def main():
 
         if "page_ranges" in config and config["page_ranges"]:
             if "pdf_file" not in config:
-                raise ValueError("'pdf_file' key is required in the YAML when 'page_ranges' is defined.")
+                raise ValueError("''pdf_file'' key is required in the YAML when ''page_ranges'' is defined.")
             source_pdf_path = Path(config["pdf_file"])
+            if not source_pdf_path.exists():
+                raise FileNotFoundError(f"Source PDF ''{source_pdf_path}'' not found.")
             _process_page_ranges(config, source_pdf_path, args.force)
         else:
             logging.info("No 'page_ranges' found. Executing in 'global' mode.")
