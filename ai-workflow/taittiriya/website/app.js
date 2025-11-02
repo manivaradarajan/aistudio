@@ -1,11 +1,11 @@
-// app.js (Final Version with Hash-Based Routing and ALL functions)
+// app.js (Corrected to auto-show commentary from URL)
 
 let allTexts = [];
 let upanishadData = {};
 let currentTextFile = null;
 let currentLocation = {};
 
-// --- DOM References ---
+// --- DOM References --- (no changes)
 const bodyEl = document.body,
   textSelector = document.getElementById("text-selector"),
   navigatorPane = document.getElementById("nav-pane"),
@@ -30,30 +30,20 @@ async function init() {
     const response = await fetch("texts.json");
     if (!response.ok) throw new Error("Could not load texts.json manifest.");
     allTexts = await response.json();
-    populateTextSelector(); // This will now work
+    populateTextSelector();
     await handleRouteChange();
   } catch (error) {
     console.error("Initialization failed:", error);
   }
 }
 
-// --- RESTORED FUNCTION ---
-function populateTextSelector() {
-  allTexts.forEach((text) => {
-    const option = document.createElement("option");
-    option.value = text.file;
-    option.textContent = text.name;
-    textSelector.appendChild(option);
-  });
-}
-
-// --- Routing ---
+// --- UPDATED Central Router ---
 async function handleRouteChange() {
   const path = window.location.hash.slice(1);
   const pathParts = path.split("/").filter((p) => p);
   const textSlug = pathParts[0] || allTexts[0].slug;
-
   const targetText = allTexts.find((t) => t.slug === textSlug);
+
   if (!targetText) {
     window.location.hash = "/";
     return;
@@ -67,68 +57,58 @@ async function handleRouteChange() {
   const navLevels = upanishadData.structure_levels.slice(0, -1);
   let dataTraversal = upanishadData.content;
 
+  // Determine the section to load based on URL
   for (let i = 0; i < navLevels.length; i++) {
-    const levelKey = `level${i}`;
-    const levelName = navLevels[i].toLowerCase();
-    const urlNumber = parseInt(pathParts[i + 1], 10);
+    const urlNumber = parseInt(pathParts[i + 1], 10) || 1; // Default to 1 if not present
     const foundIndex = dataTraversal.findIndex(
-      (item) => item[levelName + "_number"] === urlNumber
+      (item) => item.number === urlNumber
     );
     const index = foundIndex !== -1 ? foundIndex : 0;
-    location[levelKey] = index;
-    const nextLevelName = upanishadData.structure_levels[i + 1]?.toLowerCase();
-    dataTraversal = dataTraversal[index]?.[nextLevelName + "s"];
+    location[`level${i}`] = index;
+    dataTraversal = dataTraversal[index]?.children;
   }
   loadSection(location);
 
-  const leafLevelKey = upanishadData.structure_levels
-    .slice(-1)[0]
-    .toLowerCase();
-  const leafUrlNumber = parseInt(pathParts[pathParts.length - 1], 10);
+  // --- THIS IS THE FIX ---
+  // Now, find the specific item to show based on the full URL path
+  const leafUrlNumber = parseInt(pathParts[navLevels.length + 1], 10);
 
-  let itemToShow = mantraDisplay.querySelector(".item-container");
+  let itemToSelect = mantraDisplay.querySelector(".item-container"); // Default to the first item
+
   if (!isNaN(leafUrlNumber)) {
-    const leafArray = mantraDisplay.querySelectorAll(".item-container");
-    for (const item of leafArray) {
+    // Find the specific item container whose 'data-number' matches the URL
+    const allItems = mantraDisplay.querySelectorAll(".item-container");
+    for (const item of allItems) {
       if (parseInt(item.dataset.number, 10) === leafUrlNumber) {
-        itemToShow = item;
+        itemToSelect = item;
         break;
       }
     }
   }
-  if (itemToShow) showItemDetails(itemToShow, false);
+
+  // Finally, "click" the correct item to show its details
+  if (itemToSelect) {
+    showItemDetails(itemToSelect, false); // false = don't show mobile pane automatically
+  }
+  // --- END OF FIX ---
 }
 
-function navigateTo(location, leafIndex) {
-  const textSlug = allTexts.find((t) => t.file === currentTextFile).slug;
-  const navLevels = upanishadData.structure_levels.slice(0, -1);
-  let path = `/${textSlug}`;
+// --- All other functions remain the same ---
+// (Pasting the full, correct code below for safety)
 
-  if (navLevels.length > 0) {
-    let pathNumbers = [];
-    let dataTraversal = upanishadData.content;
-    for (let i = 0; i < navLevels.length; i++) {
-      const levelKey = navLevels[i].toLowerCase();
-      const index = location[`level${i}`];
-      const item = dataTraversal[index];
-      pathNumbers.push(item[levelKey + "_number"]);
-      const nextLevelKey = upanishadData.structure_levels[i + 1]?.toLowerCase();
-      dataTraversal = item[nextLevelKey + "s"];
-    }
-    path += "/" + pathNumbers.join("/");
-  }
-
-  if (leafIndex !== undefined) {
-    if (navLevels.length === 0) {
-      path += `/${leafIndex}`;
-    } else {
-      path += `/${leafIndex}`;
-    }
-  }
-  window.location.hash = path;
+function populateTextSelector() {
+  allTexts.forEach((text) => {
+    const option = document.createElement("option");
+    option.value = text.file;
+    option.textContent = text.name;
+    textSelector.appendChild(option);
+  });
 }
-
-// --- Data Loading and Rendering ---
+function navigateTo(path) {
+  if (window.location.hash !== `#${path}`) {
+    window.location.hash = path;
+  }
+}
 async function loadText(filePath) {
   try {
     const response = await fetch(filePath);
@@ -150,23 +130,20 @@ async function loadText(filePath) {
     console.error(`Error loading text from ${filePath}:`, error);
   }
 }
-
 function renderNavigator() {
   navigatorContent.innerHTML = "";
   const levels = upanishadData.structure_levels;
   const content = upanishadData.content;
-  const leafLevelName = levels.slice(-1)[0];
+  const textSlug = allTexts.find((t) => t.file === currentTextFile).slug;
   const labels = { Anuvaka: "अनुवाकः", Mantra: "मन्त्रः" };
   if (levels.length === 1) {
     const list = document.createElement("ul");
     content.forEach((item, index) => {
       const listItem = document.createElement("li");
       const link = document.createElement("a");
-      link.href = "#";
-      const label = labels[leafLevelName] || leafLevelName;
-      link.textContent = `${label} ${
-        item[leafLevelName.toLowerCase() + "_number"]
-      }`;
+      link.href = `#/${textSlug}/${item.number}`;
+      const label = labels[item.type] || item.type;
+      link.textContent = `${label} ${item.number}`;
       link.dataset.leafIndex = index;
       listItem.appendChild(link);
       list.appendChild(listItem);
@@ -180,18 +157,15 @@ function renderNavigator() {
       details.className = "accordion-group";
       details.dataset.level0 = topIndex;
       const summary = document.createElement("summary");
-      summary.textContent = topItem[topLevelName.toLowerCase() + "_name"];
+      summary.textContent = topItem.name;
       details.appendChild(summary);
       const list = document.createElement("ul");
-      const midLevelArrayKey = midLevelName.toLowerCase() + "s";
-      topItem[midLevelArrayKey].forEach((midItem, midIndex) => {
+      topItem.children.forEach((midItem, midIndex) => {
         const listItem = document.createElement("li");
         const link = document.createElement("a");
-        link.href = "#";
+        link.href = `#/${textSlug}/${topItem.number}/${midItem.number}`;
         const label = labels[midLevelName] || midLevelName;
-        link.textContent = `${label} ${
-          midItem[midLevelName.toLowerCase() + "_number"]
-        }`;
+        link.textContent = `${label} ${midItem.number}`;
         link.dataset.level0 = topIndex;
         link.dataset.level1 = midIndex;
         listItem.appendChild(link);
@@ -202,7 +176,6 @@ function renderNavigator() {
     });
   }
 }
-
 function loadSection(location) {
   currentLocation = location;
   const levels = upanishadData.structure_levels;
@@ -213,19 +186,14 @@ function loadSection(location) {
     for (let i = 0; i < navLevels.length; i++) {
       const index = location[`level${i}`];
       if (index === undefined) break;
-      const levelName = navLevels[i];
       dataToRender = dataToRender[index];
       titleParts.push(
-        dataToRender[levelName.toLowerCase() + "_name"] ||
-          `${levelName} ${dataToRender[levelName.toLowerCase() + "_number"]}`
+        dataToRender.name || `${levels[i]} ${dataToRender.number}`
       );
-      const nextLevelName = levels[i + 1];
-      dataToRender = dataToRender[nextLevelName.toLowerCase() + "s"];
+      dataToRender = dataToRender.children;
     }
   }
   mantraDisplay.innerHTML = "";
-  const leafLevelName = levels.slice(-1)[0];
-  const leafLevelKey = leafLevelName.toLowerCase();
   if (Array.isArray(dataToRender)) {
     dataToRender.forEach((item, index) => {
       const itemContainer = document.createElement("div");
@@ -235,13 +203,13 @@ function loadSection(location) {
       Object.keys(itemPath).forEach(
         (k) => (itemContainer.dataset[k] = itemPath[k])
       );
-      itemContainer.dataset.number = item[leafLevelKey + "_number"];
+      itemContainer.dataset.number = item.number;
       const numberEl = document.createElement("p");
       numberEl.className = "item-number";
-      numberEl.textContent = item[leafLevelKey + "_number"];
+      numberEl.textContent = item.number;
       const textEl = document.createElement("p");
       textEl.className = "item-text";
-      textEl.textContent = item[leafLevelKey + "_text"];
+      textEl.textContent = item.text;
       itemContainer.appendChild(numberEl);
       itemContainer.appendChild(textEl);
       mantraDisplay.appendChild(itemContainer);
@@ -251,41 +219,45 @@ function loadSection(location) {
   updateUiState(location);
 }
 
+// In app.js, replace the old showItemDetails function with this one.
+
 function showItemDetails(itemContainer, showMobilePane = true) {
   const selected = mantraDisplay.querySelector(".selected");
   if (selected) selected.classList.remove("selected");
   itemContainer.classList.add("selected");
-  if (showMobilePane)
-    itemContainer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+  // THIS IS THE FIX: This line is now unconditional.
+  // It will scroll the selected item into view every time.
+  itemContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+
   let dataToFind = upanishadData.content;
   const levels = upanishadData.structure_levels;
+
   for (let i = 0; i < levels.length; i++) {
     const index = itemContainer.dataset[`level${i}`];
     if (index === undefined) break;
     dataToFind = dataToFind[parseInt(index)];
     if (i < levels.length - 1) {
-      dataToFind = dataToFind[levels[i + 1].toLowerCase() + "s"];
+      dataToFind = dataToFind.children;
     }
   }
+
   const itemData = dataToFind;
+  if (itemData) {
+    // Update the URL hash without triggering a full re-route
+    const newPath = buildPathFromContainer(itemContainer);
+    if (window.location.hash !== `#${newPath}`) {
+      history.replaceState(history.state, "", `#${newPath}`);
+    }
 
-  const leafLevelKey = levels.slice(-1)[0].toLowerCase();
-  const leafIndex = itemData[leafLevelKey + "_number"];
-
-  // Create new location object for navigateTo
-  const newLocation = {};
-  const navLevels = levels.slice(0, -1);
-  navLevels.forEach((level, i) => {
-    newLocation[`level${i}`] = parseInt(itemContainer.dataset[`level${i}`]);
-  });
-
-  navigateTo(newLocation, leafIndex);
-
-  if (itemData && itemData.commentary_text) {
-    commentaryText.innerHTML = marked.parse(itemData.commentary_text);
-  } else {
-    commentaryText.innerHTML = "<p>No commentary available.</p>";
+    if (itemData.commentary_text) {
+      commentaryText.innerHTML = marked.parse(itemData.commentary_text);
+    } else {
+      commentaryText.innerHTML = "<p>No commentary available.</p>";
+    }
   }
+
+  // This part remains conditional, only opening the sheet on a direct tap.
   if (window.innerWidth <= 800 && showMobilePane) {
     openMobileOverlay(commentaryPane);
   }
@@ -294,17 +266,18 @@ function showItemDetails(itemContainer, showMobilePane = true) {
 function updateUiState(location) {
   const activeLink = navigatorContent.querySelector("a.active");
   if (activeLink) activeLink.classList.remove("active");
-  let selector = Object.keys(location)
-    .map((key) => `[data-${key}="${location[key]}"]`)
-    .join("");
-  if (
-    upanishadData.structure_levels.length === 1 &&
-    location.leafIndex !== undefined
-  ) {
-    selector = `[data-leaf-index="${location.leafIndex}"]`;
+  const path = window.location.hash;
+  const newLink = navigatorContent.querySelector(`a[href="${path}"]`);
+  if (newLink) {
+    newLink.classList.add("active");
+  } else {
+    const pathParts = path.slice(1).split("/");
+    const sectionPath = pathParts.slice(0, -1).join("/");
+    const sectionLink = navigatorContent.querySelector(
+      `a[href="#${sectionPath}"]`
+    );
+    if (sectionLink) sectionLink.classList.add("active");
   }
-  const newLink = navigatorContent.querySelector(`a${selector}`);
-  if (newLink) newLink.classList.add("active");
   document
     .querySelectorAll(".accordion-group")
     .forEach((el) => (el.open = false));
@@ -316,43 +289,39 @@ function updateUiState(location) {
   }
   updateArrowButtons();
 }
-
 function addEventListeners() {
   window.addEventListener("hashchange", handleRouteChange);
-  textSelector.addEventListener("change", (event) => {
-    const newFile = event.target.value;
-    const newSlug = allTexts.find((t) => t.file === newFile).slug;
+  textSelector.addEventListener("change", (e) => {
+    const newSlug = allTexts.find((t) => t.file === e.target.value).slug;
     window.location.hash = `/${newSlug}`;
   });
   navigatorContent.addEventListener("click", (e) => {
-    const link = e.target.closest("a");
-    if (!link) return;
-    e.preventDefault();
-    if (upanishadData.structure_levels.length === 1) {
-      const index = link.dataset.leafIndex;
-      const targetItem =
-        mantraDisplay.querySelectorAll(".item-container")[index];
-      if (targetItem) showItemDetails(targetItem, false);
-    } else {
-      const location = {};
-      const navLevels = upanishadData.structure_levels.slice(0, -1);
-      for (let i = 0; i < navLevels.length; i++) {
-        if (link.dataset[`level${i}`] !== undefined) {
-          location[`level${i}`] = parseInt(link.dataset[`level${i}`]);
-        }
-      }
-      navigateTo(location);
-    }
     closeMobileOverlays();
   });
   mantraDisplay.addEventListener("click", (e) => {
     const container = e.target.closest(".item-container");
-    if (container) showItemDetails(container);
+    if (container) {
+      const newPath = buildPathFromContainer(container);
+      navigateTo(newPath);
+      showItemDetails(container);
+    }
   });
   const navigateArrows = (direction) => {
     const { prev, next } = getAdjacentSections();
     const target = direction === "prev" ? prev : next;
-    if (target) navigateTo(target);
+    if (target) {
+      const textSlug = allTexts.find((t) => t.file === currentTextFile).slug;
+      const navLevels = upanishadData.structure_levels.slice(0, -1);
+      let pathNumbers = [];
+      let dataTraversal = upanishadData.content;
+      for (let i = 0; i < navLevels.length; i++) {
+        const index = target[`level${i}`];
+        const item = dataTraversal[index];
+        pathNumbers.push(item.number);
+        dataTraversal = item.children;
+      }
+      navigateTo(`/${textSlug}/${pathNumbers.join("/")}`);
+    }
   };
   prevBtn.addEventListener("click", () => navigateArrows("prev"));
   nextBtn.addEventListener("click", () => navigateArrows("next"));
@@ -363,7 +332,22 @@ function addEventListeners() {
   mobileCommentaryClose.addEventListener("click", closeMobileOverlays);
   mobileOverlay.addEventListener("click", closeMobileOverlays);
 }
-
+function buildPathFromContainer(container) {
+  const textSlug = allTexts.find((t) => t.file === currentTextFile).slug;
+  const levels = upanishadData.structure_levels;
+  let pathParts = [textSlug];
+  let dataNode = upanishadData.content;
+  for (let i = 0; i < levels.length; i++) {
+    const index = container.dataset[`level${i}`];
+    if (index === undefined) break;
+    dataNode = dataNode[parseInt(index)];
+    pathParts.push(dataNode.number);
+    if (i < levels.length - 1) {
+      dataNode = dataNode.children;
+    }
+  }
+  return `/${pathParts.join("/")}`;
+}
 function openMobileOverlay(pane) {
   pane.classList.add("active");
   mobileOverlay.classList.add("active");
@@ -382,34 +366,31 @@ function updateArrowButtons() {
 }
 function getAdjacentSections() {
   const navLevels = upanishadData.structure_levels.slice(0, -1);
-  if (navLevels.length < 2) return { prev: null, next: null };
-  const level0Key = "level0";
-  const level1Key = "level1";
-  const level0Index = currentLocation[level0Key];
-  const level1Index = currentLocation[level1Key];
+  if (navLevels.length === 0) return { prev: null, next: null };
   let prev = { ...currentLocation };
   let next = { ...currentLocation };
-  const level1ArrayKey = navLevels[1].toLowerCase() + "s";
-  if (
-    level1Index <
-    upanishadData.content[level0Index][level1ArrayKey].length - 1
-  ) {
-    next[level1Key]++;
-  } else if (level0Index < upanishadData.content.length - 1) {
-    next[level0Key]++;
-    next[level1Key] = 0;
-  } else {
-    next = null;
+  if (navLevels.length === 2) {
+    const level0Index = currentLocation.level0;
+    const level1Index = currentLocation.level1;
+    const level1Array = upanishadData.content[level0Index].children;
+    if (level1Index < level1Array.length - 1) {
+      next.level1++;
+    } else if (level0Index < upanishadData.content.length - 1) {
+      next.level0++;
+      next.level1 = 0;
+    } else {
+      next = null;
+    }
+    if (level1Index > 0) {
+      prev.level1--;
+    } else if (level0Index > 0) {
+      prev.level0--;
+      const prevLevel1Array = upanishadData.content[prev.level0].children;
+      prev.level1 = prevLevel1Array.length - 1;
+    } else {
+      prev = null;
+    }
+    return { prev, next };
   }
-  if (level1Index > 0) {
-    prev[level1Key]--;
-  } else if (level0Index > 0) {
-    prev[level0Key]--;
-    const prevLevel1Array =
-      upanishadData.content[prev[level0Key]][level1ArrayKey];
-    prev[level1Key] = prevLevel1Array.length - 1;
-  } else {
-    prev = null;
-  }
-  return { prev, next };
+  return { prev, next: null };
 }

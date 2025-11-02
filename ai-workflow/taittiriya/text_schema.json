@@ -1,36 +1,83 @@
 {
-  "type": "ARRAY",
-  "description": "A list of Vallis in the Taittiriya Upanishad.",
-  "items": {
-    "type": "OBJECT",
-    "properties": {
-      "valli_name": { "type": "STRING", "description": "The name of the Valli." },
-      "valli_number": { "type": "INTEGER", "description": "The sequential number of the Valli." },
-      "anuvakas": {
-        "type": "ARRAY",
-        "description": "A list of Anuvakas (chapters) within this Valli.",
-        "items": {
-          "type": "OBJECT",
-          "properties": {
-            "anuvaka_number": { "type": "INTEGER", "description": "The sequential number of the Anuvaka." },
-            "mantras": {
-              "type": "ARRAY",
-              "description": "A list of individual mantras within this Anuvaka.",
-              "items": {
-                "type": "OBJECT",
-                "properties": {
-                  "mantra_number": { "type": "INTEGER", "description": "The sequential number of the mantra within the Anuvaka." },
-                  "mantra_text": { "type": "STRING", "description": "The original mantra text in Devanagari." },
-                  "commentary_text": { "type": "STRING", "description": "The commentary specifically associated with this mantra, potentially with Markdown." }
-                },
-                "required": ["mantra_number", "mantra_text", "commentary_text"]
-              }
-            }
-          },
-          "required": ["anuvaka_number", "mantras"]
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generic Schema for Scriptural Texts",
+  "type": "OBJECT",
+  "properties": {
+    "text_name": {
+      "type": "STRING",
+      "description": "The full name of the text, e.g., 'Taittiriya Upanishad'."
+    },
+    "structure_levels": {
+      "type": "ARRAY",
+      "description": "An ordered list of names for the structural levels, from largest to smallest, e.g., ['Valli', 'Anuvaka', 'Mantra'].",
+      "items": {
+        "type": "STRING"
       }
     },
-    "required": ["valli_name", "valli_number", "anuvakas"]
+    "content": {
+      "type": "ARRAY",
+      "description": "An array of the top-level structural nodes (e.g., an array of Valli objects).",
+      "items": {
+        "$ref": "#/definitions/node"
+      }
+    }
+  },
+  "required": ["text_name", "structure_levels", "content"],
+
+  "definitions": {
+    "node": {
+      "description": "A node can be either a structural container or a content leaf.",
+      "oneOf": [
+        { "$ref": "#/definitions/structuralNode" },
+        { "$ref": "#/definitions/leafNode" }
+      ]
+    },
+    "structuralNode": {
+      "type": "OBJECT",
+      "properties": {
+        "type": {
+          "type": "STRING",
+          "description": "The type of this node, matching a name from structure_levels, e.g., 'Valli', 'Anuvaka'."
+        },
+        "name": {
+          "type": "STRING",
+          "description": "The name of this node, e.g., 'Anandavalli'. Optional."
+        },
+        "number": {
+          "type": "INTEGER",
+          "description": "The sequential number of this node within its parent."
+        },
+        "children": {
+          "type": "ARRAY",
+          "description": "An array of child nodes (which can be more structural nodes or leaf nodes).",
+          "items": {
+            "$ref": "#/definitions/node"
+          }
+        }
+      },
+      "required": ["type", "number", "children"]
+    },
+    "leafNode": {
+      "type": "OBJECT",
+      "properties": {
+        "type": {
+          "type": "STRING",
+          "description": "The type of this leaf node, e.g., 'Mantra', 'Sutra'."
+        },
+        "number": {
+          "type": "INTEGER",
+          "description": "The sequential number of this leaf within its parent."
+        },
+        "text": {
+          "type": "STRING",
+          "description": "The main content of the leaf node."
+        },
+        "commentary_text": {
+          "type": "STRING",
+          "description": "The associated commentary, with Markdown."
+        }
+      },
+      "required": ["type", "number", "text"]
+    }
   }
 }

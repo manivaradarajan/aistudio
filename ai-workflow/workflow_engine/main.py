@@ -4,8 +4,8 @@ import sys
 from pathlib import Path
 
 import google.generativeai as genai
-import yaml
 
+from .config import Config
 from .engine import _process_page_ranges, run_workflow
 from .gemini_utils import get_gemini_api_key
 from .file_utils import OUTPUT_DIR
@@ -40,25 +40,23 @@ def main():
         OUTPUT_DIR.mkdir(exist_ok=True)
         logging.info(f"Output directory is '{OUTPUT_DIR}'.")
 
-        with open(args.yaml_file, 'r') as f:
-            config = yaml.safe_load(f)
+        config = Config(Path(args.yaml_file))
         logging.info(f"Configuration loaded from '{args.yaml_file}'.")
 
-        if "page_ranges" in config and config["page_ranges"]:
-            if "pdf_file" not in config:
-                raise ValueError("''pdf_file'' key is required in the YAML when ''page_ranges'' is defined.")
-            source_pdf_path = Path(config["pdf_file"])
-            if not source_pdf_path.exists():
-                raise FileNotFoundError(f"Source PDF ''{source_pdf_path}'' not found.")
-            _process_page_ranges(config, source_pdf_path, args.force)
+        if config.page_ranges:
+            if not config.pdf_file:
+                raise ValueError("'pdf_file' key is required in the YAML when 'page_ranges' is defined.")
+            if not config.pdf_file.exists():
+                raise FileNotFoundError(f"Source PDF '{config.pdf_file}' not found.")
+            _process_page_ranges(config, config.pdf_file, args.force)
         else:
             logging.info("No 'page_ranges' found. Executing in 'global' mode.")
             
-            source_pdf_path = Path(config["pdf_file"]) if "pdf_file" in config else Path()
-            if "pdf_file" in config and not source_pdf_path.exists():
+            source_pdf_path = config.pdf_file if config.pdf_file else Path()
+            if config.pdf_file and not source_pdf_path.exists():
                  raise FileNotFoundError(f"Source PDF '{source_pdf_path}' not found.")
 
-            run_name = config.get('run_name') or (source_pdf_path.stem if source_pdf_path.stem else "global-run")
+            run_name = config.run_name or (source_pdf_path.stem if source_pdf_path.stem else "global-run")
             logging.info(f"Using run name as prefix: '{run_name}'")
 
             logging.info(f"\n{'='*60}\n--- Starting global workflow (Run Name: {run_name}) ---\n{'='*60}")

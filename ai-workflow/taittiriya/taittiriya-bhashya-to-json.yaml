@@ -11,6 +11,6 @@ workflow:
     fileset:
       base_dir: "."
       include:
-        - "input-files/*.md"
-        - "commentary_schema.json"
+        - "input-files/taittiriy*.md"
+        - "text_schema.json"
       global_search: true

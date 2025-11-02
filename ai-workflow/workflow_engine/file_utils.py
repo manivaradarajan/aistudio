@@ -8,7 +8,15 @@ from pypdf import PdfReader, PdfWriter
 OUTPUT_DIR = Path("output")
 
 def _get_output_path(prefix: str, step_config: Dict) -> Path:
-    """Helper function to construct a robust output path from a step's configuration."""
+    """Constructs a robust output path from a step's configuration.
+
+    Args:
+        prefix: The prefix for the output file, typically the run name or page range.
+        step_config: The configuration for the specific workflow step.
+
+    Returns:
+        The full path for the output file.
+    """
     output_ext = step_config.get('output_extension', '.txt')
     suffix = step_config.get('output_suffix')
     
@@ -20,33 +28,55 @@ def _get_output_path(prefix: str, step_config: Dict) -> Path:
     return OUTPUT_DIR / output_filename
 
 def _gather_files(fileset_config: Dict, base_dir: Path, prefix: str) -> List[Path]:
-    """Gathers files based on include/exclude glob patterns."""
+    """Gathers files based on include/exclude glob patterns.
+
+    Args:
+        fileset_config: The configuration for the fileset.
+        base_dir: The base directory to search for files.
+        prefix: The prefix for the run, used for logging.
+
+    Returns:
+        A sorted list of paths to the gathered files.
+    """
     include_patterns = fileset_config.get('include', [])
     exclude_patterns = fileset_config.get('exclude', [])
-    is_global_search = fileset_config.get('global_search', False)
-    
-    glob_prefix = "" if is_global_search else f"{prefix}"
-    if is_global_search:
-        logging.info(f"Performing global search in '{base_dir}'...")
-    else:
-        logging.info(f"Searching with prefix '{glob_prefix}'...")
+
+    logging.info(f"Searching for files to include in '{base_dir}'...")
 
     included_files = set()
     for pattern in include_patterns:
-        for file in base_dir.glob(f"{glob_prefix}{pattern}"):
-            included_files.add(file)
-            
+        # Using rglob for recursive search if the pattern contains '**'
+        if "**" in pattern:
+            files = base_dir.rglob(pattern.split('**/')[-1])
+        else:
+            files = base_dir.glob(pattern)
+        for file in files:
+            included_files.add(file.resolve())
+
     excluded_files = set()
     for pattern in exclude_patterns:
-        for file in base_dir.glob(f"{glob_prefix}{pattern}"):
-            excluded_files.add(file)
-            
+        if "**" in pattern:
+            files = base_dir.rglob(pattern.split('**/')[-1])
+        else:
+            files = base_dir.glob(pattern)
+        for file in files:
+            excluded_files.add(file.resolve())
+
     final_files = sorted(list(included_files - excluded_files))
     logging.info(f"Fileset matched {len(final_files)} files: {[f.name for f in final_files][:5]}...")
     return final_files
 
 def is_stale(output_path: Path, dependency_paths: List[Path], force: bool = False) -> bool:
-    """Checks if an output file is stale and needs to be regenerated."""
+    """Checks if an output file is stale and needs to be regenerated.
+
+    Args:
+        output_path: The path to the output file.
+        dependency_paths: A list of paths to the dependencies of the output file.
+        force: If True, the file is always considered stale.
+
+    Returns:
+        True if the file is stale, False otherwise.
+    """
     if force:
         logging.info(f"--force active. '{output_path.name}' will be regenerated.")
         return True
@@ -106,7 +136,11 @@ def split_pdf(source_pdf_path: Path, page_range_str: str, output_dir: Path) -> P
         raise
 
 def compress_pdf(pdf_path: Path):
-    """Compresses a PDF in-place using the pikepdf library."""
+    """Compresses a PDF in-place using the pikepdf library.
+
+    Args:
+        pdf_path: The path to the PDF file to compress.
+    """
     try:
         import pikepdf
     except ImportError:

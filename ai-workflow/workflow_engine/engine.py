@@ -6,11 +6,23 @@ from pypdf import PdfReader
 from tqdm import tqdm
 
 from . import handlers
+from .config import Config
 from .file_utils import is_stale, split_pdf, compress_pdf, OUTPUT_DIR
 
-def handle_run_if_step(step: Dict, config: Dict, prefix: str, current_input_path: Path, workflow_context: Dict, force_regeneration: bool) -> Path:
-    """
-    Handles the 'run_if' workflow step for conditional execution.
+
+def handle_run_if_step(step: Dict, config: Config, prefix: str, current_input_path: Path, workflow_context: Dict, force_regeneration: bool) -> Path:
+    """Handles the 'run_if' workflow step for conditional execution.
+
+    Args:
+        step: The configuration for the 'run_if' step.
+        config: The global configuration object.
+        prefix: The prefix for the current run.
+        current_input_path: The path to the input file for this step.
+        workflow_context: The context for the current workflow run.
+        force_regeneration: If True, forces regeneration of all files.
+
+    Returns:
+        The path to the output of the nested steps if the condition is met, otherwise the input path.
     """
     logging.info("\n[Workflow Step: run_if]")
     condition = step['condition']
@@ -32,8 +44,21 @@ def handle_run_if_step(step: Dict, config: Dict, prefix: str, current_input_path
         logging.info("Condition not met. Skipping nested steps.")
         return current_input_path
 
-def _run_steps(steps: List[Dict], config: Dict, prefix: str, initial_input_path: Path, workflow_context: Dict, force_regeneration: bool) -> Path:
-    """Recursively runs a list of workflow steps."""
+
+def _run_steps(steps: List[Dict], config: Config, prefix: str, initial_input_path: Path, workflow_context: Dict, force_regeneration: bool) -> Path:
+    """Recursively runs a list of workflow steps.
+
+    Args:
+        steps: A list of workflow steps to run.
+        config: The global configuration object.
+        prefix: The prefix for the current run.
+        initial_input_path: The initial input path for the workflow.
+        workflow_context: The context for the current workflow run.
+        force_regeneration: If True, forces regeneration of all files.
+
+    Returns:
+        The path to the final output of the workflow.
+    """
     current_input_path = initial_input_path
     defaults = config.get('defaults', {})
 
@@ -57,17 +82,31 @@ def _run_steps(steps: List[Dict], config: Dict, prefix: str, initial_input_path:
             raise ValueError(f"Unknown workflow step type: {step_type}")
     return current_input_path
 
-def run_workflow(config: Dict, prefix: str, source_path: Path, force_regeneration: bool):
+
+def run_workflow(config: Config, prefix: str, source_path: Path, force_regeneration: bool):
     """
     Initializes and runs the dynamic workflow based on the provided configuration.
+
+    Args:
+        config: The global configuration object.
+        prefix: The prefix for the current run.
+        source_path: The path to the source file for the workflow.
+        force_regeneration: If True, forces regeneration of all files.
     """
-    workflow_steps = config['workflow']
+    workflow_steps = config.workflow
     workflow_context = {}
     _run_steps(workflow_steps, config, prefix, source_path, workflow_context, force_regeneration)
 
+
 def _generate_page_ranges(page_ranges_config: Union[List, Dict], source_pdf_path: Path) -> List[str]:
-    """
-    Generates a list of page range strings based on the configuration.
+    """Generates a list of page range strings based on the configuration.
+
+    Args:
+        page_ranges_config: The configuration for the page ranges.
+        source_pdf_path: The path to the source PDF file.
+
+    Returns:
+        A list of page range strings.
     """
     if isinstance(page_ranges_config, list):
         return page_ranges_config
@@ -100,16 +139,21 @@ def _generate_page_ranges(page_ranges_config: Union[List, Dict], source_pdf_path
     
     raise TypeError(f"Unsupported type for 'page_ranges': {type(page_ranges_config)}. Must be a list of ranges or a dict with 'pageset_size'.")
 
-def _process_page_ranges(config: Dict, source_pdf_path: Path, force_regeneration: bool):
+def _process_page_ranges(config: Config, source_pdf_path: Path, force_regeneration: bool):
     """
     Processes the PDF in chunks based on the page ranges configuration.
+
+    Args:
+        config: The global configuration object.
+        source_pdf_path: The path to the source PDF file.
+        force_regeneration: If True, forces regeneration of all files.
     """
     logging.info("Executing in 'per-page-range' mode.")
     
     if not source_pdf_path.exists():
         raise FileNotFoundError(f"Source PDF not found: {source_pdf_path}")
 
-    page_ranges = _generate_page_ranges(config["page_ranges"], source_pdf_path)
+    page_ranges = _generate_page_ranges(config.page_ranges, source_pdf_path)
 
     for item in tqdm(page_ranges, desc="Processing page ranges"):
         if isinstance(item, dict):
@@ -133,3 +177,4 @@ def _process_page_ranges(config: Dict, source_pdf_path: Path, force_regeneration
                 logging.info(f"Using cached split PDF: {initial_input_path}")
             
             run_workflow(config, prefix, initial_input_path, force_regeneration)
+
