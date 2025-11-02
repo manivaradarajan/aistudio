@@ -6,12 +6,6 @@ This document outlines the roadmap for evolving the Upanishad Explorer from a si
 
 _Goal: Polish the application with professional features that improve usability._
 
-- [ ] **Implement Client-Side Routing:**
-
-  - [ ] Use the browser's History API or a small library to update the URL as the user navigates.
-  - [ ] Example URLs: `/taittiriya/valli/1/anuvaka/2`, `/isavasya/mantra/5`.
-  - [ ] The application should be able to parse the URL on initial load and jump directly to the correct content. This is crucial for sharing and bookmarking.
-
 - [ ] **Implement Light/Dark Mode Theme Switcher:**
 
   - [ ] Add a toggle button to the UI.

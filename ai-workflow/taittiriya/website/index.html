@@ -7,26 +7,34 @@
     <base href="/" />
     <link rel="stylesheet" href="style.css" />
   </head>
+
   <body>
     <div class="app-container">
       <nav id="nav-pane" class="navigator-pane">
-        <div id="text-selector-container">
-          <label for="text-selector">Select Text:</label>
-          <select id="text-selector"></select>
-        </div>
+        <!-- HEADER COMES FIRST -->
         <header class="pane-header">
           <h2>Navigator</h2>
           <button id="mobile-nav-close" class="close-button">&times;</button>
         </header>
+
+        <!-- TEXT SELECTOR COMES AFTER THE HEADER -->
+        <div id="text-selector-container">
+          <label for="text-selector">Select Text:</label>
+          <select id="text-selector"></select>
+        </div>
+
+        <!-- NAVIGATOR CONTENT COMES LAST -->
         <div id="navigator-content" class="pane-content"></div>
       </nav>
 
       <main id="main-pane" class="main-content-pane">
         <header class="main-header">
           <button id="mobile-nav-toggle" class="menu-button">&#9776;</button>
-          <button id="prev-anuvaka" class="nav-arrow prev-arrow">&lt;</button>
+
+          <!-- UPDATED IDs -->
+          <button id="prev-section" class="nav-arrow prev-arrow">&lt;</button>
           <h1 id="content-title">Loading...</h1>
-          <button id="next-anuvaka" class="nav-arrow next-arrow">&gt;</button>
+          <button id="next-section" class="nav-arrow next-arrow">&gt;</button>
         </header>
         <div id="mantra-display" class="pane-content"></div>
       </main>
