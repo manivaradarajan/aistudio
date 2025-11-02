@@ -28,6 +28,13 @@ body {
   overflow: hidden;
 }
 
+/* This class will be toggled by JS to prevent background scroll on mobile */
+body.mobile-overlay-active {
+  position: fixed; /* Lock the body in place */
+  width: 100%;
+  overflow: hidden; /* Hide any body scrollbars */
+}
+
 /* --- 3. DESKTOP LAYOUT --- */
 .app-container {
   display: flex;
