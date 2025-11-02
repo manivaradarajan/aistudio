@@ -1,10 +1,12 @@
 [
   {
     "name": "Taittiriya Upanishad",
-    "file": "data/taittiriya.json"
+    "file": "data/taittiriya.json",
+    "slug": "taittiriya"
   },
   {
-    "name": "Isavasya Upanishad (Coming Soon)",
-    "file": "data/isavasya.json"
+    "name": "Isavasya Upanishad",
+    "file": "data/isavasya.json",
+    "slug": "isavasya"
   }
 ]
