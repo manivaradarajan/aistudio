@@ -1,11 +1,11 @@
-// app.js (Phase 3: Final Generic Version)
+// app.js (Final Version with Hash-Based Routing and ALL functions)
 
 let allTexts = [];
 let upanishadData = {};
 let currentTextFile = null;
 let currentLocation = {};
 
-// --- DOM References (UPDATED) ---
+// --- DOM References ---
 const bodyEl = document.body,
   textSelector = document.getElementById("text-selector"),
   navigatorPane = document.getElementById("nav-pane"),
@@ -18,8 +18,8 @@ const bodyEl = document.body,
   mobileNavClose = document.getElementById("mobile-nav-close"),
   mobileCommentaryClose = document.getElementById("mobile-commentary-close"),
   mobileOverlay = document.getElementById("mobile-overlay"),
-  prevBtn = document.getElementById("prev-section"), // CORRECTED ID
-  nextBtn = document.getElementById("next-section"); // CORRECTED ID
+  prevBtn = document.getElementById("prev-section"),
+  nextBtn = document.getElementById("next-section");
 
 // --- Main Initialization ---
 document.addEventListener("DOMContentLoaded", init);
@@ -30,16 +30,14 @@ async function init() {
     const response = await fetch("texts.json");
     if (!response.ok) throw new Error("Could not load texts.json manifest.");
     allTexts = await response.json();
-    populateTextSelector();
+    populateTextSelector(); // This will now work
     await handleRouteChange();
   } catch (error) {
     console.error("Initialization failed:", error);
   }
 }
 
-// --- REST OF THE FILE IS UNCHANGED ---
-// (Pasting the full code below for safety and completeness)
-
+// --- RESTORED FUNCTION ---
 function populateTextSelector() {
   allTexts.forEach((text) => {
     const option = document.createElement("option");
@@ -49,21 +47,26 @@ function populateTextSelector() {
   });
 }
 
+// --- Routing ---
 async function handleRouteChange() {
-  const pathParts = window.location.pathname.split("/").filter((p) => p);
+  const path = window.location.hash.slice(1);
+  const pathParts = path.split("/").filter((p) => p);
   const textSlug = pathParts[0] || allTexts[0].slug;
+
   const targetText = allTexts.find((t) => t.slug === textSlug);
   if (!targetText) {
-    history.replaceState({}, "", "/");
-    await handleRouteChange();
+    window.location.hash = "/";
     return;
   }
+
   if (currentTextFile !== targetText.file) {
     await loadText(targetText.file);
   }
+
   const location = {};
   const navLevels = upanishadData.structure_levels.slice(0, -1);
   let dataTraversal = upanishadData.content;
+
   for (let i = 0; i < navLevels.length; i++) {
     const levelKey = `level${i}`;
     const levelName = navLevels[i].toLowerCase();
@@ -77,13 +80,12 @@ async function handleRouteChange() {
     dataTraversal = dataTraversal[index]?.[nextLevelName + "s"];
   }
   loadSection(location);
+
   const leafLevelKey = upanishadData.structure_levels
     .slice(-1)[0]
     .toLowerCase();
-  const leafUrlNumber = parseInt(
-    pathParts[pathParts.length - (pathParts.length - navLevels.length - 1)],
-    10
-  );
+  const leafUrlNumber = parseInt(pathParts[pathParts.length - 1], 10);
+
   let itemToShow = mantraDisplay.querySelector(".item-container");
   if (!isNaN(leafUrlNumber)) {
     const leafArray = mantraDisplay.querySelectorAll(".item-container");
@@ -101,6 +103,7 @@ function navigateTo(location, leafIndex) {
   const textSlug = allTexts.find((t) => t.file === currentTextFile).slug;
   const navLevels = upanishadData.structure_levels.slice(0, -1);
   let path = `/${textSlug}`;
+
   if (navLevels.length > 0) {
     let pathNumbers = [];
     let dataTraversal = upanishadData.content;
@@ -114,6 +117,7 @@ function navigateTo(location, leafIndex) {
     }
     path += "/" + pathNumbers.join("/");
   }
+
   if (leafIndex !== undefined) {
     if (navLevels.length === 0) {
       path += `/${leafIndex}`;
@@ -121,14 +125,10 @@ function navigateTo(location, leafIndex) {
       path += `/${leafIndex}`;
     }
   }
-  history.pushState({ file: currentTextFile, location }, "", path);
-  if (leafIndex === undefined) {
-    loadSection(location);
-    const firstItem = mantraDisplay.querySelector(".item-container");
-    if (firstItem) showItemDetails(firstItem, false);
-  }
+  window.location.hash = path;
 }
 
+// --- Data Loading and Rendering ---
 async function loadText(filePath) {
   try {
     const response = await fetch(filePath);
@@ -268,10 +268,19 @@ function showItemDetails(itemContainer, showMobilePane = true) {
     }
   }
   const itemData = dataToFind;
-  navigateTo(
-    currentLocation,
-    itemData[levels.slice(-1)[0].toLowerCase() + "_number"]
-  );
+
+  const leafLevelKey = levels.slice(-1)[0].toLowerCase();
+  const leafIndex = itemData[leafLevelKey + "_number"];
+
+  // Create new location object for navigateTo
+  const newLocation = {};
+  const navLevels = levels.slice(0, -1);
+  navLevels.forEach((level, i) => {
+    newLocation[`level${i}`] = parseInt(itemContainer.dataset[`level${i}`]);
+  });
+
+  navigateTo(newLocation, leafIndex);
+
   if (itemData && itemData.commentary_text) {
     commentaryText.innerHTML = marked.parse(itemData.commentary_text);
   } else {
@@ -288,6 +297,12 @@ function updateUiState(location) {
   let selector = Object.keys(location)
     .map((key) => `[data-${key}="${location[key]}"]`)
     .join("");
+  if (
+    upanishadData.structure_levels.length === 1 &&
+    location.leafIndex !== undefined
+  ) {
+    selector = `[data-leaf-index="${location.leafIndex}"]`;
+  }
   const newLink = navigatorContent.querySelector(`a${selector}`);
   if (newLink) newLink.classList.add("active");
   document
@@ -303,12 +318,11 @@ function updateUiState(location) {
 }
 
 function addEventListeners() {
-  window.addEventListener("popstate", handleRouteChange);
+  window.addEventListener("hashchange", handleRouteChange);
   textSelector.addEventListener("change", (event) => {
     const newFile = event.target.value;
     const newSlug = allTexts.find((t) => t.file === newFile).slug;
-    history.pushState({}, "", `/${newSlug}`);
-    handleRouteChange();
+    window.location.hash = `/${newSlug}`;
   });
   navigatorContent.addEventListener("click", (e) => {
     const link = e.target.closest("a");
@@ -368,35 +382,34 @@ function updateArrowButtons() {
 }
 function getAdjacentSections() {
   const navLevels = upanishadData.structure_levels.slice(0, -1);
-  if (navLevels.length === 0) return { prev: null, next: null };
+  if (navLevels.length < 2) return { prev: null, next: null };
+  const level0Key = "level0";
+  const level1Key = "level1";
+  const level0Index = currentLocation[level0Key];
+  const level1Index = currentLocation[level1Key];
   let prev = { ...currentLocation };
   let next = { ...currentLocation };
-  if (navLevels.length === 2) {
-    const level0Index = currentLocation.level0;
-    const level1Index = currentLocation.level1;
-    const level1ArrayKey = navLevels[1].toLowerCase() + "s";
-    if (
-      level1Index <
-      upanishadData.content[level0Index][level1ArrayKey].length - 1
-    ) {
-      next.level1++;
-    } else if (level0Index < upanishadData.content.length - 1) {
-      next.level0++;
-      next.level1 = 0;
-    } else {
-      next = null;
-    }
-    if (level1Index > 0) {
-      prev.level1--;
-    } else if (level0Index > 0) {
-      prev.level0--;
-      const prevLevel1Array =
-        upanishadData.content[prev.level0][level1ArrayKey];
-      prev.level1 = prevLevel1Array.length - 1;
-    } else {
-      prev = null;
-    }
-    return { prev, next };
+  const level1ArrayKey = navLevels[1].toLowerCase() + "s";
+  if (
+    level1Index <
+    upanishadData.content[level0Index][level1ArrayKey].length - 1
+  ) {
+    next[level1Key]++;
+  } else if (level0Index < upanishadData.content.length - 1) {
+    next[level0Key]++;
+    next[level1Key] = 0;
+  } else {
+    next = null;
   }
-  return { prev: null, next: null };
+  if (level1Index > 0) {
+    prev[level1Key]--;
+  } else if (level0Index > 0) {
+    prev[level0Key]--;
+    const prevLevel1Array =
+      upanishadData.content[prev[level0Key]][level1ArrayKey];
+    prev[level1Key] = prevLevel1Array.length - 1;
+  } else {
+    prev = null;
+  }
+  return { prev, next };
 }
