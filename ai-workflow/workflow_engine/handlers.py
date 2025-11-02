@@ -16,6 +16,8 @@ def handle_extract_text_step(step: Dict, config: Dict, prefix: str, input_pdf: P
     logging.info("\n[Workflow Step: extract_text_from_pdf]")
     output_path = _get_output_path(prefix, step)
     prompt_path = Path(step['prompt'])
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt file '{prompt_path}' not found.")
     
     if is_stale(output_path, [input_pdf, prompt_path], force):
         logging.info(f"Uploading '{input_pdf.name}' and generating text with '{prompt_path.name}'.")
@@ -81,7 +83,8 @@ def handle_chat_step(step: Dict, config: Dict, prefix: str, input_path: Path, co
     
     if 'input_file' in step:
         current_chat_input_path = Path(step['input_file'])
-    else:
+        if not current_chat_input_path.exists():
+            raise FileNotFoundError(f"Input file for chat '{current_chat_input_path}' not found.")
         current_chat_input_path = input_path
 
     if 'turns' in step:
@@ -93,11 +96,15 @@ def handle_chat_step(step: Dict, config: Dict, prefix: str, input_path: Path, co
     for i, turn in enumerate(turns):
         logging.info(f"-- Chat Turn {i+1}/{len(turns)} --")
         turn_prompt_path = Path(turn['prompt'])
-        output_path = _get_output_path(prefix, turn)
+        if not turn_prompt_path.exists():
+            raise FileNotFoundError(f"Prompt file for chat turn '{turn_prompt_path}' not found.")
         
         dependencies = [current_chat_input_path, turn_prompt_path]
         if 'system_prompt' in turn:
-            dependencies.append(Path(turn['system_prompt']))
+            system_prompt_path = Path(turn['system_prompt'])
+            if not system_prompt_path.exists():
+                raise FileNotFoundError(f"System prompt file for chat turn '{system_prompt_path}' not found.")
+            dependencies.append(system_prompt_path)
         fileset_content = ""
         
         turn_files = []
@@ -119,6 +126,8 @@ def handle_chat_step(step: Dict, config: Dict, prefix: str, input_path: Path, co
             logging.info(f"Concatenating content from {len(turn_files)} files for this turn...")
             content_parts = []
             for file_path in turn_files:
+                if not file_path.exists():
+                    raise FileNotFoundError(f"Fileset file '{file_path}' not found.")
                 logging.info(f"  -> Reading: {file_path.name}")
                 content_parts.append(f"--- CONTENT FROM {file_path.name} ---\n\n{file_path.read_text(encoding='utf-8')}")
             fileset_content = "\n\n".join(content_parts)
