@@ -1,58 +1,19 @@
 # Upanishad Explorer - Project Expansion TODO
 
-This document outlines the roadmap for evolving the Upanishad Explorer from a single-text viewer into a scalable, multi-text digital library. Great progress so far on the core UI/UX!
-
----
-
-## Phase 1: Foundational Refactoring (Prepare for Growth)
-
-*Goal: Decouple the application from a single text file and prepare the structure for multiple texts.*
-
-- [ ] **Create a Text Manifest:**
-  - [ ] Create a new root file named `texts.json`.
-  - [ ] This file will be an array of objects, with each object defining a text (e.g., `{ "name": "Taittiriya Upanishad", "file": "taittiriya.json" }`).
-
-- [ ] **Implement Text Selection UI:**
-  - [ ] Add a dropdown menu or a simple list to the UI that is populated from `texts.json`.
-  - [ ] This will allow the user to choose which Upanishad or text to view.
-
-- [ ] **Update Application Logic to Load Selected Text:**
-  - [ ] Modify the `init()` function in `app.js` to first `fetch` `texts.json`.
-  - [ ] After the user selects a text, `fetch` the corresponding JSON file (e.g., `taittiriya.json`).
-  - [ ] Store the currently loaded text data in the `upanishadData` variable.
-
-- [ ] **Housekeeping:**
-  - [ ] Rename `foo.html` to `index.html` for clarity.
-  - [ ] Move `taittiriya-upanishad-commentary.json` to a new file, perhaps `data/taittiriya.json`, and update the `fetch` path.
-
----
-
-## Phase 2: Core Generalization (The Heavy Lifting)
-
-*Goal: Make the UI rendering logic data-driven, so it can handle any text structure without code changes.*
-
-- [ ] **Generalize the JSON Data Structure:**
-  - [ ] For each text's JSON file, add a top-level `structure_levels` array (e.g., `["Valli", "Anuvaka", "Mantra"]`).
-  - [ ] Create a new JSON file for a simpler text like the Isavasya Upanishad to test the new structure (e.g., `isavasya.json` with `structure_levels: ["Mantra"]`).
-  - [ ] Standardize the keys used for arrays (e.g., always use the plural form: `anuvakas`, `padas`, `sutras`).
-
-- [ ] **Refactor `app.js` to be Data-Driven:**
-  - [ ] **Rewrite `renderNavigator()`:** This is the most critical task. The function must read the `structure_levels` array and dynamically generate the navigation UI. It should be able to handle 1, 2, or 3+ levels of nesting.
-  - [ ] **Rename and Generalize `loadAnuvaka()`:** Rename it to `loadSection()`. This function should be responsible for loading the final "leaf" nodes (e.g., the list of mantras or sutras) into the center pane.
-  - [ ] **Dynamically Build Titles:** The header title (`contentTitle`) should be constructed dynamically based on the user's navigation path (e.g., "Anandavalli - Anuvaka 3").
-
----
+This document outlines the roadmap for evolving the Upanishad Explorer from a single-text viewer into a scalable, multi-text digital library.
 
 ## Phase 3: UI/UX Enhancements
 
-*Goal: Polish the application with professional features that improve usability.*
+_Goal: Polish the application with professional features that improve usability._
 
 - [ ] **Implement Client-Side Routing:**
+
   - [ ] Use the browser's History API or a small library to update the URL as the user navigates.
   - [ ] Example URLs: `/taittiriya/valli/1/anuvaka/2`, `/isavasya/mantra/5`.
   - [ ] The application should be able to parse the URL on initial load and jump directly to the correct content. This is crucial for sharing and bookmarking.
 
 - [ ] **Implement Light/Dark Mode Theme Switcher:**
+
   - [ ] Add a toggle button to the UI.
   - [ ] Create a second set of CSS color variables for the dark theme.
   - [ ] Use JavaScript to toggle a class (e.g., `dark-mode`) on the `<body>` element, which will apply the new set of variables.
@@ -66,17 +27,20 @@ This document outlines the roadmap for evolving the Upanishad Explorer from a si
 
 ## Phase 4: Future Features & Long-Term Goals
 
-*Goal: Plan for major new features that would expand the application's capabilities.*
+_Goal: Plan for major new features that would expand the application's capabilities._
 
 - [ ] **Support for Multiple Text Views:**
+
   - [ ] Update the JSON schema to allow for alternate text versions within a mantra object (e.g., `mantra_text_iast`, `mantra_translation_en`).
   - [ ] Add UI controls (e.g., tabs or a dropdown) in the center pane to switch between Devanagari, IAST, and English Translation.
 
 - [ ] **Implement Search Functionality:**
+
   - [ ] Add a search bar to the navigator.
   - [ ] The search should be able to query the content of the currently loaded text and display a list of results.
 
 - [ ] **Handle Commentary Subheadings:**
+
   - [ ] The LLM-generated JSON includes subheadings like `[प्रकाशिका]`.
   - [ ] Update the Markdown rendering to style these subheadings appropriately in the commentary pane.
 

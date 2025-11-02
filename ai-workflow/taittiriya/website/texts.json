@@ -1,0 +1,10 @@
+[
+  {
+    "name": "Taittiriya Upanishad",
+    "file": "data/taittiriya.json"
+  },
+  {
+    "name": "Isavasya Upanishad (Coming Soon)",
+    "file": "data/isavasya.json"
+  }
+]

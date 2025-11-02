@@ -1,130 +1,325 @@
-// app.js (With Mobile Scroll Lock Fix)
+// app.js (Corrected with Devanagari Labels)
 
-let upanishadData = [];
-let currentLocation = { valli: 0, anuvaka: 0 };
+let allTexts = [];
+let upanishadData = {};
+let currentLocation = {};
 
 // --- DOM Element References ---
-const bodyEl = document.body; // Reference to the body
-const navigatorPane = document.getElementById("nav-pane");
-const commentaryPane = document.getElementById("commentary-pane");
-const navigatorContent = document.getElementById("navigator-content");
-const contentTitle = document.getElementById("content-title");
-const mantraDisplay = document.getElementById("mantra-display");
-const commentaryText = document.getElementById("commentary-text");
-const mobileNavToggle = document.getElementById("mobile-nav-toggle");
-const mobileNavClose = document.getElementById("mobile-nav-close");
-const mobileCommentaryClose = document.getElementById(
-  "mobile-commentary-close"
-);
-const mobileOverlay = document.getElementById("mobile-overlay");
-const prevAnuvakaBtn = document.getElementById("prev-anuvaka");
-const nextAnuvakaBtn = document.getElementById("next-anuvaka");
+// ... (same as before) ...
+const bodyEl = document.body,
+  textSelector = document.getElementById("text-selector"),
+  navigatorPane = document.getElementById("nav-pane"),
+  commentaryPane = document.getElementById("commentary-pane"),
+  navigatorContent = document.getElementById("navigator-content"),
+  contentTitle = document.getElementById("content-title"),
+  mantraDisplay = document.getElementById("mantra-display"),
+  commentaryText = document.getElementById("commentary-text"),
+  mobileNavToggle = document.getElementById("mobile-nav-toggle"),
+  mobileNavClose = document.getElementById("mobile-nav-close"),
+  mobileCommentaryClose = document.getElementById("mobile-commentary-close"),
+  mobileOverlay = document.getElementById("mobile-overlay"),
+  prevAnuvakaBtn = document.getElementById("prev-anuvaka"),
+  nextAnuvakaBtn = document.getElementById("next-anuvaka");
 
 // --- Main Initialization ---
 document.addEventListener("DOMContentLoaded", init);
-
 async function init() {
+  // ... (same as before) ...
+  addEventListeners();
   try {
-    const response = await fetch("taittiriya-upanishad-commentary.json");
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    const response = await fetch("texts.json");
+    if (!response.ok) throw new Error("Could not load texts.json manifest.");
+    allTexts = await response.json();
+    populateTextSelector();
+    await loadText(allTexts[0].file);
+  } catch (error) {
+    console.error("Initialization failed:", error);
+    contentTitle.textContent = "Error";
+    mantraDisplay.innerHTML = `<p style="color:red;">Could not load application data. Please check console.</p>`;
+  }
+}
+
+// ... (populateTextSelector and loadText are the same as before) ...
+
+/**
+ * GENERIC: Renders navigator, NOW WITH DEVANAGARI LABELS
+ */
+function renderNavigator() {
+  navigatorContent.innerHTML = "";
+  const levels = upanishadData.structure_levels;
+  const content = upanishadData.content;
+  const leafLevelName = levels.slice(-1)[0];
+
+  // --- NEW: A map for Devanagari labels ---
+  const devanagariLabels = {
+    Anuvaka: "अनुवाकः",
+    Mantra: "मन्त्रः",
+    Pada: "पादः",
+    Adhyaya: "अध्यायः",
+    // Add more as you add new texts with different structures
+  };
+  // -----------------------------------------
+
+  // Case 1: Simple list (e.g., Isavasya)
+  if (levels.length === 1) {
+    const list = document.createElement("ul");
+    content.forEach((item, index) => {
+      const listItem = document.createElement("li");
+      const link = document.createElement("a");
+      link.href = "#";
+
+      // USE THE MAP to get the label
+      const label = devanagariLabels[leafLevelName] || leafLevelName;
+      link.textContent = `${label} ${
+        item[leafLevelName.toLowerCase() + "_number"]
+      }`;
+
+      link.dataset.leafIndex = index;
+      listItem.appendChild(link);
+      list.appendChild(listItem);
+    });
+    navigatorContent.appendChild(list);
+  }
+  // Case 2: Hierarchical (e.g., Taittiriya)
+  else if (levels.length > 1) {
+    const topLevelKey = levels[0].toLowerCase();
+    const midLevelName = levels[1]; // "Anuvaka"
+    const midLevelKey = midLevelName.toLowerCase();
+    const midLevelArrayKey = midLevelKey + "s";
+
+    content.forEach((topItem, topIndex) => {
+      const details = document.createElement("details");
+      details.className = "valli-group";
+      details.dataset[topLevelKey] = topIndex;
+
+      const summary = document.createElement("summary");
+      summary.textContent = topItem[topLevelKey + "_name"];
+      details.appendChild(summary);
+
+      const list = document.createElement("ul");
+      topItem[midLevelArrayKey].forEach((midItem, midIndex) => {
+        const listItem = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = "#";
+
+        // USE THE MAP to get the label
+        const label = devanagariLabels[midLevelName] || midLevelName;
+        link.textContent = `${label} ${midItem[midLevelKey + "_number"]}`;
+
+        link.dataset[topLevelKey] = topIndex;
+        link.dataset[midLevelKey] = midIndex;
+        listItem.appendChild(link);
+        list.appendChild(listItem);
+      });
+      details.appendChild(list);
+      navigatorContent.appendChild(details);
+    });
+  }
+}
+
+// --- ALL OTHER FUNCTIONS ARE UNCHANGED ---
+// Paste the full code below to be safe.
+
+function populateTextSelector() {
+  allTexts.forEach((text) => {
+    const option = document.createElement("option");
+    option.value = text.file;
+    option.textContent = text.name;
+    textSelector.appendChild(option);
+  });
+}
+
+async function loadText(filePath) {
+  try {
+    const response = await fetch(filePath);
+    if (!response.ok) throw new Error(`Failed to fetch ${filePath}`);
     upanishadData = await response.json();
-
-    renderNavigator();
-    addEventListeners();
-    loadAnuvaka(currentLocation.valli, currentLocation.anuvaka);
-
-    const firstMantra = mantraDisplay.querySelector(".mantra-container");
-    if (firstMantra) {
-      showMantraDetails(firstMantra, false);
+    currentLocation = {};
+    const navLevels = upanishadData.structure_levels.slice(0, -1);
+    if (navLevels.length > 0) {
+      navLevels.forEach((level) => {
+        currentLocation[level.toLowerCase()] = 0;
+      });
     }
-
-    if (window.innerWidth > 800) {
-      Split(["#nav-pane", "#main-pane", "#commentary-pane"], {
-        sizes: [20, 45, 35],
+    contentTitle.textContent = upanishadData.text_name;
+    renderNavigator();
+    loadSection(currentLocation);
+    const firstItem = mantraDisplay.querySelector(".mantra-container");
+    if (firstItem) {
+      showMantraDetails(firstItem, false);
+    }
+    if (window.Split && window.innerWidth > 800) {
+      const gutters = document.querySelectorAll(".gutter");
+      gutters.forEach((g) => g.remove());
+      window.Split(["#nav-pane", "#main-pane", "#commentary-pane"], {
+        sizes: [25, 45, 30],
         minSize: [200, 300, 300],
         gutterSize: 2,
         cursor: "col-resize",
       });
     }
   } catch (error) {
-    console.error("Failed to load or process data:", error);
-    navigatorContent.innerHTML = `<p style="color: red;">Error loading data.</p>`;
+    console.error(`Error loading text from ${filePath}:`, error);
+    mantraDisplay.innerHTML = `<p style="color:red;">Could not load the selected text.</p>`;
   }
 }
 
-// --- NEW HELPER FUNCTIONS FOR MOBILE OVERLAYS ---
-function openMobileOverlay(pane) {
-  pane.classList.add("active");
-  mobileOverlay.classList.add("active");
-  bodyEl.classList.add("mobile-overlay-active"); // Lock background scroll
+function loadSection(location) {
+  currentLocation = location;
+  const levels = upanishadData.structure_levels;
+  const navLevels = levels.slice(0, -1);
+  let titleParts = [upanishadData.text_name];
+  let dataToRender = upanishadData.content;
+  if (navLevels.length > 0) {
+    for (const level of navLevels) {
+      const key = level.toLowerCase();
+      const index = location[key];
+      if (index === undefined) break;
+      dataToRender = dataToRender[index];
+      titleParts.push(
+        dataToRender[key + "_name"] ||
+          `${level} ${dataToRender[key + "_number"]}`
+      );
+      const nextLevelKey = levels[levels.indexOf(level) + 1].toLowerCase();
+      dataToRender = dataToRender[nextLevelKey + "s"];
+    }
+  }
+  mantraDisplay.innerHTML = "";
+  const leafLevelKey = levels.slice(-1)[0].toLowerCase();
+  if (Array.isArray(dataToRender)) {
+    dataToRender.forEach((item, index) => {
+      const itemContainer = document.createElement("div");
+      itemContainer.className = "mantra-container";
+      const itemPath = { ...location, [leafLevelKey]: index };
+      Object.keys(itemPath).forEach(
+        (k) => (itemContainer.dataset[k] = itemPath[k])
+      );
+      const numberEl = document.createElement("p");
+      numberEl.className = "mantra-number";
+      numberEl.textContent = item[leafLevelKey + "_number"];
+      const textEl = document.createElement("p");
+      textEl.className = "mantra-text";
+      textEl.textContent = item[leafLevelKey + "_text"];
+      itemContainer.appendChild(numberEl);
+      itemContainer.appendChild(textEl);
+      mantraDisplay.appendChild(itemContainer);
+    });
+  } else {
+    mantraDisplay.innerHTML = "";
+    upanishadData.content.forEach((item, index) => {
+      const itemContainer = document.createElement("div");
+      itemContainer.className = "mantra-container";
+      itemContainer.dataset[leafLevelKey] = index;
+      const numberEl = document.createElement("p");
+      numberEl.className = "mantra-number";
+      numberEl.textContent = item[leafLevelKey + "_number"];
+      const textEl = document.createElement("p");
+      textEl.className = "mantra-text";
+      textEl.textContent = item[leafLevelKey + "_text"];
+      itemContainer.appendChild(numberEl);
+      itemContainer.appendChild(textEl);
+      mantraDisplay.appendChild(itemContainer);
+    });
+    titleParts = [upanishadData.text_name];
+  }
+  contentTitle.textContent = titleParts.join(" - ");
+  updateUiState(location);
 }
 
-function closeMobileOverlays() {
-  navigatorPane.classList.remove("active");
-  commentaryPane.classList.remove("active");
-  mobileOverlay.classList.remove("active");
-  bodyEl.classList.remove("mobile-overlay-active"); // Unlock background scroll
-}
-
-// --- Logic and Rendering Functions --- (showMantraDetails is updated)
 function showMantraDetails(mantraContainer, showMobilePane = true) {
   const selected = mantraDisplay.querySelector(".selected");
   if (selected) selected.classList.remove("selected");
   mantraContainer.classList.add("selected");
   mantraContainer.scrollIntoView({ behavior: "smooth", block: "nearest" });
-
-  const { valli, anuvaka, mantra } = mantraContainer.dataset;
-  const mantraData =
-    upanishadData[parseInt(valli)]?.anuvakas[parseInt(anuvaka)]?.mantras[
-      parseInt(mantra)
-    ];
-
+  let dataToFind = upanishadData.content;
+  const levels = upanishadData.structure_levels;
+  for (let i = 0; i < levels.length; i++) {
+    const key = levels[i].toLowerCase();
+    const index = mantraContainer.dataset[key];
+    if (index === undefined) break;
+    dataToFind = dataToFind[parseInt(index)];
+    const nextLevelKey = levels[i + 1]?.toLowerCase();
+    if (nextLevelKey) {
+      dataToFind = dataToFind[nextLevelKey + "s"];
+    }
+  }
+  const mantraData = dataToFind;
   if (mantraData && mantraData.commentary_text) {
     commentaryText.innerHTML = marked.parse(mantraData.commentary_text);
   } else {
     commentaryText.innerHTML =
       "<p>No commentary available for this selection.</p>";
   }
-
-  // UPDATED: Use the new helper function
   if (window.innerWidth <= 800 && showMobilePane) {
     openMobileOverlay(commentaryPane);
   }
 }
 
-// --- Event Listeners --- (Updated to use new helpers)
+function updateUiState(location) {
+  const activeLink = navigatorContent.querySelector("a.active");
+  if (activeLink) activeLink.classList.remove("active");
+  let selector = Object.keys(location)
+    .map((key) => `[data-${key}="${location[key]}"]`)
+    .join("");
+  const newLink = navigatorContent.querySelector(`a${selector}`);
+  if (newLink) newLink.classList.add("active");
+  document.querySelectorAll(".valli-group").forEach((el) => (el.open = false));
+  const topLevelKey = upanishadData.structure_levels[0].toLowerCase();
+  if (location[topLevelKey] !== undefined) {
+    const activeAccordion = navigatorContent.querySelector(
+      `[data-${topLevelKey}="${location[topLevelKey]}"]`
+    );
+    if (activeAccordion) activeAccordion.open = true;
+  }
+  updateArrowButtons();
+}
+
 function addEventListeners() {
+  textSelector.addEventListener("change", (event) => {
+    loadText(event.target.value);
+  });
   navigatorContent.addEventListener("click", (e) => {
     const link = e.target.closest("a");
-    if (link) {
-      e.preventDefault();
-      const { valli, anuvaka } = link.dataset;
-      loadAnuvaka(parseInt(valli), parseInt(anuvaka));
+    if (!link) return;
+    e.preventDefault();
+    if (upanishadData.structure_levels.length === 1) {
+      const index = link.dataset.leafIndex;
+      const targetItem =
+        mantraDisplay.querySelectorAll(".mantra-container")[index];
+      if (targetItem) showMantraDetails(targetItem, false);
+      const activeLink = navigatorContent.querySelector("a.active");
+      if (activeLink) activeLink.classList.remove("active");
+      link.classList.add("active");
+    } else {
+      const location = {};
+      const navLevels = upanishadData.structure_levels.slice(0, -1);
+      navLevels.forEach((level) => {
+        const key = level.toLowerCase();
+        if (link.dataset[key] !== undefined) {
+          location[key] = parseInt(link.dataset[key]);
+        }
+      });
+      loadSection(location);
       const firstMantra = mantraDisplay.querySelector(".mantra-container");
       if (firstMantra) showMantraDetails(firstMantra, false);
-      closeMobileOverlays(); // Use helper
     }
+    closeMobileOverlays();
   });
-
   mantraDisplay.addEventListener("click", (e) => {
     const container = e.target.closest(".mantra-container");
     if (container) showMantraDetails(container);
   });
-
   const navigate = (direction) => {
     const { prev, next } = getAdjacentAnuvakas();
     const target = direction === "prev" ? prev : next;
     if (target) {
-      loadAnuvaka(target.valli, target.anuvaka);
+      loadSection(target);
       const firstMantra = mantraDisplay.querySelector(".mantra-container");
       if (firstMantra) showMantraDetails(firstMantra, false);
     }
   };
-
   prevAnuvakaBtn.addEventListener("click", () => navigate("prev"));
   nextAnuvakaBtn.addEventListener("click", () => navigate("next"));
-
-  // UPDATED: All mobile listeners now use the helpers
   mobileNavToggle.addEventListener("click", () =>
     openMobileOverlay(navigatorPane)
   );
@@ -133,95 +328,45 @@ function addEventListeners() {
   mobileOverlay.addEventListener("click", closeMobileOverlays);
 }
 
-// --- Other functions (No changes needed) ---
-function renderNavigator() {
-  // ... same as before
-  navigatorContent.innerHTML = "";
-  upanishadData.forEach((valli, valliIndex) => {
-    const valliGroup = document.createElement("details");
-    valliGroup.className = "valli-group";
-    valliGroup.dataset.valliIndex = valliIndex;
-    const valliTitle = document.createElement("summary");
-    valliTitle.textContent = valli.valli_name;
-    valliGroup.appendChild(valliTitle);
-    const anuvakaList = document.createElement("ul");
-    valli.anuvakas.forEach((anuvaka, anuvakaIndex) => {
-      const listItem = document.createElement("li");
-      const link = document.createElement("a");
-      link.href = "#";
-      link.textContent = `अनुवाकः ${anuvaka.anuvaka_number}`;
-      link.dataset.valli = valliIndex;
-      link.dataset.anuvaka = anuvakaIndex;
-      listItem.appendChild(link);
-      anuvakaList.appendChild(listItem);
-    });
-    valliGroup.appendChild(anuvakaList);
-    navigatorContent.appendChild(valliGroup);
-  });
+function openMobileOverlay(pane) {
+  pane.classList.add("active");
+  mobileOverlay.classList.add("active");
+  bodyEl.classList.add("mobile-overlay-active");
 }
-function loadAnuvaka(valliIndex, anuvakaIndex) {
-  // ... same as before
-  currentLocation = { valli: valliIndex, anuvaka: anuvakaIndex };
-  const valli = upanishadData[valliIndex];
-  const anuvaka = valli?.anuvakas[anuvakaIndex];
-  if (!anuvaka) return;
-  document.querySelectorAll(".valli-group").forEach((el) => (el.open = false));
-  const activeValliGroup = navigatorContent.querySelector(
-    `.valli-group[data-valli-index="${valliIndex}"]`
-  );
-  if (activeValliGroup) activeValliGroup.open = true;
-  const activeLink = navigatorContent.querySelector("a.active");
-  if (activeLink) activeLink.classList.remove("active");
-  const newLink = navigatorContent.querySelector(
-    `a[data-valli="${valliIndex}"][data-anuvaka="${anuvakaIndex}"]`
-  );
-  if (newLink) newLink.classList.add("active");
-  contentTitle.textContent = `${valli.valli_name} - अनुवाकः ${anuvaka.anuvaka_number}`;
-  mantraDisplay.innerHTML = "";
-  anuvaka.mantras.forEach((mantra, mantraIndex) => {
-    const mantraContainer = document.createElement("div");
-    mantraContainer.className = "mantra-container";
-    Object.assign(mantraContainer.dataset, {
-      valli: valliIndex,
-      anuvaka: anuvakaIndex,
-      mantra: mantraIndex,
-    });
-    const numberEl = document.createElement("p");
-    numberEl.className = "mantra-number";
-    numberEl.textContent = mantra.mantra_number;
-    const textEl = document.createElement("p");
-    textEl.className = "mantra-text";
-    textEl.textContent = mantra.mantra_text;
-    mantraContainer.appendChild(numberEl);
-    mantraContainer.appendChild(textEl);
-    mantraDisplay.appendChild(mantraContainer);
-  });
-  commentaryText.innerHTML = "<p>Select a mantra to see its commentary.</p>";
-  updateArrowButtons();
+function closeMobileOverlays() {
+  navigatorPane.classList.remove("active");
+  commentaryPane.classList.remove("active");
+  mobileOverlay.classList.remove("active");
+  bodyEl.classList.remove("mobile-overlay-active");
 }
 function updateArrowButtons() {
-  // ... same as before
   const { prev, next } = getAdjacentAnuvakas();
   prevAnuvakaBtn.disabled = !prev;
   nextAnuvakaBtn.disabled = !next;
 }
 function getAdjacentAnuvakas() {
-  // ... same as before
-  const { valli, anuvaka } = currentLocation;
+  const navLevels = upanishadData.structure_levels.slice(0, -1);
+  if (navLevels.length === 0) return { prev: null, next: null };
+  const topLevelKey = navLevels[0].toLowerCase();
+  const midLevelKey = navLevels[1].toLowerCase();
+  const valli = currentLocation[topLevelKey];
+  const anuvaka = currentLocation[midLevelKey];
   let prev = null,
     next = null;
   if (anuvaka > 0) {
-    prev = { valli, anuvaka: anuvaka - 1 };
+    prev = { [topLevelKey]: valli, [midLevelKey]: anuvaka - 1 };
   } else if (valli > 0) {
-    prev = {
-      valli: valli - 1,
-      anuvaka: upanishadData[valli - 1].anuvakas.length - 1,
-    };
+    const prevValliIndex = valli - 1;
+    const prevMidLevelArrayKey = midLevelKey + "s";
+    const prevAnuvakaIndex =
+      upanishadData.content[prevValliIndex][prevMidLevelArrayKey].length - 1;
+    prev = { [topLevelKey]: prevValliIndex, [midLevelKey]: prevAnuvakaIndex };
   }
-  if (anuvaka < upanishadData[valli].anuvakas.length - 1) {
-    next = { valli, anuvaka: anuvaka + 1 };
-  } else if (valli < upanishadData.length - 1) {
-    next = { valli: valli + 1, anuvaka: 0 };
+  const midLevelArrayKey = midLevelKey + "s";
+  if (anuvaka < upanishadData.content[valli][midLevelArrayKey].length - 1) {
+    next = { [topLevelKey]: valli, [midLevelKey]: anuvaka + 1 };
+  } else if (valli < upanishadData.content.length - 1) {
+    next = { [topLevelKey]: valli + 1, [midLevelKey]: 0 };
   }
   return { prev, next };
 }

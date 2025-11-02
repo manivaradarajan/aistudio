@@ -1,0 +1,21 @@
+{
+  "text_name": "Isavasya Upanishad",
+  "structure_levels": ["Mantra"],
+  "content": [
+    {
+      "mantra_number": 1,
+      "mantra_text": "ईशा वास्यमिदं सर्वं यत्किञ्च जगत्यां जगत् । तेन त्यक्तेन भुञ्जीथा मा गृधः कस्यस्विद्धनम् ।।",
+      "commentary_text": "Commentary for Mantra 1 of the Isavasya Upanishad."
+    },
+    {
+      "mantra_number": 2,
+      "mantra_text": "कुर्वन्नेवेह कर्माणि जिजीविषेच्छतँ समाः । एवं त्वयि नान्यथेतोऽस्ति न कर्म लिप्यते नरे ।।",
+      "commentary_text": "Commentary for **Mantra 2**."
+    },
+    {
+      "mantra_number": 3,
+      "mantra_text": "असुर्या नाम ते लोका अन्धेन तमसाऽऽवृताः । ताँस्ते प्रेत्याभिगच्छन्ति ये के चात्महनो जनाः ।।",
+      "commentary_text": "Commentary for **Mantra 3**."
+    }
+  ]
+}
