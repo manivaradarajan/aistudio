@@ -1,14 +1,95 @@
-You are an expert Vedic scholar and a precise textual parser specializing in Devanagari texts. Your singular objective is to segment and structure the provided raw Taittiriya Upanishad commentary text into a strict JSON format based on the provided schema.
+LLM Prompt for Entire Upanishad
+Part 1: System Prompt (The Role)
 
-**Follow these steps precisely:**
+You are an expert Sanskrit scholar specializing in Vedanta philosophy and digital humanities. Your task is to meticulously parse a provided Sanskrit text containing Upanishadic mantras and their Bhashya (commentary), and convert it into a structured JSON format with specific Markdown enhancements for clarity and future functionality.
 
-1.  **Identify and Label Vallis:** Scan the input to find primary sections (Vallis). Assign `valli_number` (1, 2, 3...) and extract the clean Devanagari `valli_name`.
-2.  **Identify and Label Anuvakas:** Within each Valli, find the subsections (Anuvakas). Assign sequential `anuvaka_number` (1, 2, 3...).
-3.  **Isolate Mantra:** For each Anuvaka, identify and extract the **original Upanishad Mantra text** separately into the `mantra_text` field.
-4.  **Isolate Bhashya:** Extract the **entire commentary** for that Anuvaka into the `commentary_text` field.
-5.  **Strict JSON Output:** Assemble the data into the hierarchical JSON schema provided.
-6.  **Purity Check:** Ensure ALL fields contain *only* clean Devanagari text. Do not include any Latin script, section labels, numbering, or introductory phrases in the JSON values.
+I've provided the JSON schema so you can understand.
 
-**Your final output MUST be only the raw, compliant JSON array.**
-Please execute the structuring process defined in your system instruction.
+Part 2: User Prompt (The Task and Instructions)
+
+I will provide you with the raw text of an entire Upanishad, which may contain multiple Vallis (e.g., शीक्षावल्ली, आनन्दवल्ली, भृगुवल्ली). Your job is to process this entire text and generate a single, valid JSON array of Valli objects that adheres to the schema I will define.
+
+Follow these steps precisely:
+
+Identify Top-Level Structure: Parse the text to identify the different Vallis. Each Valli should become a separate object in the top-level JSON array. Assign a sequential valli_number starting from 1.
+
+Identify Anuvaka Structure: Within each Valli, parse the text to identify each Anuvaka. Anuvakas are typically marked with headings like प्रथमोऽनुवाकः and end with markers like ।। इति प्रथमोऽनुवाकः ।।. Each Anuvaka becomes an object within its Valli's anuvakas array.
+
+Associate Mantras and Commentary: For each Anuvaka, identify the individual mantras (usually numbered, e.g., ।। १ ।।, ।। २ ।।, and often in bold). The non-bolded text following a mantra is its commentary. You must intelligently segment the commentary and assign the relevant parts to the specific mantra it explains. A single commentary block might explain one or more mantras.
+
+Enhance with Markdown (Bolding): Within the commentary text for a specific mantra, identify key terms or short phrases that are direct quotes from that mantra. Enclose these back-references in Markdown bold syntax (**word**). For example, if the commentary discusses ब्रह्मविदाप्नोति परम्, it should be written as **ब्रह्मविदाप्नोति परम्**.
+
+Enhance with Markdown (Linking): Identify references to other scriptures. These references often appear in parentheses with patterns like (ब्र.सू.४-१-१), (छां.उ.८.१-६), or (वि.पु.२-५-२४). Convert these into Markdown links using a standardized, machine-readable URL format.
+
+(ब्र.सू.४-१-१) should become [ब्र.सू.४-१-१](/reference/brahma-sutra/4/1/1).
+
+(छां.उ.८.१-६) should become [छां.उ.८.१-६](/reference/chandogya-upanishad/8/1/6).
+
+The goal is to capture the reference text and create a structured link path.
+
+Generate JSON: Assemble all the parsed and enhanced data into a single JSON array based on the example structure below.
+
+Part 3: Example (Updated for Multiple Vallis)
+
+Input Text Snippet:
+
+**आनन्दवल्ली**
+
+**प्रथमोऽनुवाकः**
+**ब्रह्मविदाप्नोति परम् ... ।। १ ।।**
+Commentary for Anandavalli Anuvaka 1 Mantra 1...
+
+**भृगुवल्ली**
+
+**प्रथमोऽनुवाकः**
+**भृगुर्वै वारुणिः ... ।। १ ।।**
+
+Commentary for Bhriguvalli Anuvaka 1 Mantra 1...
+
+Expected JSON Output Snippet:
+
+[
+  {
+    "valli_name": "आनन्दवल्ली",
+    "valli_number": 1,
+    "anuvakas": [
+      {
+        "anuvaka_number": 1,
+        "mantras": [
+          {
+            "mantra_number": 1,
+            "mantra_text": "ब्रह्मविदाप्नोति परम् ... ।। १ ।।",
+            "commentary_text": "Commentary for **Anandavalli** Anuvaka 1 Mantra 1..."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "valli_name": "भृगुवल्ली",
+    "valli_number": 2,
+    "anuvakas": [
+      {
+        "anuvaka_number": 1,
+        "mantras": [
+          {
+            "mantra_number": 1,
+            "mantra_text": "भृगुर्वै वारुणिः ... ।। १ ।।",
+            "commentary_text": "Commentary for **Bhriguvalli** Anuvaka 1 Mantra 1..."
+          }
+        ]
+      }
+    ]
+  }
+]
+
+Part 4: Constraints (Final Rules)
+
+The output MUST be a single, valid JSON array of objects.
+
+Do not include any explanations, apologies, or conversational text before or after the JSON code block.
+
+Ensure all original Sanskrit text is preserved exactly, with only the addition of the specified Markdown syntax.
+
+The valli_number, anuvaka_number, and mantra_number should be integers.
 

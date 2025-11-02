@@ -1,0 +1,313 @@
+/* style.css (Cleaned and Corrected) */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap");
+
+/* --- 1. THEME & FONT VARIABLES --- */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #212529;
+  --text-color-muted: #6c757d;
+  --accent-color: #0056b3;
+  --border-color: #dee2e6;
+  --font-family-latin: "Noto Sans", sans-serif;
+  --font-family-devanagari: "Noto Sans Devanagari", sans-serif;
+  --spacing-unit: 1rem;
+}
+
+/* --- 2. GLOBAL & BODY STYLES --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: var(--font-family-latin);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.7;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* --- 3. DESKTOP LAYOUT --- */
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+.navigator-pane,
+.main-content-pane,
+.commentary-pane {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.main-content-pane {
+  border-left: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+}
+.pane-header,
+.main-header {
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+h1,
+h2 {
+  font-size: 1.25rem;
+}
+
+.pane-content {
+  padding: calc(var(--spacing-unit) * 1.5);
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* --- 4. COMPONENT STYLES --- */
+/* Font Application */
+#navigator-content h3,
+#navigator-content a,
+#content-title,
+.mantra-text {
+  font-family: var(--font-family-devanagari), var(--font-family-latin);
+}
+
+/* Navigator */
+#navigator-content h3 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+#navigator-content ul {
+  list-style-type: none;
+  padding-left: 0.5rem;
+  margin-top: 0.5rem;
+}
+#navigator-content li {
+  margin-bottom: 0.25rem;
+}
+#navigator-content a {
+  text-decoration: none;
+  color: var(--accent-color);
+}
+#navigator-content a:hover {
+  text-decoration: underline;
+}
+#navigator-content a.active {
+  background-color: #e9ecef;
+  font-weight: 700;
+  color: var(--text-color);
+  display: block;
+  margin: -0.25rem -0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+.valli-group {
+  margin-bottom: 1rem;
+}
+.valli-group summary {
+  font-family: var(--font-family-devanagari), var(--font-family-latin);
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  padding-left: 1.5rem;
+}
+.valli-group summary::before {
+  content: "▶";
+  position: absolute;
+  left: 0;
+  top: 5px;
+  font-size: 0.8em;
+  color: var(--text-color-muted);
+  transition: transform 0.2s ease-in-out;
+}
+.valli-group[open] > summary::before {
+  transform: rotate(90deg);
+}
+.valli-group summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Mantra Display */
+.mantra-container {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin: 0 -0.5rem 1.5rem -0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease-in-out;
+}
+.mantra-container:hover {
+  background-color: #f1f3f5;
+}
+.mantra-container.selected {
+  background-color: #e9ecef;
+}
+.mantra-number {
+  font-size: 0.9rem;
+  color: var(--text-color-muted);
+  width: 2em;
+  flex-shrink: 0;
+}
+.mantra-text {
+  font-size: 1.2rem;
+  line-height: 2;
+}
+
+/* Splitter */
+.gutter {
+  background-color: var(--border-color);
+}
+.gutter.gutter-horizontal {
+  cursor: col-resize;
+}
+
+/* Hiding Mobile-only elements on Desktop */
+#mobile-nav-toggle,
+#mobile-nav-close,
+#mobile-commentary-close,
+.nav-arrow {
+  display: none;
+}
+
+/* --- 5. MOBILE RESPONSIVE STYLES --- */
+@media (max-width: 800px) {
+  .app-container {
+    display: block;
+    position: relative;
+  }
+  .main-content-pane {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .pane-content {
+    padding: var(--spacing-unit);
+  }
+
+  /* Header */
+  .main-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-unit);
+  }
+  .main-header h1 {
+    font-size: 1rem;
+    text-align: center;
+    flex-grow: 1;
+  }
+  #mobile-nav-toggle {
+    display: block;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color-muted);
+  }
+  .nav-arrow {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color);
+    padding: 0 0.5rem;
+  }
+  .nav-arrow:disabled {
+    color: var(--border-color);
+    cursor: not-allowed;
+  }
+
+  /* Navigator Pane (Off-Canvas Menu) */
+  .navigator-pane {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height: 100%;
+    background-color: var(--bg-color);
+    z-index: 1000;
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  .navigator-pane.active {
+    transform: translateX(0);
+  }
+  #mobile-nav-close {
+    display: block;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color-muted);
+  }
+
+  /* Commentary Pane (Bottom Sheet) */
+  .commentary-pane {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    max-height: 500px;
+    background-color: var(--bg-color);
+    z-index: 1000;
+    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid var(--border-color);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  .commentary-pane.active {
+    transform: translateY(0);
+  }
+  .commentary-pane .pane-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  #mobile-commentary-close {
+    display: block;
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color-muted);
+  }
+
+  /* Overlay */
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+  }
+  .mobile-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Hide Desktop Splitter */
+  .gutter {
+    display: none;
+  }
+
+  /* --- ADD THIS RULE BACK --- */
+  .pane-content {
+    padding: var(--spacing-unit);
+  }
+}

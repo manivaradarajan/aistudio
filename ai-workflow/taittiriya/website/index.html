@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upanishad Explorer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <nav id="nav-pane" class="navigator-pane">
+        <header class="pane-header">
+          <h2>Navigator</h2>
+          <button id="mobile-nav-close" class="close-button">&times;</button>
+        </header>
+        <div id="navigator-content" class="pane-content"></div>
+      </nav>
+
+      <main id="main-pane" class="main-content-pane">
+        <header class="main-header">
+          <button id="mobile-nav-toggle" class="menu-button">&#9776;</button>
+          <button id="prev-anuvaka" class="nav-arrow prev-arrow">&lt;</button>
+          <h1 id="content-title">Loading...</h1>
+          <button id="next-anuvaka" class="nav-arrow next-arrow">&gt;</button>
+        </header>
+        <div id="mantra-display" class="pane-content"></div>
+      </main>
+
+      <aside id="commentary-pane" class="commentary-pane">
+        <header class="pane-header">
+          <h2>Commentary</h2>
+          <button id="mobile-commentary-close" class="close-button">
+            &times;
+          </button>
+        </header>
+        <div id="commentary-text" class="pane-content"></div>
+      </aside>
+
+      <div id="mobile-overlay" class="mobile-overlay"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://unpkg.com/split.js/dist/split.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
