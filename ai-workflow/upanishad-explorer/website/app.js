@@ -51,7 +51,9 @@ async function handleRouteChange() {
 
   if (!targetText) {
     console.error(`Text with slug '${textSlug}' not found.`);
-    window.location.hash = state.allTexts[0]?.slug ? `/${state.allTexts[0].slug}` : '/';
+    window.location.hash = state.allTexts[0]?.slug
+      ? `/${state.allTexts[0].slug}`
+      : "/";
     return;
   }
 
@@ -65,7 +67,9 @@ async function handleRouteChange() {
 
   for (let i = 0; i < navLevels.length; i++) {
     const urlNumber = parseInt(pathParts[i + 1], 10) || 1;
-    const foundIndex = dataTraversal.findIndex((item) => item.number === urlNumber);
+    const foundIndex = dataTraversal.findIndex(
+      (item) => item.number === urlNumber
+    );
     const index = foundIndex !== -1 ? foundIndex : 0;
     location[`level${i}`] = index;
     dataTraversal = dataTraversal[index]?.children;
@@ -169,7 +173,7 @@ function renderNavigator() {
         const link = document.createElement("a");
         link.href = `#/${textSlug}/${topItem.number}/${midItem.number}`;
         const label = labels[midLevelName] || midLevelName;
-        link.textContent = `${label} ${midItem.number}`;
+        link.textContent = midItem.name || `${label} ${midItem.number}`;
         link.dataset.level0 = topIndex;
         link.dataset.level1 = midIndex;
         listItem.appendChild(link);
@@ -274,11 +278,15 @@ function updateUiState() {
     newLink.classList.add("active");
   } else {
     const sectionPath = path.slice(0, path.lastIndexOf("/"));
-    const sectionLink = dom.navigatorContent.querySelector(`a[href="${sectionPath}"]`);
+    const sectionLink = dom.navigatorContent.querySelector(
+      `a[href="${sectionPath}"]`
+    );
     if (sectionLink) sectionLink.classList.add("active");
   }
 
-  document.querySelectorAll(".accordion-group").forEach((el) => (el.open = false));
+  document
+    .querySelectorAll(".accordion-group")
+    .forEach((el) => (el.open = false));
   const { level0 } = state.currentLocation;
   if (level0 !== undefined) {
     const activeAccordion = dom.navigatorContent.querySelector(
@@ -297,8 +305,8 @@ function addEventListeners() {
   });
 
   dom.navigatorContent.addEventListener("click", (e) => {
-    if (e.target.tagName === 'A') {
-        closeMobileOverlays();
+    if (e.target.tagName === "A") {
+      closeMobileOverlays();
     }
   });
 
@@ -315,7 +323,10 @@ function addEventListeners() {
     const target = direction === "prev" ? prev : next;
     if (target) {
       const textSlug = state.currentText.slug;
-      const navLevels = state.currentUpanishadData.structure_levels.slice(0, -1);
+      const navLevels = state.currentUpanishadData.structure_levels.slice(
+        0,
+        -1
+      );
       let pathNumbers = [];
       let dataTraversal = state.currentUpanishadData.content;
       for (let i = 0; i < navLevels.length; i++) {
@@ -331,7 +342,9 @@ function addEventListeners() {
   dom.prevBtn.addEventListener("click", () => navigateArrows("prev"));
   dom.nextBtn.addEventListener("click", () => navigateArrows("next"));
 
-  dom.mobileNavToggle.addEventListener("click", () => openMobileOverlay(dom.navigatorPane));
+  dom.mobileNavToggle.addEventListener("click", () =>
+    openMobileOverlay(dom.navigatorPane)
+  );
   dom.mobileNavClose.addEventListener("click", closeMobileOverlays);
   dom.mobileCommentaryClose.addEventListener("click", closeMobileOverlays);
   dom.mobileOverlay.addEventListener("click", closeMobileOverlays);
@@ -411,4 +424,3 @@ function getAdjacentSections() {
   // Fallback for other structures (e.g., single level)
   return { prev: null, next: null };
 }
-

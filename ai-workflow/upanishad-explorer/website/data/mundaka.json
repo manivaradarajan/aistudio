@@ -9,7 +9,7 @@
       "children": [
         {
           "type": "Khanda",
-          "name": "प्रथमः खण्डः",
+          "name": "खण्डः 1",
           "number": 1,
           "children": [
             {
@@ -82,7 +82,7 @@
         },
         {
           "type": "Khanda",
-          "name": "द्वितीयखण्डः",
+          "name": "खण्डः 2",
           "number": 2,
           "children": [
             {
@@ -174,7 +174,7 @@
       "children": [
         {
           "type": "Khanda",
-          "name": "प्रथमखण्डः",
+          "name": "खण्डः 1",
           "number": 1,
           "children": [
             {
@@ -241,7 +241,7 @@
         },
         {
           "type": "Khanda",
-          "name": "द्वितीयखण्डः",
+          "name": "खण्डः 2",
           "number": 2,
           "children": [
             {
@@ -327,7 +327,7 @@
       "children": [
         {
           "type": "Khanda",
-          "name": "प्रथमखण्डः",
+          "name": "खण्डः 1",
           "number": 1,
           "children": [
             {
@@ -394,7 +394,7 @@
         },
         {
           "type": "Khanda",
-          "name": "द्वितीयः खण्डः",
+          "name": "खण्डः 2",
           "number": 2,
           "children": [
             {
