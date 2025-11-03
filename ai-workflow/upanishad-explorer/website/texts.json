@@ -5,6 +5,11 @@
     "slug": "isavasya"
   },
   {
+    "name": "केनोपनिषत्",
+    "file": "data/kena.json",
+    "slug": "kena"
+  },
+  {
     "name": "कठोपनिषत्",
     "file": "data/katha.json",
     "slug": "katha"
