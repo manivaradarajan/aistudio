@@ -1,0 +1,11 @@
+model: gemini-2.5-pro
+run_name: "kena"
+
+workflow:
+  - type: chat
+    prompt: "prompt-task.txt"
+    output_extension: ".json"
+    fileset:
+      include:
+        - "input-files/kena/kenopaniSat.md"
+        - "text_schema.json"

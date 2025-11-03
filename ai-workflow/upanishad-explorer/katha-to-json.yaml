@@ -1,0 +1,16 @@
+model: gemini-2.5-pro
+run_name: "katha"
+
+workflow:
+  - type: chat
+    prompt: "prompt-task.txt"
+    output_extension: ".json"
+    fileset:
+      include:
+        - "input-files/katha/kaThopaniSat-prathamA-vallI.md"
+        - "input-files/katha/kaThopaniSat-dvitIyA-valla.md"
+        - "input-files/katha/kaThopaniSat-tRtIyA-vallI.md"
+        - "input-files/katha/kaThopaniSat-caturthI-vallI.md"
+        - "input-files/katha/kaThopaniSat-paJcamI-vallI.md"
+        - "input-files/katha/kaThopaniSat-SaSThI-vallI.md"
+        - "text_schema.json"

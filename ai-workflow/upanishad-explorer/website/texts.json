@@ -1,12 +1,22 @@
 [
   {
-    "name": "Isavasya Upanishad",
+    "name": "ईशावास्योपनिषत्",
     "file": "data/isavasya.json",
     "slug": "isavasya"
   },
   {
-    "name": "Taittiriya Upanishad",
+    "name": "कठोपनिषत्",
+    "file": "data/katha.json",
+    "slug": "katha"
+  },
+  {
+    "name": "तैत्तिरीयोपनिषत्",
     "file": "data/taittiriya.json",
     "slug": "taittiriya"
+  },
+  {
+    "name": "ऐतरेयोपनिषत्",
+    "file": "data/aitareya.json",
+    "slug": "aitareya"
   }
 ]

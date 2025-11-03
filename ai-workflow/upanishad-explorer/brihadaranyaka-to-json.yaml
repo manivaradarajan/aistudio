@@ -1,0 +1,16 @@
+model: gemini-2.5-pro
+run_name: "brihadaranyaka"
+
+workflow:
+  - type: chat
+    prompt: "prompt-task.txt"
+    output_extension: ".json"
+    fileset:
+      include:
+        - "input-files/brihadaranyaka/bRhadAraNyakopaniSat-aSTama.md"
+        - "input-files/brihadaranyaka/bRhadAraNyakopaniSat-catur.md"
+        - "input-files/brihadaranyaka/bRhadAraNyakopaniSat-paJcama.md"
+        - "input-files/brihadaranyaka/bRhadAraNyakopaniSat-saptama.md"
+        - "input-files/brihadaranyaka/bRhadAraNyakopaniSat-SaSTho.md"
+        - "input-files/brihadaranyaka/bRhadAraNyakopaniSat-tRtIya.md"
+        - "text_schema.json"

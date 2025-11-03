@@ -1,0 +1,18 @@
+model: gemini-2.5-pro
+run_name: "chandogya"
+
+workflow:
+  - type: chat
+    prompt: "prompt-task.txt"
+    output_extension: ".json"
+    fileset:
+      include:
+        - "input-files/chandogya/chAndogyopaniSat-aSTamaH.md"
+        - "input-files/chandogya/chAndogyopaniSat-caturtha.md"
+        - "input-files/chandogya/chAndogyopaniSat-dvitI.md"
+        - "input-files/chandogya/chAndogyopaniSat-paJcamaH.md"
+        - "input-files/chandogya/chAndogyopaniSat-prathamaH.md"
+        - "input-files/chandogya/chAndogyopaniSat-saptamaH.md"
+        - "input-files/chandogya/chAndogyopaniSat-SaSThaH-pa.md"
+        - "input-files/chandogya/chAndogyopaniSat-tRtIyaH.md"
+        - "text_schema.json"

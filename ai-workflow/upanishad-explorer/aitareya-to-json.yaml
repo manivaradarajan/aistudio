@@ -1,0 +1,13 @@
+model: gemini-2.5-pro
+run_name: "aitareya"
+
+workflow:
+  - type: chat
+    prompt: "prompt-task.txt"
+    output_extension: ".json"
+    fileset:
+      base_dir: "."
+      include:
+        - "input-files/aitareya/aitareyopaniSat.md"
+        - "text_schema.json"
+      global_search: true
