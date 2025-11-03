@@ -3,7 +3,7 @@ run_name: "mundaka-upanishad-commentary"
 
 workflow:
   - type: chat
-    prompt: "prompt-task-mundaka.txt"
+    prompt: "prompt-task.txt"
     output_extension: ".json"
     fileset:
       base_dir: "."

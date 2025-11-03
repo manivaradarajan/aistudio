@@ -15,6 +15,11 @@
     "slug": "katha"
   },
   {
+    "name": "मुण्डकोपनिषत्",
+    "file": "data/mundaka.json",
+    "slug": "mundaka"
+  },
+  {
     "name": "तैत्तिरीयोपनिषत्",
     "file": "data/taittiriya.json",
     "slug": "taittiriya"
