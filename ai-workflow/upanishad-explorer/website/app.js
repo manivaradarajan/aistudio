@@ -1,4 +1,4 @@
-// app.js (Refactored for maintainability)
+// app.js - Upanishad Explorer (Optimized)
 
 // --- Application State ---
 const state = {
@@ -6,107 +6,204 @@ const state = {
   currentText: null,
   currentUpanishadData: null,
   currentLocation: {},
+  userInitiatedClick: false, // Track if click was from user interaction
 };
 
-// --- DOM References ---
+// --- DOM References (Cached at initialization) ---
 const dom = {
   body: document.body,
-  textSelector: document.getElementById("text-selector"),
-  navigatorPane: document.getElementById("nav-pane"),
-  commentaryPane: document.getElementById("commentary-pane"),
-  navigatorContent: document.getElementById("navigator-content"),
-  contentTitle: document.getElementById("content-title"),
-  mantraDisplay: document.getElementById("mantra-display"),
-  commentaryText: document.getElementById("commentary-text"),
-  mobileNavToggle: document.getElementById("mobile-nav-toggle"),
-  mobileNavClose: document.getElementById("mobile-nav-close"),
-  mobileCommentaryClose: document.getElementById("mobile-commentary-close"),
-  mobileOverlay: document.getElementById("mobile-overlay"),
-  prevBtn: document.getElementById("prev-section"),
-  nextBtn: document.getElementById("next-section"),
+  textSelector: null,
+  navigatorPane: null,
+  commentaryPane: null,
+  navigatorContent: null,
+  contentTitle: null,
+  mantraDisplay: null,
+  commentaryText: null,
+  mobileNavToggle: null,
+  mobileNavClose: null,
+  mobileCommentaryClose: null,
+  mobileOverlay: null,
+  prevBtn: null,
+  nextBtn: null,
+};
+
+// --- Constants ---
+const CONFIG = {
+  TEXTS_MANIFEST: "texts.json",
+  MOBILE_BREAKPOINT: 800,
+  SPLIT_CONFIG: {
+    sizes: [25, 45, 30],
+    minSize: [200, 300, 300],
+    gutterSize: 2,
+    cursor: "col-resize",
+  },
+  DEVANAGARI_LABELS: {
+    Anuvaka: "अनुवाकः",
+    Mantra: "मन्त्रः",
+  },
 };
 
 // --- Main Initialization ---
 document.addEventListener("DOMContentLoaded", init);
 
 async function init() {
+  cacheDomReferences();
   addEventListeners();
+
   try {
-    const response = await fetch("texts.json");
-    if (!response.ok) throw new Error("Could not load texts.json manifest.");
-    state.allTexts = await response.json();
+    state.allTexts = await loadTextsManifest();
     populateTextSelector();
     await handleRouteChange();
   } catch (error) {
     console.error("Initialization failed:", error);
+    showError("Failed to load application. Please refresh the page.");
+  }
+}
+
+function cacheDomReferences() {
+  const elements = {
+    body: document.body,
+    textSelector: "text-selector",
+    navigatorPane: "nav-pane",
+    commentaryPane: "commentary-pane",
+    navigatorContent: "navigator-content",
+    contentTitle: "content-title",
+    mantraDisplay: "mantra-display",
+    commentaryText: "commentary-text",
+    mobileNavToggle: "mobile-nav-toggle",
+    mobileNavClose: "mobile-nav-close",
+    mobileCommentaryClose: "mobile-commentary-close",
+    mobileOverlay: "mobile-overlay",
+    prevBtn: "prev-section",
+    nextBtn: "next-section",
+  };
+
+  for (const [key, value] of Object.entries(elements)) {
+    if (key === "body") {
+      dom[key] = value;
+    } else {
+      dom[key] = document.getElementById(value);
+    }
+  }
+}
+
+async function loadTextsManifest() {
+  const response = await fetch(CONFIG.TEXTS_MANIFEST);
+  if (!response.ok) {
+    throw new Error(`Could not load ${CONFIG.TEXTS_MANIFEST} manifest.`);
+  }
+  return response.json();
+}
+
+function showError(message) {
+  if (dom.contentTitle) {
+    dom.contentTitle.textContent = message;
   }
 }
 
 // --- Central Router ---
 async function handleRouteChange() {
-  const pathParts = window.location.hash.slice(1).split("/").filter(Boolean);
+  const pathParts = parseHashPath();
   const textSlug = pathParts[0] || state.allTexts[0]?.slug;
-
-  const targetText = state.allTexts.find((t) => t.slug === textSlug);
+  const targetText = findTextBySlug(textSlug);
 
   if (!targetText) {
-    console.error(`Text with slug '${textSlug}' not found.`);
-    window.location.hash = state.allTexts[0]?.slug
-      ? `/${state.allTexts[0].slug}`
-      : "/";
+    handleInvalidRoute(textSlug);
     return;
   }
 
+  // Load text data if it's a new text
   if (state.currentText?.file !== targetText.file) {
     await loadText(targetText);
   }
 
+  const location = parseLocationFromPath(pathParts);
+  loadSection(location);
+  selectItemFromUrl(pathParts);
+}
+
+function parseHashPath() {
+  return window.location.hash.slice(1).split("/").filter(Boolean);
+}
+
+function findTextBySlug(slug) {
+  return state.allTexts.find((t) => t.slug === slug);
+}
+
+function handleInvalidRoute(slug) {
+  console.error(`Text with slug '${slug}' not found.`);
+  const fallbackSlug = state.allTexts[0]?.slug;
+  if (fallbackSlug) {
+    window.location.hash = `/${fallbackSlug}`;
+  }
+}
+
+function parseLocationFromPath(pathParts) {
   const navLevels = state.currentUpanishadData.structure_levels.slice(0, -1);
   const location = {};
   let dataTraversal = state.currentUpanishadData.content;
 
   for (let i = 0; i < navLevels.length; i++) {
     const urlNumber = parseInt(pathParts[i + 1], 10) || 1;
-    const foundIndex = dataTraversal.findIndex(
-      (item) => item.number === urlNumber
-    );
-    const index = foundIndex !== -1 ? foundIndex : 0;
+    const index = findIndexByNumber(dataTraversal, urlNumber);
     location[`level${i}`] = index;
     dataTraversal = dataTraversal[index]?.children;
   }
 
-  loadSection(location);
-  selectItemFromUrl(pathParts);
+  return location;
+}
+
+function findIndexByNumber(array, number) {
+  const foundIndex = array.findIndex((item) => item.number === number);
+  return foundIndex !== -1 ? foundIndex : 0;
 }
 
 function selectItemFromUrl(pathParts) {
   const navLevels = state.currentUpanishadData.structure_levels.slice(0, -1);
   const leafUrlNumber = parseInt(pathParts[navLevels.length + 1], 10);
 
-  let itemToSelect = dom.mantraDisplay.querySelector(".item-container"); // Default to first
-
-  if (!isNaN(leafUrlNumber)) {
-    const allItems = dom.mantraDisplay.querySelectorAll(".item-container");
-    for (const item of allItems) {
-      if (parseInt(item.dataset.number, 10) === leafUrlNumber) {
-        itemToSelect = item;
-        break;
-      }
-    }
-  }
+  const itemToSelect = findItemToSelect(leafUrlNumber);
 
   if (itemToSelect) {
-    showItemDetails(itemToSelect, false); // false = don't show mobile pane automatically
+    // Show mobile pane only if this was triggered by a user click
+    const showMobilePane = state.userInitiatedClick && isMobileView();
+    showItemDetails(itemToSelect, showMobilePane);
+    state.userInitiatedClick = false; // Reset flag
   }
 }
 
+function findItemToSelect(leafUrlNumber) {
+  const allItems = dom.mantraDisplay.querySelectorAll(".item-container");
+
+  if (isNaN(leafUrlNumber)) {
+    return allItems[0]; // Default to first item
+  }
+
+  for (const item of allItems) {
+    if (parseInt(item.dataset.number, 10) === leafUrlNumber) {
+      return item;
+    }
+  }
+
+  return allItems[0]; // Fallback to first item
+}
+
+function isMobileView() {
+  return window.innerWidth <= CONFIG.MOBILE_BREAKPOINT;
+}
+
+// --- Text Loading ---
 function populateTextSelector() {
+  const fragment = document.createDocumentFragment();
+
   state.allTexts.forEach((text) => {
     const option = document.createElement("option");
     option.value = text.file;
     option.textContent = text.name;
-    dom.textSelector.appendChild(option);
+    fragment.appendChild(option);
   });
+
+  dom.textSelector.appendChild(fragment);
 }
 
 function navigateTo(path) {
@@ -118,226 +215,324 @@ function navigateTo(path) {
 async function loadText(textObject) {
   try {
     const response = await fetch(textObject.file);
-    if (!response.ok) throw new Error(`Failed to fetch ${textObject.file}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${textObject.file}`);
+    }
+
     state.currentUpanishadData = await response.json();
     state.currentText = textObject;
     dom.textSelector.value = textObject.file;
 
     renderNavigator();
-
-    if (window.Split && window.innerWidth > 800) {
-      document.querySelectorAll(".gutter").forEach((g) => g.remove());
-      window.Split(["#nav-pane", "#main-pane", "#commentary-pane"], {
-        sizes: [25, 45, 30],
-        minSize: [200, 300, 300],
-        gutterSize: 2,
-        cursor: "col-resize",
-      });
-    }
+    initializeSplitPanes();
   } catch (error) {
     console.error(`Error loading text from ${textObject.file}:`, error);
+    showError("Failed to load text. Please try again.");
   }
 }
+
+function initializeSplitPanes() {
+  if (!window.Split || isMobileView()) {
+    return;
+  }
+
+  // Remove existing gutters
+  document.querySelectorAll(".gutter").forEach((g) => g.remove());
+
+  window.Split(
+    ["#nav-pane", "#main-pane", "#commentary-pane"],
+    CONFIG.SPLIT_CONFIG
+  );
+}
+
+// --- Navigator Rendering ---
 function renderNavigator() {
-  dom.navigatorContent.innerHTML = "";
-  const levels = state.currentUpanishadData.structure_levels;
-  const content = state.currentUpanishadData.content;
-  const textSlug = state.currentText.slug;
-  const labels = { Anuvaka: "अनुवाकः", Mantra: "मन्त्रः" };
+  const { structure_levels, content } = state.currentUpanishadData;
 
-  if (levels.length === 1) {
-    const list = document.createElement("ul");
-    content.forEach((item, index) => {
-      const listItem = document.createElement("li");
-      const link = document.createElement("a");
-      link.href = `#/${textSlug}/${item.number}`;
-      const label = labels[item.type] || item.type;
-      link.textContent = `${label} ${item.number}`;
-      link.dataset.leafIndex = index;
-      listItem.appendChild(link);
-      list.appendChild(listItem);
-    });
-    dom.navigatorContent.appendChild(list);
-  } else if (levels.length > 1) {
-    const midLevelName = levels[1];
-    content.forEach((topItem, topIndex) => {
-      const details = document.createElement("details");
-      details.className = "accordion-group";
-      details.dataset.level0 = topIndex;
-      const summary = document.createElement("summary");
-      summary.textContent = topItem.name;
-      details.appendChild(summary);
-      const list = document.createElement("ul");
-      topItem.children.forEach((midItem, midIndex) => {
-        const listItem = document.createElement("li");
-        const link = document.createElement("a");
-        link.href = `#/${textSlug}/${topItem.number}/${midItem.number}`;
-        const label = labels[midLevelName] || midLevelName;
-        link.textContent = midItem.name || `${label} ${midItem.number}`;
-        link.dataset.level0 = topIndex;
-        link.dataset.level1 = midIndex;
-        listItem.appendChild(link);
-        list.appendChild(listItem);
-      });
-      details.appendChild(list);
-      dom.navigatorContent.appendChild(details);
-    });
+  dom.navigatorContent.innerHTML = "";
+
+  if (structure_levels.length === 1) {
+    renderFlatNavigator(content);
+  } else if (structure_levels.length > 1) {
+    renderHierarchicalNavigator(content, structure_levels[1]);
   }
 }
 
+function renderFlatNavigator(content) {
+  const list = document.createElement("ul");
+  const textSlug = state.currentText.slug;
+
+  content.forEach((item, index) => {
+    const listItem = document.createElement("li");
+    const link = createNavigatorLink(item, textSlug, index);
+    listItem.appendChild(link);
+    list.appendChild(listItem);
+  });
+
+  dom.navigatorContent.appendChild(list);
+}
+
+function createNavigatorLink(
+  item,
+  textSlug,
+  index,
+  level0 = null,
+  level1 = null
+) {
+  const link = document.createElement("a");
+  const label = CONFIG.DEVANAGARI_LABELS[item.type] || item.type;
+
+  link.href = `#/${textSlug}/${item.number}`;
+  link.textContent = item.name || `${label} ${item.number}`;
+
+  if (level0 !== null) link.dataset.level0 = level0;
+  if (level1 !== null) link.dataset.level1 = level1;
+  if (level0 === null && level1 === null) link.dataset.leafIndex = index;
+
+  return link;
+}
+
+function renderHierarchicalNavigator(content, midLevelName) {
+  const fragment = document.createDocumentFragment();
+  const textSlug = state.currentText.slug;
+
+  content.forEach((topItem, topIndex) => {
+    const details = createAccordionGroup(
+      topItem,
+      topIndex,
+      midLevelName,
+      textSlug
+    );
+    fragment.appendChild(details);
+  });
+
+  dom.navigatorContent.appendChild(fragment);
+}
+
+function createAccordionGroup(topItem, topIndex, midLevelName, textSlug) {
+  const details = document.createElement("details");
+  details.className = "accordion-group";
+  details.dataset.level0 = topIndex;
+
+  const summary = document.createElement("summary");
+  summary.textContent = topItem.name;
+  details.appendChild(summary);
+
+  const list = document.createElement("ul");
+  topItem.children.forEach((midItem, midIndex) => {
+    const listItem = document.createElement("li");
+    const link = document.createElement("a");
+    const label = CONFIG.DEVANAGARI_LABELS[midLevelName] || midLevelName;
+
+    link.href = `#/${textSlug}/${topItem.number}/${midItem.number}`;
+    link.textContent = midItem.name || `${label} ${midItem.number}`;
+    link.dataset.level0 = topIndex;
+    link.dataset.level1 = midIndex;
+
+    listItem.appendChild(link);
+    list.appendChild(listItem);
+  });
+
+  details.appendChild(list);
+  return details;
+}
+
+// --- Section Loading ---
 function loadSection(location) {
   state.currentLocation = location;
-  const levels = state.currentUpanishadData.structure_levels;
-  const navLevels = levels.slice(0, -1);
-  let titleParts = [state.currentUpanishadData.text_name];
-  let dataToRender = state.currentUpanishadData.content;
 
-  if (navLevels.length > 0) {
-    for (let i = 0; i < navLevels.length; i++) {
-      const index = location[`level${i}`];
-      if (index === undefined) break;
-      dataToRender = dataToRender[index];
-      titleParts.push(
-        dataToRender.name || `${levels[i]} ${dataToRender.number}`
-      );
-      dataToRender = dataToRender.children;
-    }
-  }
+  const { titleParts, dataToRender } = getSectionData(location);
 
-  dom.mantraDisplay.innerHTML = "";
-  if (Array.isArray(dataToRender)) {
-    dataToRender.forEach((item, index) => {
-      const itemContainer = document.createElement("div");
-      itemContainer.className = "item-container";
-      let itemPath = { ...location };
-      itemPath[`level${navLevels.length}`] = index;
-      Object.keys(itemPath).forEach(
-        (k) => (itemContainer.dataset[k] = itemPath[k])
-      );
-      itemContainer.dataset.number = item.number;
-      const numberEl = document.createElement("p");
-      numberEl.className = "item-number";
-      numberEl.textContent = item.number;
-      const textEl = document.createElement("p");
-      textEl.className = "item-text";
-      textEl.textContent = item.text;
-      itemContainer.appendChild(numberEl);
-      itemContainer.appendChild(textEl);
-      dom.mantraDisplay.appendChild(itemContainer);
-    });
-  }
-
+  renderSectionItems(dataToRender, location);
   dom.contentTitle.textContent = titleParts.join(" - ");
-  updateUiState(location);
+  updateUiState();
 }
 
+function getSectionData(location) {
+  const { structure_levels, content, text_name } = state.currentUpanishadData;
+  const navLevels = structure_levels.slice(0, -1);
+
+  let titleParts = [text_name];
+  let dataToRender = content;
+
+  for (let i = 0; i < navLevels.length; i++) {
+    const index = location[`level${i}`];
+    if (index === undefined) break;
+
+    dataToRender = dataToRender[index];
+    titleParts.push(
+      dataToRender.name || `${structure_levels[i]} ${dataToRender.number}`
+    );
+    dataToRender = dataToRender.children;
+  }
+
+  return { titleParts, dataToRender };
+}
+
+function renderSectionItems(dataToRender, location) {
+  if (!Array.isArray(dataToRender)) {
+    dom.mantraDisplay.innerHTML = "";
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  const navLevels = state.currentUpanishadData.structure_levels.slice(0, -1);
+
+  dataToRender.forEach((item, index) => {
+    const itemContainer = createItemContainer(
+      item,
+      location,
+      navLevels.length,
+      index
+    );
+    fragment.appendChild(itemContainer);
+  });
+
+  dom.mantraDisplay.innerHTML = "";
+  dom.mantraDisplay.appendChild(fragment);
+}
+
+function createItemContainer(item, location, levelDepth, index) {
+  const container = document.createElement("div");
+  container.className = "item-container";
+
+  // Store path data
+  const itemPath = { ...location, [`level${levelDepth}`]: index };
+  Object.entries(itemPath).forEach(([key, value]) => {
+    container.dataset[key] = value;
+  });
+  container.dataset.number = item.number;
+
+  // Create number element
+  const numberEl = document.createElement("p");
+  numberEl.className = "item-number";
+  numberEl.textContent = item.number;
+
+  // Create text element
+  const textEl = document.createElement("p");
+  textEl.className = "item-text";
+  textEl.textContent = item.text;
+
+  container.appendChild(numberEl);
+  container.appendChild(textEl);
+
+  return container;
+}
+
+// --- Item Selection & Commentary ---
 function showItemDetails(itemContainer, showMobilePane = true) {
+  // Update selection state
   const selected = dom.mantraDisplay.querySelector(".selected");
-  if (selected) selected.classList.remove("selected");
+  if (selected) {
+    selected.classList.remove("selected");
+  }
   itemContainer.classList.add("selected");
 
+  // Smooth scroll to item
   itemContainer.scrollIntoView({ behavior: "smooth", block: "center" });
 
-  let dataToFind = state.currentUpanishadData.content;
+  // Find and display item data
+  const itemData = getItemData(itemContainer);
+
+  if (itemData) {
+    updateUrlFromContainer(itemContainer);
+    renderCommentary(itemData);
+  }
+
+  // Show mobile pane if requested
+  if (showMobilePane) {
+    openMobileOverlay(dom.commentaryPane);
+  }
+}
+
+function getItemData(itemContainer) {
   const levels = state.currentUpanishadData.structure_levels;
+  let dataToFind = state.currentUpanishadData.content;
 
   for (let i = 0; i < levels.length; i++) {
     const index = itemContainer.dataset[`level${i}`];
     if (index === undefined) break;
+
     dataToFind = dataToFind[parseInt(index)];
+
     if (i < levels.length - 1) {
       dataToFind = dataToFind.children;
     }
   }
 
-  const itemData = dataToFind;
-  if (itemData) {
-    const newPath = buildPathFromContainer(itemContainer);
-    if (window.location.hash !== `#${newPath}`) {
-      history.replaceState(null, "", `#${newPath}`);
-    }
+  return dataToFind;
+}
 
-    dom.commentaryText.innerHTML = itemData.commentary_text
-      ? marked.parse(itemData.commentary_text)
-      : "<p>No commentary available.</p>";
-  }
+function updateUrlFromContainer(itemContainer) {
+  const newPath = buildPathFromContainer(itemContainer);
 
-  if (window.innerWidth <= 800 && showMobilePane) {
-    openMobileOverlay(dom.commentaryPane);
+  if (window.location.hash !== `#${newPath}`) {
+    history.replaceState(null, "", `#${newPath}`);
   }
 }
 
-function updateUiState() {
-  const activeLink = dom.navigatorContent.querySelector("a.active");
-  if (activeLink) activeLink.classList.remove("active");
+function renderCommentary(itemData) {
+  if (itemData.commentary_text) {
+    dom.commentaryText.innerHTML = marked.parse(itemData.commentary_text);
+  } else {
+    dom.commentaryText.innerHTML = "<p>No commentary available.</p>";
+  }
+}
 
+// --- UI State Management ---
+function updateUiState() {
+  updateActiveNavigatorLink();
+  updateAccordionState();
+  updateArrowButtons();
+}
+
+function updateActiveNavigatorLink() {
+  // Remove existing active class
+  const activeLink = dom.navigatorContent.querySelector("a.active");
+  if (activeLink) {
+    activeLink.classList.remove("active");
+  }
+
+  // Find and activate current link
   const path = window.location.hash;
-  const newLink = dom.navigatorContent.querySelector(`a[href="${path}"]`);
+  let newLink = dom.navigatorContent.querySelector(`a[href="${path}"]`);
+
+  // Fallback to section link if exact match not found
+  if (!newLink) {
+    const sectionPath = path.slice(0, path.lastIndexOf("/"));
+    newLink = dom.navigatorContent.querySelector(`a[href="${sectionPath}"]`);
+  }
 
   if (newLink) {
     newLink.classList.add("active");
-  } else {
-    const sectionPath = path.slice(0, path.lastIndexOf("/"));
-    const sectionLink = dom.navigatorContent.querySelector(
-      `a[href="${sectionPath}"]`
-    );
-    if (sectionLink) sectionLink.classList.add("active");
   }
+}
 
-  document
-    .querySelectorAll(".accordion-group")
-    .forEach((el) => (el.open = false));
+function updateAccordionState() {
+  // Close all accordions
+  document.querySelectorAll(".accordion-group").forEach((el) => {
+    el.open = false;
+  });
+
+  // Open current accordion
   const { level0 } = state.currentLocation;
   if (level0 !== undefined) {
     const activeAccordion = dom.navigatorContent.querySelector(
       `[data-level0="${level0}"]`
     );
-    if (activeAccordion) activeAccordion.open = true;
+    if (activeAccordion) {
+      activeAccordion.open = true;
+    }
   }
-  updateArrowButtons();
 }
+
+// --- Event Listeners ---
 function addEventListeners() {
   window.addEventListener("hashchange", handleRouteChange);
 
-  dom.textSelector.addEventListener("change", (e) => {
-    const newSlug = state.allTexts.find((t) => t.file === e.target.value).slug;
-    window.location.hash = `/${newSlug}`;
-  });
-
-  dom.navigatorContent.addEventListener("click", (e) => {
-    if (e.target.tagName === "A") {
-      closeMobileOverlays();
-    }
-  });
-
-  dom.mantraDisplay.addEventListener("click", (e) => {
-    const container = e.target.closest(".item-container");
-    if (container) {
-      const newPath = buildPathFromContainer(container);
-      navigateTo(newPath);
-    }
-  });
-
-  const navigateArrows = (direction) => {
-    const { prev, next } = getAdjacentSections();
-    const target = direction === "prev" ? prev : next;
-    if (target) {
-      const textSlug = state.currentText.slug;
-      const navLevels = state.currentUpanishadData.structure_levels.slice(
-        0,
-        -1
-      );
-      let pathNumbers = [];
-      let dataTraversal = state.currentUpanishadData.content;
-      for (let i = 0; i < navLevels.length; i++) {
-        const index = target[`level${i}`];
-        const item = dataTraversal[index];
-        pathNumbers.push(item.number);
-        dataTraversal = item.children;
-      }
-      navigateTo(`/${textSlug}/${pathNumbers.join("/")}`);
-    }
-  };
+  dom.textSelector.addEventListener("change", handleTextChange);
+  dom.navigatorContent.addEventListener("click", handleNavigatorClick);
+  dom.mantraDisplay.addEventListener("click", handleMantraClick);
 
   dom.prevBtn.addEventListener("click", () => navigateArrows("prev"));
   dom.nextBtn.addEventListener("click", () => navigateArrows("next"));
@@ -349,24 +544,80 @@ function addEventListeners() {
   dom.mobileCommentaryClose.addEventListener("click", closeMobileOverlays);
   dom.mobileOverlay.addEventListener("click", closeMobileOverlays);
 }
+
+function handleTextChange(e) {
+  const newText = state.allTexts.find((t) => t.file === e.target.value);
+  if (newText) {
+    window.location.hash = `/${newText.slug}`;
+  }
+}
+
+function handleNavigatorClick(e) {
+  if (e.target.tagName === "A") {
+    closeMobileOverlays();
+  }
+}
+
+function handleMantraClick(e) {
+  const container = e.target.closest(".item-container");
+  if (container) {
+    state.userInitiatedClick = true; // Set flag before navigation
+    const newPath = buildPathFromContainer(container);
+    navigateTo(newPath);
+  }
+}
+
+// --- Arrow Navigation ---
+function navigateArrows(direction) {
+  const { prev, next } = getAdjacentSections();
+  const target = direction === "prev" ? prev : next;
+
+  if (!target) return;
+
+  const path = buildPathFromLocation(target);
+  navigateTo(path);
+}
+
+function buildPathFromLocation(location) {
+  const textSlug = state.currentText.slug;
+  const navLevels = state.currentUpanishadData.structure_levels.slice(0, -1);
+  const pathNumbers = [];
+
+  let dataTraversal = state.currentUpanishadData.content;
+
+  for (let i = 0; i < navLevels.length; i++) {
+    const index = location[`level${i}`];
+    const item = dataTraversal[index];
+    pathNumbers.push(item.number);
+    dataTraversal = item.children;
+  }
+
+  return `/${textSlug}/${pathNumbers.join("/")}`;
+}
+
 function buildPathFromContainer(container) {
   const textSlug = state.currentText.slug;
   const levels = state.currentUpanishadData.structure_levels;
-  let pathParts = [textSlug];
+  const pathParts = [textSlug];
+
   let dataNode = state.currentUpanishadData.content;
 
   for (let i = 0; i < levels.length; i++) {
     const index = container.dataset[`level${i}`];
     if (index === undefined) break;
+
     dataNode = dataNode[parseInt(index)];
     pathParts.push(dataNode.number);
+
     if (i < levels.length - 1) {
       dataNode = dataNode.children;
     }
   }
+
   return `/${pathParts.join("/")}`;
 }
 
+// --- Mobile UI ---
 function openMobileOverlay(pane) {
   pane.classList.add("active");
   dom.mobileOverlay.classList.add("active");
@@ -380,6 +631,7 @@ function closeMobileOverlays() {
   dom.body.classList.remove("mobile-overlay-active");
 }
 
+// --- Arrow Button State ---
 function updateArrowButtons() {
   const { prev, next } = getAdjacentSections();
   dom.prevBtn.disabled = !prev;
@@ -388,39 +640,47 @@ function updateArrowButtons() {
 
 function getAdjacentSections() {
   const navLevels = state.currentUpanishadData.structure_levels.slice(0, -1);
-  if (navLevels.length === 0) return { prev: null, next: null };
+
+  if (navLevels.length === 0) {
+    return { prev: null, next: null };
+  }
+
+  // Currently only supports 2-level navigation
+  if (navLevels.length === 2) {
+    return getAdjacentSectionsForTwoLevels();
+  }
+
+  return { prev: null, next: null };
+}
+
+function getAdjacentSectionsForTwoLevels() {
+  const { level0, level1 } = state.currentLocation;
+  const level0Array = state.currentUpanishadData.content;
+  const level1Array = level0Array[level0].children;
 
   let prev = { ...state.currentLocation };
   let next = { ...state.currentLocation };
 
-  // This logic currently only supports 2 levels of navigation.
-  // It can be generalized if deeper structures are needed.
-  if (navLevels.length === 2) {
-    const level0Index = state.currentLocation.level0;
-    const level1Index = state.currentLocation.level1;
-    const level0Array = state.currentUpanishadData.content;
-    const level1Array = level0Array[level0Index].children;
-
-    if (level1Index < level1Array.length - 1) {
-      next.level1++;
-    } else if (level0Index < level0Array.length - 1) {
-      next.level0++;
-      next.level1 = 0;
-    } else {
-      next = null;
-    }
-
-    if (level1Index > 0) {
-      prev.level1--;
-    } else if (level0Index > 0) {
-      prev.level0--;
-      const prevLevel1Array = level0Array[prev.level0].children;
-      prev.level1 = prevLevel1Array.length - 1;
-    } else {
-      prev = null;
-    }
-    return { prev, next };
+  // Calculate next section
+  if (level1 < level1Array.length - 1) {
+    next.level1++;
+  } else if (level0 < level0Array.length - 1) {
+    next.level0++;
+    next.level1 = 0;
+  } else {
+    next = null;
   }
-  // Fallback for other structures (e.g., single level)
-  return { prev: null, next: null };
+
+  // Calculate previous section
+  if (level1 > 0) {
+    prev.level1--;
+  } else if (level0 > 0) {
+    prev.level0--;
+    const prevLevel1Array = level0Array[prev.level0].children;
+    prev.level1 = prevLevel1Array.length - 1;
+  } else {
+    prev = null;
+  }
+
+  return { prev, next };
 }
