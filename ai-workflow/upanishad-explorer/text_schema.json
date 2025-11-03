@@ -5,11 +5,11 @@
   "properties": {
     "text_name": {
       "type": "string",
-      "description": "The full name of the text, e.g., 'Taittiriya Upanishad'."
+      "description": "The full name of the text in its original script, e.g., 'तैत्तिरीयोपनिषत्'."
     },
     "structure_levels": {
       "type": "array",
-      "description": "An ordered list of names for the structural levels, from largest to smallest, e.g., ['Valli', 'Anuvaka', 'Mantra'].",
+      "description": "An ordered list of names for the structural levels, from largest to smallest, e.g., ['Valli', 'Anuvaka', 'Mantra']. The application uses this to parse the hierarchy.",
       "items": {
         "type": "string"
       }
@@ -41,28 +41,48 @@
         },
         "name": {
           "type": "string",
-          "description": "The name of this node, e.g., 'Anandavalli'. Optional."
+          "description": "The name of this node, e.g., 'Anandavalli'. This is optional."
         },
         "number": {
           "type": "integer",
-          "description": "The sequential number of this node within its parent."
-        },
-        "children": {
-          "type": "array",
-          "description": "An array of child nodes (which can be more structural nodes or leaf nodes).",
-          "items": {
-            "$ref": "#/definitions/node"
-          }
+          "description": "The sequential number of this node within its parent, used for URL generation."
         }
       },
-      "required": ["type", "number", "children"]
+      "required": ["type", "number"],
+      "oneOf": [
+        {
+          "title": "Eager Node",
+          "description": "A node with its children defined directly within the same file.",
+          "properties": {
+            "children": {
+              "type": "array",
+              "description": "An array of child nodes (which can be more structural nodes or leaf nodes).",
+              "items": {
+                "$ref": "#/definitions/node"
+              }
+            }
+          },
+          "required": ["children"]
+        },
+        {
+          "title": "Lazy Node",
+          "description": "A node whose children are defined in a separate file, to be loaded on demand.",
+          "properties": {
+            "file": {
+              "type": "string",
+              "description": "The relative path to a JSON file containing the children for this node."
+            }
+          },
+          "required": ["file"]
+        }
+      ]
     },
     "leafNode": {
       "type": "object",
       "properties": {
         "type": {
           "type": "string",
-          "description": "The type of this leaf node, e.g., 'Mantra', 'Sutra'."
+          "description": "The type of this leaf node, matching the last name in structure_levels, e.g., 'Mantra', 'Sutra'."
         },
         "number": {
           "type": "integer",
@@ -74,7 +94,7 @@
         },
         "commentary_text": {
           "type": "string",
-          "description": "The associated commentary, with Markdown."
+          "description": "The associated commentary text. Markdown is supported."
         }
       },
       "required": ["type", "number", "text"]

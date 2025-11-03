@@ -1,4 +1,4 @@
-// app.js - Upanishad Explorer (Optimized)
+// app.js - Upanishad Explorer (Optimized with Multi-File Support)
 
 // --- Application State ---
 const state = {
@@ -7,6 +7,8 @@ const state = {
   currentUpanishadData: null,
   currentLocation: {},
   userInitiatedClick: false, // Track if click was from user interaction
+  sectionCache: new Map(), // Cache for loaded section files
+  loadingSection: false, // Track if a section is currently loading
 };
 
 // --- DOM References (Cached at initialization) ---
@@ -99,6 +101,15 @@ function showError(message) {
   if (dom.contentTitle) {
     dom.contentTitle.textContent = message;
   }
+  if (dom.mantraDisplay) {
+    dom.mantraDisplay.innerHTML = `<p style="padding: 2rem; text-align: center; color: var(--text-color-muted);">${message}</p>`;
+  }
+}
+
+function showLoading(message = "Loading...") {
+  if (dom.mantraDisplay) {
+    dom.mantraDisplay.innerHTML = `<p style="padding: 2rem; text-align: center; color: var(--text-color-muted);">${message}</p>`;
+  }
 }
 
 // --- Central Router ---
@@ -118,7 +129,7 @@ async function handleRouteChange() {
   }
 
   const location = parseLocationFromPath(pathParts);
-  loadSection(location);
+  await loadSection(location);
   selectItemFromUrl(pathParts);
 }
 
@@ -223,6 +234,9 @@ async function loadText(textObject) {
     state.currentText = textObject;
     dom.textSelector.value = textObject.file;
 
+    // Clear section cache when loading new text
+    state.sectionCache.clear();
+
     renderNavigator();
     initializeSplitPanes();
   } catch (error) {
@@ -243,6 +257,46 @@ function initializeSplitPanes() {
     ["#nav-pane", "#main-pane", "#commentary-pane"],
     CONFIG.SPLIT_CONFIG
   );
+}
+
+// --- Lazy Loading Support ---
+function isLazyNode(node) {
+  return node && typeof node.file === "string" && !node.children;
+}
+
+async function loadLazyNode(node) {
+  // Check cache first
+  const cacheKey = node.file;
+  if (state.sectionCache.has(cacheKey)) {
+    return state.sectionCache.get(cacheKey);
+  }
+
+  try {
+    const response = await fetch(node.file);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch section: ${node.file}`);
+    }
+
+    const data = await response.json();
+
+    // Cache the loaded data
+    state.sectionCache.set(cacheKey, data.children);
+
+    return data.children;
+  } catch (error) {
+    console.error(`Error loading lazy section from ${node.file}:`, error);
+    throw error;
+  }
+}
+
+async function ensureNodeLoaded(node) {
+  if (isLazyNode(node)) {
+    const children = await loadLazyNode(node);
+    // Mutate the node to replace file reference with actual children
+    node.children = children;
+    delete node.file;
+  }
+  return node;
 }
 
 // --- Navigator Rendering ---
@@ -319,36 +373,68 @@ function createAccordionGroup(topItem, topIndex, midLevelName, textSlug) {
   details.appendChild(summary);
 
   const list = document.createElement("ul");
-  topItem.children.forEach((midItem, midIndex) => {
+
+  // For lazy nodes, we still need to show navigation links
+  // The children will be loaded when the section is accessed
+  const children = topItem.children || [];
+
+  if (children.length === 0 && isLazyNode(topItem)) {
+    // This is a lazy node - create a placeholder link that goes to this section
     const listItem = document.createElement("li");
     const link = document.createElement("a");
-    const label = CONFIG.DEVANAGARI_LABELS[midLevelName] || midLevelName;
-
-    link.href = `#/${textSlug}/${topItem.number}/${midItem.number}`;
-    link.textContent = midItem.name || `${label} ${midItem.number}`;
+    link.href = `#/${textSlug}/${topItem.number}`;
+    link.textContent = "View Section";
     link.dataset.level0 = topIndex;
-    link.dataset.level1 = midIndex;
-
     listItem.appendChild(link);
     list.appendChild(listItem);
-  });
+  } else {
+    // Regular children rendering
+    children.forEach((midItem, midIndex) => {
+      const listItem = document.createElement("li");
+      const link = document.createElement("a");
+      const label = CONFIG.DEVANAGARI_LABELS[midLevelName] || midLevelName;
+
+      link.href = `#/${textSlug}/${topItem.number}/${midItem.number}`;
+      link.textContent = midItem.name || `${label} ${midItem.number}`;
+      link.dataset.level0 = topIndex;
+      link.dataset.level1 = midIndex;
+
+      listItem.appendChild(link);
+      list.appendChild(listItem);
+    });
+  }
 
   details.appendChild(list);
   return details;
 }
 
 // --- Section Loading ---
-function loadSection(location) {
+async function loadSection(location) {
+  if (state.loadingSection) {
+    return; // Prevent concurrent loads
+  }
+
+  state.loadingSection = true;
   state.currentLocation = location;
 
-  const { titleParts, dataToRender } = getSectionData(location);
+  try {
+    const { titleParts, dataToRender } = await getSectionData(location);
 
-  renderSectionItems(dataToRender, location);
-  dom.contentTitle.textContent = titleParts.join(" - ");
-  updateUiState();
+    if (dataToRender) {
+      renderSectionItems(dataToRender, location);
+      dom.contentTitle.textContent = titleParts.join(" - ");
+    }
+
+    updateUiState();
+  } catch (error) {
+    console.error("Error loading section:", error);
+    showError("Failed to load section. Please try again.");
+  } finally {
+    state.loadingSection = false;
+  }
 }
 
-function getSectionData(location) {
+async function getSectionData(location) {
   const { structure_levels, content, text_name } = state.currentUpanishadData;
   const navLevels = structure_levels.slice(0, -1);
 
@@ -360,6 +446,13 @@ function getSectionData(location) {
     if (index === undefined) break;
 
     dataToRender = dataToRender[index];
+
+    // Check if this is a lazy node and load it
+    if (isLazyNode(dataToRender)) {
+      showLoading("Loading section...");
+      await ensureNodeLoaded(dataToRender);
+    }
+
     titleParts.push(
       dataToRender.name || `${structure_levels[i]} ${dataToRender.number}`
     );
