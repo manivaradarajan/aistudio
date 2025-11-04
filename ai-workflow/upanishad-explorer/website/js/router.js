@@ -8,6 +8,7 @@ import * as commonUI from "./ui/common.js";
 import { initializeSplitPanes } from "./ui/split-pane.js";
 import { updateArrowButtons } from "./app.js";
 import { CONFIG } from "./constants.js";
+import { isMobileView } from "./utils.js"; // <-- FIX: Import isMobileView
 
 /**
  * Navigates to a new hash path, updating the URL.
@@ -23,8 +24,7 @@ export function navigateTo(path) {
  * Main routing function triggered on hash change or initial load.
  */
 export async function handleRouteChange() {
-  // Get a unique ID for this specific navigation request.
-  const requestId = state.getNewNavigationRequestId(); // <-- FIX: Generate new request ID
+  const requestId = state.getNewNavigationRequestId();
 
   state.setUiStatus("loading");
   const { allTexts } = state.getState();
@@ -56,21 +56,13 @@ export async function handleRouteChange() {
     }
   }
 
-  // Pass the request ID to the rendering logic.
-  await loadAndRenderSection(pathParts, requestId); // <-- FIX: Pass ID down
-  state.setUserInitiatedClick(false);
+  await loadAndRenderSection(pathParts, requestId);
+  state.setUserInitiatedClick(false); // Reset the flag after every navigation is complete
   state.setUiStatus("idle");
 }
 
 async function loadAndRenderSection(pathParts, requestId) {
-  // <-- FIX: Accept ID
-  // --- FIX: Race Condition Abort ---
-  // Yield to the event loop with a microtask. This allows any subsequent,
-  // rapid-fire navigation events to be processed and update the global request ID.
   await Promise.resolve();
-
-  // Before performing any logic or DOM updates, check if this request has been
-  // superseded by a newer one. If so, abort immediately to prevent flashing.
   if (requestId !== state.getCurrentNavigationRequestId()) {
     return;
   }
@@ -92,13 +84,14 @@ async function loadAndRenderSection(pathParts, requestId) {
 
     if (node.file && !node.children) {
       try {
+        if (requestId !== state.getCurrentNavigationRequestId()) return;
         commonUI.showLoading("Loading section...");
         const lazyChildren = await loadLazySection(node.file);
+        if (requestId !== state.getCurrentNavigationRequestId()) return;
         const {
           processedData: { content: processedChildren },
           dataMap: lazyMap,
         } = processTextData({ content: lazyChildren }, pathParts[0]);
-
         node.children = processedChildren;
         const globalDataMap = state.getState().dataMap;
         lazyMap.forEach((value, key) => globalDataMap.set(key, value));
@@ -106,7 +99,7 @@ async function loadAndRenderSection(pathParts, requestId) {
       } catch (error) {
         console.error("Failed to load lazy section:", error);
         commonUI.showError("Failed to load the section content.");
-        return; // Stop processing if lazy load fails
+        return;
       }
     }
 
@@ -119,12 +112,15 @@ async function loadAndRenderSection(pathParts, requestId) {
     dataTraversal = node.children;
   }
 
+  if (requestId !== state.getCurrentNavigationRequestId()) {
+    return;
+  }
+
   state.setCurrentLocation(location);
   contentUI.setContentTitle(titleParts.join(" - "));
   contentUI.renderSectionItems(dataTraversal);
 
-  // Determine which item to select. If the URL specifies a full path to an item, use that.
-  // Otherwise (if URL only specifies a section), default to the first item in the section.
+  const { userInitiatedClick } = state.getState();
   const hasSpecificItemInUrl =
     pathParts.length > upanishadData.structure_levels.length - 1;
   const itemNumber = hasSpecificItemInUrl
@@ -135,13 +131,21 @@ async function loadAndRenderSection(pathParts, requestId) {
     dataTraversal?.find((item) => item.number === itemNumber) ||
     dataTraversal?.[0];
 
-  if (itemToSelect) {
+  if (!itemToSelect) {
+    // Empty section
+    contentUI.clearSelection();
+    navUI.updateNavigatorState();
+    updateArrowButtons();
+    return;
+  }
+
+  // --- FIX: CORE LOGIC CHANGE IS HERE ---
+  // On Desktop, OR if the user explicitly clicked an item, show the details.
+  if (!isMobileView() || userInitiatedClick) {
     contentUI.showItemDetails(itemToSelect.id);
   } else {
-    contentUI.renderCommentary({
-      commentary_text: "No items in this section.",
-    });
-    // Still need to update arrows and navigator even if section is empty
+    // On Mobile section navigation, just clear selection and update UI state.
+    contentUI.clearSelection();
     navUI.updateNavigatorState();
     updateArrowButtons();
   }

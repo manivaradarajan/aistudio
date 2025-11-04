@@ -132,8 +132,6 @@ export function updateNavigatorState() {
   for (const link of allLinks) {
     const sectionId = link.dataset.sectionId;
     if (currentItemId.startsWith(sectionId)) {
-      // Find the most specific link that contains the current item.
-      // If we've already found a link, check if this new one is more specific (longer ID).
       if (
         !activeLink ||
         sectionId.length > activeLink.dataset.sectionId.length

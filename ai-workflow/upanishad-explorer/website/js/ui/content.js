@@ -53,7 +53,6 @@ export function setContentTitle(title) {
 }
 
 /**
-
  * Renders the commentary for a given data item.
  * @param {object} itemData - The data object for the selected item.
  */
@@ -64,22 +63,38 @@ export function renderCommentary(itemData) {
 }
 
 /**
+ * Clears any selected item and its commentary.
+ * Used for mobile section navigation.
+ */
+export function clearSelection() {
+  dom.mantraDisplay
+    .querySelectorAll(".selected")
+    .forEach((el) => el.classList.remove("selected"));
+  renderCommentary({ commentary_text: "" }); // Clear commentary pane
+}
+
+/**
  * Highlights a specific item in the main view and displays its details.
  * This is the central function for changing the "selected" state.
- * It is now responsible for triggering UI updates that depend on this state.
  * @param {string} itemId - The unique ID of the item to show.
  */
 export function showItemDetails(itemId) {
   const { userInitiatedClick } = state.getState();
-  const itemContainer = dom.mantraDisplay.querySelector(
-    `[data-id="${itemId}"]`
-  );
-  if (!itemContainer) return;
 
-  // FIX: Use querySelectorAll to robustly clear any existing selected items.
+  // Clear previous selection first for robustness
   dom.mantraDisplay
     .querySelectorAll(".selected")
     .forEach((el) => el.classList.remove("selected"));
+
+  const itemContainer = dom.mantraDisplay.querySelector(
+    `[data-id="${itemId}"]`
+  );
+
+  if (!itemContainer) {
+    updateNavigatorState();
+    updateArrowButtons();
+    return;
+  }
 
   itemContainer.classList.add("selected");
   itemContainer.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -93,8 +108,6 @@ export function showItemDetails(itemId) {
     }
   }
 
-  // Trigger navigator and arrow updates AFTER the item is selected.
-  // This ensures they can correctly read the state from the DOM.
   updateNavigatorState();
   updateArrowButtons();
 

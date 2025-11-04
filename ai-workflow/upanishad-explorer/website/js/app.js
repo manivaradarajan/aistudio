@@ -93,61 +93,48 @@ function handleMantraClick(e) {
 
 /**
  * Updates the enabled/disabled state of the previous/next arrow buttons.
- * Exported so it can be called from the router after content renders.
+ * This is now based on the application state, not the DOM.
  */
 export function updateArrowButtons() {
-  const navigatorRootUl = dom.navigatorContent.querySelector("ul");
-  if (!navigatorRootUl) {
+  const { currentLocation, currentUpanishadData } = state.getState();
+  if (!currentUpanishadData || !currentLocation) {
     dom.prevBtn.disabled = true;
     dom.nextBtn.disabled = true;
     return;
   }
 
-  // A "section" is a top-level list item in the navigator.
-  const allSectionContainers = Array.from(navigatorRootUl.children);
-  if (allSectionContainers.length <= 1) {
+  const topLevelSections = currentUpanishadData.content;
+  const currentIndex = currentLocation.level0; // Assumes arrows navigate top-level sections
+
+  if (topLevelSections.length <= 1) {
     dom.prevBtn.disabled = true;
     dom.nextBtn.disabled = true;
     return;
   }
-
-  const currentLink = dom.navigatorContent.querySelector("a.active");
-  const currentSectionContainer = currentLink
-    ? currentLink.closest("#navigator-content > ul > li")
-    : null;
-  const currentIndex = currentSectionContainer
-    ? allSectionContainers.indexOf(currentSectionContainer)
-    : -1;
 
   dom.prevBtn.disabled = currentIndex <= 0;
-  dom.nextBtn.disabled =
-    currentIndex === -1 || currentIndex >= allSectionContainers.length - 1;
+  dom.nextBtn.disabled = currentIndex >= topLevelSections.length - 1;
 }
 
 /**
- * Navigates to the adjacent (previous or next) section.
+ * Navigates to the adjacent (previous or next) section using data from the state.
  * @param {'prev' | 'next'} direction - The direction to navigate.
  */
 function navigateArrows(direction) {
-  const navigatorRootUl = dom.navigatorContent.querySelector("ul");
-  if (!navigatorRootUl) return;
+  const { currentLocation, currentUpanishadData, currentTextSlug } =
+    state.getState();
+  if (!currentUpanishadData) return;
 
-  const allSectionContainers = Array.from(navigatorRootUl.children);
-  const currentLink = dom.navigatorContent.querySelector("a.active");
-  const currentSectionContainer = currentLink
-    ? currentLink.closest("#navigator-content > ul > li")
-    : null;
-  if (!currentSectionContainer) return;
+  const topLevelSections = currentUpanishadData.content;
+  const currentIndex = currentLocation.level0;
+  const targetIndex =
+    direction === "next" ? currentIndex + 1 : currentIndex - 1;
 
-  const currentIndex = allSectionContainers.indexOf(currentSectionContainer);
-  let targetIndex = direction === "next" ? currentIndex + 1 : currentIndex - 1;
-
-  if (targetIndex >= 0 && targetIndex < allSectionContainers.length) {
-    const targetContainer = allSectionContainers[targetIndex];
-    // Find the first actual link inside the target section container to navigate to.
-    const targetLink = targetContainer.querySelector("a");
-    if (targetLink) {
-      navigateTo(targetLink.getAttribute("href").substring(1));
-    }
+  if (targetIndex >= 0 && targetIndex < topLevelSections.length) {
+    const targetSection = topLevelSections[targetIndex];
+    // Navigate to the section itself, not a specific item within it.
+    // The router will handle selecting the first item on desktop.
+    const newPath = `/${currentTextSlug}/${targetSection.number}`;
+    navigateTo(newPath);
   }
 }
