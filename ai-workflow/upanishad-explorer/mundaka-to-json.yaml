@@ -2,17 +2,12 @@ model: gemini-2.5-pro
 run_name: "mundaka-upanishad-commentary"
 
 workflow:
-  - type: chat
+prompts:
+  - name: to_json
     prompt: "prompt-task.txt"
-    output_extension: ".json"
+    json: true
+    schema: "text_schema.json"
     fileset:
       base_dir: "."
       include:
-        - "input-files/mundaka/muNDakopaniSat-dvitIyama-2.md"
-        - "input-files/mundaka/muNDakopaniSat-dvitIyamu.md"
-        - "input-files/mundaka/muNDakopaniSat-prathamamuN.md"
-        - "input-files/mundaka/muNDakopaniSat-prathamamuNa-2.md"
-        - "input-files/mundaka/muNDakopaniSat-tRtIyamuN.md"
-        - "input-files/mundaka/muNDakopaniSat-tRtIyamuNa-2.md"
         - "text_schema.json"
-      global_search: true

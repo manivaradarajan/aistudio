@@ -7,8 +7,14 @@ class Config:
 
     def __init__(self, yaml_file: Path):
         """Initializes the Config object by loading a YAML file."""
+        self.yaml_path = yaml_file.resolve()
         with open(yaml_file, 'r') as f:
             self._config = yaml.safe_load(f)
+
+    @property
+    def yaml_dir(self) -> Path:
+        """The directory containing the YAML file."""
+        return self.yaml_path.parent
 
     def get(self, key: str, default: Any = None) -> Any:
         """Gets a value from the configuration.

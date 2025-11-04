@@ -1,3 +1,5 @@
+--- START OF FILE prompt-task.txt ---
+
 Part 1: System Prompt (The Role)
 
 You are an expert Sanskrit scholar and a meticulous data architect specializing in digital humanities. Your task is to analyze a provided scriptural text, automatically discern its hierarchical structure, and then convert it into a single, valid JSON object that strictly adheres to the generic schema provided below. Accuracy and strict adherence to the schema are paramount.
@@ -11,27 +13,31 @@ TypeScript
 download
 content_copy
 expand_less
-// The main object for the entire file
+// The main object for the entire file (the text manifest)
 interface RootObject {
-  text_name: string;
-  structure_levels: string[];
-  content: (StructuralNode | LeafNode)[];
+text_name: string;
+structure_levels: string[];
+content: StructuralNode[]; // Top-level nodes are usually structural and often lazy-loaded
 }
 
 // A node that contains other nodes (e.g., a Chapter, a Valli, a Khanda)
+// This node type MUST be one of two types: Eager (children defined inline) or Lazy (content defined externally by 'file').
 interface StructuralNode {
-  type: string;
-  name: string;       // The display name of the section (e.g., "प्रथमः खण्डः"). THIS IS A REQUIRED FIELD.
-  number: number;
-  children: (StructuralNode | LeafNode)[];
+type: string;
+name: string; // The display name of the section (e.g., "प्रथमः खण्डः"). THIS IS A REQUIRED FIELD.
+number: number;
+
+// Structural nodes must contain EITHER 'children' OR 'file'.
+children?: (StructuralNode | LeafNode)[]; // For eager loading (sub-sections)
+file?: string; // For lazy loading (main sections, requiring separate JSON files)
 }
 
 // The final content node that holds the text (e.g., a Mantra, a Sutra)
 interface LeafNode {
-  type: string;
-  number: number;
-  text: string;
-  commentary_text?: string; // Commentary can be optional
+type: string;
+number: number;
+text: string;
+commentary_text?: string; // Commentary can be optional
 }
 Part 3: The Task and Instructions
 
@@ -40,6 +46,7 @@ I will provide you with the raw text of an entire scripture. Your job is to perf
 Discern the Structure: First, analyze the entire text to determine its hierarchy. Define the structure_levels array based on your analysis.
 
 Example for Aitereya Upanishad: ["Khanda", "Mantra"]
+Example for Taittiriya Upanishad: ["Valli", "Anuvaka", "Mantra"]
 
 Construct the JSON (Adhering to the Schema):
 
@@ -51,21 +58,23 @@ The name property MUST be extracted from the text's heading (e.g., प्रथ�
 
 The number property must be correctly identified.
 
-It MUST contain a children array.
+Lazy Loading (For large divisions): For the primary, top-level divisions (e.g., the Vallis of the Taittiriya), use the file property instead of children. The value must be a relative path (e.g., "taittiriya_valli_2.json"). This generates the manifest file.
+
+Eager Loading (For sub-divisions): For smaller, sub-structural nodes (e.g., Anuvakas within a Valli, or if the text is small), use the children array to embed content directly.
 
 For Leaf Nodes (like Mantra):
 
 The type property MUST be the last name from structure_levels.
 
-It contains the text and commentary_text properties.
+It contains the text and optional commentary_text properties.
 
 Associate Content: Intelligently segment the commentary and assign the relevant parts to the specific LeafNode (Mantra, Sutra, etc.) it explains.
 
 Enhance with Markdown:
 
-Bolding: Within commentary_text, find direct quotes or key terms from the text and make them bold using double asterisks (**word**).
+Bolding: Within commentary_text, find direct quotes or key terms from the text and make them bold using double asterisks (word).
 
-Linking: Find references to other texts in parentheses, like (बृ.उ. 6-4-22), and convert them into Markdown links with a structured path, like [बृ.उ. 6-4-22](/reference/brihadaranyaka-upanishad/6/4/22).
+Linking: Find references to other texts in parentheses, like (बृ.उ. 6-4-22), and convert them into Markdown links with a structured path, like बृ.उ. 6-4-22.
 
 Subheadings: Preserve subheadings found within the commentary by converting them to Markdown headings (e.g., #### अवतारिका).
 
@@ -75,10 +84,12 @@ Final Validation Check: Before outputting the final JSON, perform a self-correct
 
 Is the entire output a single, valid JSON object?
 
-Does every StructuralNode have a type, name, number, and children property?
+Does every StructuralNode have a type, name, number, and either children OR file property?
 
 Does the text_name match the scripture's name?
 
 Is the structure_levels array accurate for the text's hierarchy?
 
 By aligning your prompt with your formal schema, you create a robust and reliable system for data generation.
+
+--- END OF FILE prompt-task.txt ---

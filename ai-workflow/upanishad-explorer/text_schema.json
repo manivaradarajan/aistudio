@@ -1,6 +1,4 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Generic Schema for Scriptural Texts",
   "type": "object",
   "properties": {
     "text_name": {
@@ -18,86 +16,43 @@
       "type": "array",
       "description": "An array of the top-level structural nodes (e.g., an array of Valli objects).",
       "items": {
-        "$ref": "#/definitions/node"
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of this node, matching a name from structure_levels, e.g., 'Valli', 'Anuvaka', 'Mantra'."
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of this node, e.g., 'Anandavalli'. Optional for structural nodes."
+          },
+          "number": {
+            "type": "integer",
+            "description": "The sequential number of this node within its parent, used for URL generation."
+          },
+          "children": {
+            "type": "array",
+            "description": "An array of child nodes (for structural nodes). Omit this field for leaf nodes.",
+            "items": {
+              "type": "object"
+            }
+          },
+          "file": {
+            "type": "string",
+            "description": "The relative path to a JSON file containing the children for this node (for lazy-loaded structural nodes). Mutually exclusive with 'children'."
+          },
+          "text": {
+            "type": "string",
+            "description": "The main content of the leaf node (for leaf nodes only)."
+          },
+          "commentary_text": {
+            "type": "string",
+            "description": "The associated commentary text (for leaf nodes). Markdown is supported."
+          }
+        },
+        "required": ["type", "number"]
       }
     }
   },
-  "required": ["text_name", "structure_levels", "content"],
-
-  "definitions": {
-    "node": {
-      "description": "A node can be either a structural container or a content leaf.",
-      "oneOf": [
-        { "$ref": "#/definitions/structuralNode" },
-        { "$ref": "#/definitions/leafNode" }
-      ]
-    },
-    "structuralNode": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "The type of this node, matching a name from structure_levels, e.g., 'Valli', 'Anuvaka'."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of this node, e.g., 'Anandavalli'. This is optional."
-        },
-        "number": {
-          "type": "integer",
-          "description": "The sequential number of this node within its parent, used for URL generation."
-        }
-      },
-      "required": ["type", "number"],
-      "oneOf": [
-        {
-          "title": "Eager Node",
-          "description": "A node with its children defined directly within the same file.",
-          "properties": {
-            "children": {
-              "type": "array",
-              "description": "An array of child nodes (which can be more structural nodes or leaf nodes).",
-              "items": {
-                "$ref": "#/definitions/node"
-              }
-            }
-          },
-          "required": ["children"]
-        },
-        {
-          "title": "Lazy Node",
-          "description": "A node whose children are defined in a separate file, to be loaded on demand.",
-          "properties": {
-            "file": {
-              "type": "string",
-              "description": "The relative path to a JSON file containing the children for this node."
-            }
-          },
-          "required": ["file"]
-        }
-      ]
-    },
-    "leafNode": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "The type of this leaf node, matching the last name in structure_levels, e.g., 'Mantra', 'Sutra'."
-        },
-        "number": {
-          "type": "integer",
-          "description": "The sequential number of this leaf within its parent."
-        },
-        "text": {
-          "type": "string",
-          "description": "The main content of the leaf node."
-        },
-        "commentary_text": {
-          "type": "string",
-          "description": "The associated commentary text. Markdown is supported."
-        }
-      },
-      "required": ["type", "number", "text"]
-    }
-  }
+  "required": ["text_name", "structure_levels", "content"]
 }

@@ -1,7 +1,7 @@
 import os
 import logging
 import time
-from typing import Any, List
+from typing import Any, List, Dict
 
 import google.generativeai as genai
 from google.api_core import exceptions
@@ -27,7 +27,7 @@ def get_gemini_api_key() -> str:
         raise ValueError("GEMINI_API_KEY not found in environment or .env file.")
     return api_key
 
-def _call_gemini_api(model: genai.GenerativeModel, prompt_parts: List[Any], spinner_message: str) -> str:
+def _call_gemini_api(model: genai.GenerativeModel, prompt_parts: List[Any], spinner_message: str, response_mime_type: str | None = None, response_schema: Dict | None = None) -> str:
     """
     Calls the Gemini API with a given prompt, handling retries on resource exhaustion.
 
@@ -35,6 +35,8 @@ def _call_gemini_api(model: genai.GenerativeModel, prompt_parts: List[Any], spin
         model: The initialized GenerativeModel instance.
         prompt_parts: A list of parts to be sent to the model's generate_content method.
         spinner_message: The message to display while waiting for the API call.
+        response_mime_type: Optional. The desired MIME type for the response (e.g., "application/json").
+        response_schema: Optional. A dictionary representing the JSON schema for the response.
 
     Returns:
         The text response from the API.
@@ -48,7 +50,16 @@ def _call_gemini_api(model: genai.GenerativeModel, prompt_parts: List[Any], spin
     try:
         while True:
             try:
-                response = model.generate_content(prompt_parts)
+                generation_config = {}
+                if response_mime_type:
+                    generation_config["response_mime_type"] = response_mime_type
+                if response_schema:
+                    generation_config["response_schema"] = response_schema
+
+                if generation_config:
+                    response = model.generate_content(prompt_parts, generation_config=generation_config)
+                else:
+                    response = model.generate_content(prompt_parts)
                 return response.text
             except exceptions.ResourceExhausted as e:
                 spinner.stop()
