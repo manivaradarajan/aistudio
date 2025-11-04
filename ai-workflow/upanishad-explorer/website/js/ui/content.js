@@ -44,7 +44,6 @@ export function renderSectionItems(items) {
   dom.mantraDisplay.appendChild(fragment);
 }
 
-// NEW FUNCTION: Add this utility function
 /**
  * Scrolls the main content display to the top.
  */
@@ -84,14 +83,12 @@ export function clearSelection() {
 }
 
 /**
- * Highlights a specific item in the main view and displays its details.
- * This is the central function for changing the "selected" state.
- * @param {string} itemId - The unique ID of the item to show.
+ * Selects an item: highlights it, updates state, and renders commentary.
+ * This function does NOT handle scrolling.
+ * @param {string} itemId - The unique ID of the item to select.
  */
-export function showItemDetails(itemId) {
-  const { userInitiatedClick } = state.getState();
-
-  // Clear previous selection first for robustness
+export function selectItem(itemId) {
+  // Clear previous selection
   dom.mantraDisplay
     .querySelectorAll(".selected")
     .forEach((el) => el.classList.remove("selected"));
@@ -107,7 +104,6 @@ export function showItemDetails(itemId) {
   }
 
   itemContainer.classList.add("selected");
-  itemContainer.scrollIntoView({ behavior: "smooth", block: "center" });
 
   const itemData = state.getNodeById(itemId);
   if (itemData) {
@@ -120,7 +116,27 @@ export function showItemDetails(itemId) {
 
   updateNavigatorState();
   updateArrowButtons();
+}
 
+/**
+ * Selects an item AND scrolls it into the center of the view.
+ * This is the central function for changing the "selected" state via direct interaction.
+ * @param {string} itemId - The unique ID of the item to show.
+ */
+export function showItemDetails(itemId) {
+  // First, perform all the state and rendering updates.
+  selectItem(itemId);
+
+  // Then, handle the view scrolling.
+  const itemContainer = dom.mantraDisplay.querySelector(
+    `[data-id="${itemId}"]`
+  );
+  if (itemContainer) {
+    itemContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  // Finally, handle mobile-specific UI changes.
+  const { userInitiatedClick } = state.getState();
   if (userInitiatedClick) {
     openMobileOverlay(dom.commentaryPane);
   }

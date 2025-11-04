@@ -10,19 +10,14 @@ import { updateArrowButtons } from "./app.js";
 import { CONFIG } from "./constants.js";
 import { isMobileView } from "./utils.js";
 
-/**
- * Navigates to a new hash path, updating the URL.
- * @param {string} path - The new path, e.g., `/slug/1/2`.
- */
+// ... (navigateTo and handleRouteChange functions remain the same) ...
+
 export function navigateTo(path) {
   if (window.location.hash !== `#${path}`) {
     window.location.hash = path;
   }
 }
 
-/**
- * Main routing function triggered on hash change or initial load.
- */
 export async function handleRouteChange() {
   const requestId = state.getNewNavigationRequestId();
 
@@ -120,9 +115,9 @@ async function loadAndRenderSection(pathParts, requestId) {
   contentUI.setContentTitle(titleParts.join(" - "));
   contentUI.renderSectionItems(dataTraversal);
 
-  // This check now correctly distinguishes between section-level and item-level URLs.
+  // FIX: This logic is now correct.
   const hasSpecificItemInUrl =
-    pathParts.length > upanishadData.structure_levels.length - 1;
+    pathParts.length > upanishadData.structure_levels.length;
 
   const itemNumberInUrl = hasSpecificItemInUrl
     ? parseInt(pathParts[pathParts.length - 1], 10)
@@ -133,24 +128,34 @@ async function loadAndRenderSection(pathParts, requestId) {
     : dataTraversal?.[0];
 
   if (!itemToSelect) {
-    // Empty section or item not found
     contentUI.clearSelection();
     navUI.updateNavigatorState();
     updateArrowButtons();
     return;
   }
 
-  // --- REVISED LOGIC ---
-  // If the URL specifies a particular item, OR if we're on desktop (where we always select the first item of a section),
-  // then we must show the details for that item.
-  if (hasSpecificItemInUrl || !isMobileView()) {
+  // --- ADDED CONSOLE LOGGING ---
+  console.log(
+    `[Router] Path: /${pathParts.join("/")}`,
+    `| hasSpecificItemInUrl: ${hasSpecificItemInUrl}`,
+    `| isMobileView: ${isMobileView()}`
+  );
+
+  if (hasSpecificItemInUrl) {
+    console.log("[Router] Path has specific item. Calling showItemDetails.");
     contentUI.showItemDetails(itemToSelect.id);
   } else {
-    // This block now ONLY runs on mobile when navigating to a section-level URL (e.g., /#/taittiriya/1).
-    // This is the only case where we want to clear selection and scroll to the top.
-    contentUI.resetContentScroll(); // (This function was added in the previous fix)
-    contentUI.clearSelection();
-    navUI.updateNavigatorState();
-    updateArrowButtons();
+    console.log("[Router] Path is for a section. Resetting scroll.");
+    contentUI.resetContentScroll();
+
+    if (isMobileView()) {
+      console.log("[Router] Mobile view. Clearing selection.");
+      contentUI.clearSelection();
+      navUI.updateNavigatorState();
+      updateArrowButtons();
+    } else {
+      console.log("[Router] Desktop view. Calling selectItem to avoid centering.");
+      contentUI.selectItem(itemToSelect.id);
+    }
   }
 }
