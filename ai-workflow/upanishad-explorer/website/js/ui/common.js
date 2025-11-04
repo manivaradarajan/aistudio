@@ -1,4 +1,5 @@
 // js/ui/common.js
+import * as state from "../state.js"; // Add this import
 
 let dom; // To be initialized in app.js
 
@@ -40,4 +41,33 @@ export function populateTextSelector(allTexts) {
     option.textContent = text.name;
     dom.textSelector.appendChild(option);
   });
+}
+
+
+// --- FUNCTION MOVED HERE ---
+/**
+ * Updates the enabled/disabled state of the previous/next arrow buttons
+ * based on the current application state.
+ */
+export function updateArrowButtons() {
+  if (!dom) return; // Guard against calls before initialization
+
+  const { currentLocation, currentUpanishadData } = state.getState();
+  if (!currentUpanishadData || !currentLocation) {
+    dom.prevBtn.disabled = true;
+    dom.nextBtn.disabled = true;
+    return;
+  }
+
+  const topLevelSections = currentUpanishadData.content;
+  const currentIndex = currentLocation.level0; // Assumes arrows navigate top-level sections
+
+  if (topLevelSections.length <= 1) {
+    dom.prevBtn.disabled = true;
+    dom.nextBtn.disabled = true;
+    return;
+  }
+
+  dom.prevBtn.disabled = currentIndex <= 0;
+  dom.nextBtn.disabled = currentIndex >= topLevelSections.length - 1;
 }

@@ -1,6 +1,19 @@
 {
   "text_name": "ऐतरेयोपनिषत्",
-  "structure_levels": ["Khanda", "Mantra"],
+  "structure_levels": [
+    {
+      "key": "Khanda",
+      "scriptNames": {
+        "devanagari": "खण्डः"
+      }
+    },
+    {
+      "key": "Mantra",
+      "scriptNames": {
+        "devanagari": "मन्त्रः"
+      }
+    }
+  ],
   "content": [
     {
       "type": "Khanda",

@@ -1,6 +1,25 @@
 {
   "text_name": "बृहद्-वाक्य उपनिषत्",
-  "structure_levels": ["Adhyaya", "Brahmana", "Mantra"],
+  "structure_levels": [
+    {
+      "key": "Adhyaya",
+      "scriptNames": {
+        "devanagari": "अध्यायः"
+      }
+    },
+    {
+      "key": "Brahmana",
+      "scriptNames": {
+        "devanagari": "ब्राह्मणम्"
+      }
+    },
+    {
+      "key": "Mantra",
+      "scriptNames": {
+        "devanagari": "मन्त्रः"
+      }
+    }
+  ],
   "content": [
     {
       "type": "Adhyaya",

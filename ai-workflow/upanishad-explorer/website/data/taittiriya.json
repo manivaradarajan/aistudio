@@ -1,8 +1,18 @@
 {
   "text_name": "तैत्तिरीयोपनिषत्",
   "structure_levels": [
-    "Valli",
-    "Anuvaka"
+    {
+      "key": "Valli",
+      "scriptNames": {
+        "devanagari": "वल्ली"
+      }
+    },
+    {
+      "key": "Anuvaka",
+      "scriptNames": {
+        "devanagari": "अनुवाकः"
+      }
+    }
   ],
   "content": [
     {

@@ -1,6 +1,19 @@
 {
   "text_name": "कठोपनिषत्",
-  "structure_levels": ["Valli", "Mantra"],
+  "structure_levels": [
+    {
+      "key": "Valli",
+      "scriptNames": {
+        "devanagari": "वल्ली"
+      }
+    },
+    {
+      "key": "Mantra",
+      "scriptNames": {
+        "devanagari": "मन्त्रः"
+      }
+    }
+  ],
   "content": [
     {
       "type": "Valli",

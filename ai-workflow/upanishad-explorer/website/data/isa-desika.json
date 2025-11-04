@@ -1,6 +1,13 @@
 {
   "text_name": "ईशावास्योपनिषत्",
-  "structure_levels": ["Mantra"],
+  "structure_levels": [
+    {
+      "key": "Mantra",
+      "scriptNames": {
+        "devanagari": "मन्त्रः"
+      }
+    }
+  ],
   "content": [
     {
       "type": "Mantra",

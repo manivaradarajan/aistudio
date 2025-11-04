@@ -1,6 +1,25 @@
 {
   "text_name": "मुण्डकोपनिषत्",
-  "structure_levels": ["Mundaka", "Khanda", "Mantra"],
+  "structure_levels": [
+    {
+      "key": "Mundaka",
+      "scriptNames": {
+        "devanagari": "मुण्डकः"
+      }
+    },
+    {
+      "key": "Khanda",
+      "scriptNames": {
+        "devanagari": "खण्डः"
+      }
+    },
+    {
+      "key": "Mantra",
+      "scriptNames": {
+        "devanagari": "मन्त्रः"
+      }
+    }
+  ],
   "content": [
     {
       "type": "Mundaka",

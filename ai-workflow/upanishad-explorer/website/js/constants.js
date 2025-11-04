@@ -5,7 +5,7 @@ export const DOM_SELECTORS = {
   textSelector: "#text-selector",
   navigatorPane: "#nav-pane",
   commentaryPane: "#commentary-pane",
-  mainPane: "#main-pane", // <-- FIX: ADDED THIS LINE
+  mainPane: "#main-pane",
   navigatorContent: "#navigator-content",
   contentTitle: "#content-title",
   mantraDisplay: "#mantra-display",
@@ -22,7 +22,7 @@ export const DOM_SELECTORS = {
 };
 
 export const CONFIG = {
-  TEXTS_MANIFEST: "texts.json",
+  TEXTS_MANIFEST: "library.json", // This was the previous change
   MOBILE_BREAKPOINT: 800,
   SPLIT_CONFIG: {
     sizes: [25, 45, 30],
@@ -30,15 +30,7 @@ export const CONFIG = {
     gutterSize: 2,
     cursor: "col-resize",
   },
-  DEVANAGARI_LABELS: {
-    Anuvaka: "अनुवाकः",
-    Mantra: "मन्त्रः",
-    Khanda: "खण्डः",
-    Valli: "वल्ली",
-    Mundaka: "मुण्डकः",
-    Adhyaya: "अध्यायः",
-    Brahmana: "ब्राह्मणम्",
-  },
+  // DEVANAGARI_LABELS object has been REMOVED
 };
 
 export const UI_STATUS = {
