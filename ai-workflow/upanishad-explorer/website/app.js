@@ -44,7 +44,9 @@ const CONFIG = {
     Mantra: "मन्त्रः",
     Khanda: "खण्डः",
     Valli: "वल्ली",
-    Mundaka: "मुण्डकः"
+    Mundaka: "मुण्डकः",
+    Adhyaya: "अध्यायः",
+    Brahmana: "ब्राह्मणम्",
   },
 };
 
@@ -102,11 +104,13 @@ async function loadTextsManifest() {
 
 function showError(message) {
   if (dom.contentTitle) dom.contentTitle.textContent = "Error";
-  if (dom.mantraDisplay) dom.mantraDisplay.innerHTML = `<p style="padding: 2rem; text-align: center; color: var(--text-color-muted);">${message}</p>`;
+  if (dom.mantraDisplay)
+    dom.mantraDisplay.innerHTML = `<p style="padding: 2rem; text-align: center; color: var(--text-color-muted);">${message}</p>`;
 }
 
 function showLoading(message = "Loading...") {
-    if (dom.mantraDisplay) dom.mantraDisplay.innerHTML = `<p style="padding: 2rem; text-align: center; color: var(--text-color-muted);">${message}</p>`;
+  if (dom.mantraDisplay)
+    dom.mantraDisplay.innerHTML = `<p style="padding: 2rem; text-align: center; color: var(--text-color-muted);">${message}</p>`;
 }
 
 // --- Central Router ---
@@ -150,7 +154,10 @@ function parseLocationFromPath(pathParts) {
 
   for (let i = 0; i < navLevels.length; i++) {
     const urlNumber = parseInt(pathParts[i + 1], 10);
-    const index = findIndexByNumber(dataTraversal, isNaN(urlNumber) ? null : urlNumber);
+    const index = findIndexByNumber(
+      dataTraversal,
+      isNaN(urlNumber) ? null : urlNumber
+    );
     location[`level${i}`] = index;
     if (!dataTraversal || !dataTraversal[index]) break;
     dataTraversal = dataTraversal[index]?.children;
@@ -159,10 +166,10 @@ function parseLocationFromPath(pathParts) {
 }
 
 function findIndexByNumber(array, number) {
-    if (number === null) return 0;
-    if(!array) return 0;
-    const foundIndex = array.findIndex((item) => item.number === number);
-    return foundIndex !== -1 ? foundIndex : 0;
+  if (number === null) return 0;
+  if (!array) return 0;
+  const foundIndex = array.findIndex((item) => item.number === number);
+  return foundIndex !== -1 ? foundIndex : 0;
 }
 
 function selectItemFromUrl(pathParts) {
@@ -213,7 +220,7 @@ async function loadText(textObject) {
     state.currentText = textObject;
     dom.textSelector.value = textObject.file;
     state.sectionCache.clear();
-    renderNavigator();
+    await renderNavigator(); // MADE ASYNC
     initializeSplitPanes();
   } catch (error) {
     console.error(`Error loading text from ${textObject.file}:`, error);
@@ -224,7 +231,10 @@ async function loadText(textObject) {
 function initializeSplitPanes() {
   if (!window.Split || isMobileView()) return;
   document.querySelectorAll(".gutter").forEach((g) => g.remove());
-  window.Split(["#nav-pane", "#main-pane", "#commentary-pane"], CONFIG.SPLIT_CONFIG);
+  window.Split(
+    ["#nav-pane", "#main-pane", "#commentary-pane"],
+    CONFIG.SPLIT_CONFIG
+  );
 }
 
 // --- Lazy Loading Support ---
@@ -257,103 +267,150 @@ async function ensureNodeLoaded(node) {
 }
 
 // --- GENERIC Navigator Rendering ---
-function renderNavigator() {
-    const { structure_levels, content } = state.currentUpanishadData;
-    dom.navigatorContent.innerHTML = "";
-    const fragment = document.createDocumentFragment();
+async function renderNavigator() {
+  // MADE ASYNC
+  const { structure_levels, content } = state.currentUpanishadData;
+  dom.navigatorContent.innerHTML = "";
+  const fragment = document.createDocumentFragment();
 
-    if (structure_levels.length === 1) { // Flat list (e.g., Isavasya)
-        renderFlatNavigator(content, fragment);
-    } else { // Hierarchical list
-        renderHierarchicalNavigator(content, fragment, structure_levels);
-    }
-    dom.navigatorContent.appendChild(fragment);
+  if (structure_levels.length <= 1) {
+    // Flat list (e.g., Isavasya)
+    renderFlatNavigator(content, fragment);
+  } else {
+    // Hierarchical list
+    await renderHierarchicalNavigator(content, fragment, structure_levels); // MADE ASYNC
+  }
+  dom.navigatorContent.appendChild(fragment);
 }
 
 function renderFlatNavigator(nodes, parentElement) {
-    const ul = document.createElement("ul");
-    nodes.forEach((leaf, index) => {
-        const listItem = document.createElement("li");
-        const link = document.createElement("a");
-        const leafLevelName = state.currentUpanishadData.structure_levels[0];
-        const label = CONFIG.DEVANAGARI_LABELS[leafLevelName] || leafLevelName;
-        const title = leaf.name || `${label} ${leaf.number}`;
+  const ul = document.createElement("ul");
+  nodes.forEach((leaf, index) => {
+    const listItem = document.createElement("li");
+    const link = document.createElement("a");
+    const leafLevelName = state.currentUpanishadData.structure_levels[0];
+    const label = CONFIG.DEVANAGARI_LABELS[leafLevelName] || leafLevelName;
+    const title = leaf.name || `${label} ${leaf.number}`;
 
-        link.href = `#/${state.currentText.slug}/${leaf.number}`;
-        populateLinkWithPreview(link, leaf, title);
-        link.dataset.level0 = index;
+    link.href = `#/${state.currentText.slug}/${leaf.number}`;
+    populateLinkWithPreview(link, leaf, title);
+    link.dataset.level0 = index;
 
-        listItem.appendChild(link);
-        ul.appendChild(listItem);
-    });
-    parentElement.appendChild(ul);
+    listItem.appendChild(link);
+    ul.appendChild(listItem);
+  });
+  parentElement.appendChild(ul);
 }
 
-function renderHierarchicalNavigator(nodes, parentElement, structureLevels) {
-    nodes.forEach((topItem, topIndex) => {
-        const details = createAccordionGroup(topItem, topIndex, structureLevels, [topItem.number]);
-        parentElement.appendChild(details);
-    });
+async function renderHierarchicalNavigator(
+  nodes,
+  parentElement,
+  structureLevels
+) {
+  // MADE ASYNC
+  for (const [topIndex, topItem] of nodes.entries()) {
+    // Use for...of to support await
+    const details = await createAccordionGroup(
+      topItem,
+      topIndex,
+      structureLevels,
+      [topItem.number]
+    ); // MADE ASYNC
+    parentElement.appendChild(details);
+  }
 }
 
-function createAccordionGroup(node, index, structureLevels, pathNumbers, currentLevel = 0) {
-    const details = document.createElement("details");
-    details.className = "accordion-group";
-    details[`dataset`][`level${currentLevel}`] = index;
+async function createAccordionGroup(
+  node,
+  index,
+  structureLevels,
+  pathNumbers,
+  currentLevel = 0
+) {
+  // MADE ASYNC
+  // FIX: Ensure lazy-loaded data is available before rendering children.
+  await ensureNodeLoaded(node);
 
-    const summary = document.createElement("summary");
-    const levelName = structureLevels[currentLevel];
-    const label = CONFIG.DEVANAGARI_LABELS[levelName] || levelName;
-    summary.textContent = node.name || `${label} ${node.number}`;
-    details.appendChild(summary);
+  const details = document.createElement("details");
+  details.className = "accordion-group";
+  details[`dataset`][`level${currentLevel}`] = index;
 
-    const ul = document.createElement("ul");
-    const children = node.children || [];
-    const isPenultimateLevel = currentLevel === structureLevels.length - 2;
+  const summary = document.createElement("summary");
+  const levelName = structureLevels[currentLevel];
+  const label = CONFIG.DEVANAGARI_LABELS[levelName] || levelName;
+  summary.textContent = node.name || `${label} ${node.number}`;
+  details.appendChild(summary);
 
-    children.forEach((childNode, childIndex) => {
-        const newPathNumbers = [...pathNumbers, childNode.number];
-        if (isPenultimateLevel) {
-            // This is the last level of accordions, children are leaves.
-            const listItem = document.createElement("li");
-            const link = document.createElement("a");
-            const childLevelName = structureLevels[currentLevel + 1];
-            const childLabel = CONFIG.DEVANAGARI_LABELS[childLevelName] || childLevelName;
+  const ul = document.createElement("ul");
+  const children = node.children || [];
+  const linkLevel = structureLevels.length - 2;
 
-            const title = childNode.name || `${childLabel} ${childNode.number}`;
-            link.href = `#/${state.currentText.slug}/${newPathNumbers.join('/')}`;
+  // FIX: This loop correctly distinguishes between children that are links and children that are more accordions.
+  for (const [childIndex, childNode] of children.entries()) {
+    const childLevel = currentLevel + 1;
+    // Stop if we are at the content level (e.g., Mantra), which shouldn't be in the navigator.
+    if (childLevel > linkLevel) continue;
 
-            populateLinkWithPreview(link, childNode, title);
+    const newPathNumbers = [...pathNumbers, childNode.number];
+    const li = document.createElement("li");
 
-            link.dataset[`level${currentLevel}`] = index;
-            link.dataset[`level${currentLevel + 1}`] = childIndex;
+    if (childLevel === linkLevel) {
+      // This child is a final navigation link (e.g., a Brahmana or Anuvaka).
+      const link = document.createElement("a");
+      const childLevelName = structureLevels[childLevel];
+      const childLabel =
+        CONFIG.DEVANAGARI_LABELS[childLevelName] || childLevelName;
+      const title = childNode.name || `${childLabel} ${childNode.number}`;
+      link.href = `#/${state.currentText.slug}/${newPathNumbers.join("/")}`;
 
-            listItem.appendChild(link);
-            ul.appendChild(listItem);
-        } else {
-            // Children are more accordions, recurse.
-            const nestedAccordion = createAccordionGroup(childNode, childIndex, structureLevels, newPathNumbers, currentLevel + 1);
-            ul.appendChild(nestedAccordion);
-        }
-    });
+      // For preview text, we must load the child node if it's lazy.
+      await ensureNodeLoaded(childNode);
+      populateLinkWithPreview(link, getFirstDescendantLeaf(childNode), title);
 
-    details.appendChild(ul);
-    return details;
+      // Data attributes for state management.
+      link.dataset[`level${currentLevel}`] = index;
+      link.dataset[`level${childLevel}`] = childIndex;
+
+      li.appendChild(link);
+    } else {
+      // childLevel < linkLevel
+      // This child is another accordion level. Recurse.
+      const nestedAccordion = await createAccordionGroup(
+        childNode,
+        childIndex,
+        structureLevels,
+        newPathNumbers,
+        childLevel
+      );
+      li.appendChild(nestedAccordion);
+    }
+    ul.appendChild(li);
+  }
+
+  details.appendChild(ul);
+  return details;
 }
 
 // Helper to find the first leaf node in a hierarchy for previews.
 function getFirstDescendantLeaf(node) {
-    if (!node) return null;
-    if (node.text !== undefined) return node;
-    if (node.children && node.children.length > 0) {
-        return getFirstDescendantLeaf(node.children[0]);
-    }
-    return null;
+  if (!node) return null;
+  if (node.text !== undefined) return node;
+
+  // FIX: If children are lazy-loaded, we can't get a preview synchronously.
+  // The caller function (createAccordionGroup) now ensures nodes are loaded before calling this.
+  if (isLazyNode(node)) return null;
+
+  if (node.children && node.children.length > 0) {
+    return getFirstDescendantLeaf(node.children[0]);
+  }
+  return null;
 }
 
 function populateLinkWithPreview(link, item, title) {
-  if (item?.text) {
-    const previewText = item.text.trim().split('\n')[0]; // Use only first line for preview
+  // Use the item's own text for preview if it exists (for flat structures).
+  const previewNode = item || getFirstDescendantLeaf(item);
+  if (previewNode?.text) {
+    const previewText = previewNode.text.trim().split("\n")[0]; // Use only first line for preview
     if (/\S/.test(previewText)) {
       const titleSpan = document.createElement("span");
       titleSpan.className = "nav-item-title";
@@ -406,14 +463,20 @@ async function getSectionData(location) {
       showLoading("Loading section...");
       await ensureNodeLoaded(dataToRender);
     }
-    titleParts.push(dataToRender.name || `${structure_levels[i]} ${dataToRender.number}`);
+    titleParts.push(
+      dataToRender.name || `${structure_levels[i]} ${dataToRender.number}`
+    );
     dataToRender = dataToRender.children;
   }
   return { titleParts, dataToRender };
 }
 
 function renderSectionItems(dataToRender, location) {
-  const dataArray = Array.isArray(dataToRender) ? dataToRender : (dataToRender ? dataToRender.children : null);
+  const dataArray = Array.isArray(dataToRender)
+    ? dataToRender
+    : dataToRender
+    ? dataToRender.children
+    : null;
   if (!dataArray) {
     dom.mantraDisplay.innerHTML = "";
     return;
@@ -423,7 +486,12 @@ function renderSectionItems(dataToRender, location) {
   const levelDepth = Object.keys(location).length;
 
   dataArray.forEach((item, index) => {
-    const itemContainer = createItemContainer(item, location, levelDepth, index);
+    const itemContainer = createItemContainer(
+      item,
+      location,
+      levelDepth,
+      index
+    );
     fragment.appendChild(itemContainer);
   });
 
@@ -435,7 +503,9 @@ function createItemContainer(item, location, levelDepth, index) {
   const container = document.createElement("div");
   container.className = "item-container";
   const itemPath = { ...location, [`level${levelDepth}`]: index };
-  Object.entries(itemPath).forEach(([key, value]) => { container.dataset[key] = value; });
+  Object.entries(itemPath).forEach(([key, value]) => {
+    container.dataset[key] = value;
+  });
   container.dataset.number = item.number;
 
   const numberEl = document.createElement("p");
@@ -472,7 +542,10 @@ function getItemData(itemContainer) {
     const index = itemContainer.dataset[`level${i}`];
     if (index === undefined) break;
     dataToFind = dataToFind[parseInt(index)];
-    if (dataToFind && i < state.currentUpanishadData.structure_levels.length - 1) {
+    if (
+      dataToFind &&
+      i < state.currentUpanishadData.structure_levels.length - 1
+    ) {
       dataToFind = dataToFind.children;
     }
   }
@@ -487,7 +560,9 @@ function updateUrlFromContainer(itemContainer) {
 }
 
 function renderCommentary(itemData) {
-  dom.commentaryText.innerHTML = itemData.commentary_text ? marked.parse(itemData.commentary_text) : "<p>No commentary available.</p>";
+  dom.commentaryText.innerHTML = itemData.commentary_text
+    ? marked.parse(itemData.commentary_text)
+    : "<p>No commentary available.</p>";
 }
 
 // --- UI State Management ---
@@ -509,19 +584,25 @@ function updateActiveNavigatorLink() {
 }
 
 function updateAccordionState() {
-    document.querySelectorAll(".accordion-group[open]").forEach((el) => { el.open = false; });
+  document.querySelectorAll(".accordion-group[open]").forEach((el) => {
+    el.open = false;
+  });
 
-    let path = [];
-    for(let i = 0; i < state.currentUpanishadData.structure_levels.length - 1; i++) {
-        const levelIndex = state.currentLocation[`level${i}`];
-        if (levelIndex === undefined) break;
-        path.push(`[data-level${i}="${levelIndex}"]`);
-        const selector = path.join(' ');
-        const accordion = dom.navigatorContent.querySelector(selector);
-        if (accordion && accordion.tagName === 'DETAILS') {
-            accordion.open = true;
-        }
+  let path = [];
+  for (
+    let i = 0;
+    i < state.currentUpanishadData.structure_levels.length - 1;
+    i++
+  ) {
+    const levelIndex = state.currentLocation[`level${i}`];
+    if (levelIndex === undefined) break;
+    path.push(`[data-level${i}="${levelIndex}"]`);
+    const selector = path.join(" ");
+    const accordion = dom.navigatorContent.querySelector(selector);
+    if (accordion && accordion.tagName === "DETAILS") {
+      accordion.open = true;
     }
+  }
 }
 
 // --- Event Listeners ---
@@ -532,7 +613,9 @@ function addEventListeners() {
   dom.mantraDisplay.addEventListener("click", handleMantraClick);
   dom.prevBtn.addEventListener("click", () => navigateArrows("prev"));
   dom.nextBtn.addEventListener("click", () => navigateArrows("next"));
-  dom.mobileNavToggle.addEventListener("click", () => openMobileOverlay(dom.navigatorPane));
+  dom.mobileNavToggle.addEventListener("click", () =>
+    openMobileOverlay(dom.navigatorPane)
+  );
   dom.mobileNavClose.addEventListener("click", closeMobileOverlays);
   dom.mobileCommentaryClose.addEventListener("click", closeMobileOverlays);
   dom.mobileOverlay.addEventListener("click", closeMobileOverlays);
@@ -574,7 +657,7 @@ function buildPathFromLocation(location) {
   let dataTraversal = state.currentUpanishadData.content;
   for (let i = 0; i < navLevels.length; i++) {
     const index = location[`level${i}`];
-    if(!dataTraversal || !dataTraversal[index]) break;
+    if (!dataTraversal || !dataTraversal[index]) break;
     const item = dataTraversal[index];
     pathNumbers.push(item.number);
     dataTraversal = item.children;
@@ -613,12 +696,12 @@ function closeMobileOverlays() {
 
 // --- GENERIC Arrow Button State ---
 function getNodesAtLevel(level, pathIndices) {
-    let nodes = state.currentUpanishadData.content;
-    for (let i = 0; i < level; i++) {
-        if (!nodes || !nodes[pathIndices[i]]) return [];
-        nodes = nodes[pathIndices[i]].children;
-    }
-    return nodes || [];
+  let nodes = state.currentUpanishadData.content;
+  for (let i = 0; i < level; i++) {
+    if (!nodes || !nodes[pathIndices[i]]) return [];
+    nodes = nodes[pathIndices[i]].children;
+  }
+  return nodes || [];
 }
 
 function updateArrowButtons() {
@@ -641,13 +724,14 @@ function getAdjacentSections() {
       const siblings = getNodesAtLevel(i, parentPathIndices);
       const currentIndex = newLocation[`level${i}`];
 
-      if (direction === 'next') {
+      if (direction === "next") {
         if (currentIndex < siblings.length - 1) {
           newLocation[`level${i}`]++;
           for (let j = i + 1; j < maxLevels; j++) newLocation[`level${j}`] = 0;
           return newLocation;
         }
-      } else { // prev
+      } else {
+        // prev
         if (currentIndex > 0) {
           newLocation[`level${i}`]--;
           for (let j = i + 1; j < maxLevels; j++) {
@@ -662,5 +746,5 @@ function getAdjacentSections() {
     return null; // Reached beginning or end
   };
 
-  return { prev: calculate('prev'), next: calculate('next') };
+  return { prev: calculate("prev"), next: calculate("next") };
 }
