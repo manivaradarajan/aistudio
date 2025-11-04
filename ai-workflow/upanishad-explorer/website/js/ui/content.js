@@ -44,6 +44,16 @@ export function renderSectionItems(items) {
   dom.mantraDisplay.appendChild(fragment);
 }
 
+// NEW FUNCTION: Add this utility function
+/**
+ * Scrolls the main content display to the top.
+ */
+export function resetContentScroll() {
+  if (dom && dom.mantraDisplay) {
+    dom.mantraDisplay.scrollTop = 0;
+  }
+}
+
 /**
  * Sets the main content title.
  * @param {string} title - The title to display.

@@ -8,7 +8,7 @@ import * as commonUI from "./ui/common.js";
 import { initializeSplitPanes } from "./ui/split-pane.js";
 import { updateArrowButtons } from "./app.js";
 import { CONFIG } from "./constants.js";
-import { isMobileView } from "./utils.js"; // <-- FIX: Import isMobileView
+import { isMobileView } from "./utils.js";
 
 /**
  * Navigates to a new hash path, updating the URL.
@@ -120,31 +120,35 @@ async function loadAndRenderSection(pathParts, requestId) {
   contentUI.setContentTitle(titleParts.join(" - "));
   contentUI.renderSectionItems(dataTraversal);
 
-  const { userInitiatedClick } = state.getState();
+  // This check now correctly distinguishes between section-level and item-level URLs.
   const hasSpecificItemInUrl =
     pathParts.length > upanishadData.structure_levels.length - 1;
-  const itemNumber = hasSpecificItemInUrl
-    ? parseInt(pathParts[pathParts.length - 1], 10)
-    : dataTraversal?.[0]?.number;
 
-  const itemToSelect =
-    dataTraversal?.find((item) => item.number === itemNumber) ||
-    dataTraversal?.[0];
+  const itemNumberInUrl = hasSpecificItemInUrl
+    ? parseInt(pathParts[pathParts.length - 1], 10)
+    : undefined;
+
+  const itemToSelect = itemNumberInUrl !== undefined
+    ? dataTraversal?.find((item) => item.number === itemNumberInUrl)
+    : dataTraversal?.[0];
 
   if (!itemToSelect) {
-    // Empty section
+    // Empty section or item not found
     contentUI.clearSelection();
     navUI.updateNavigatorState();
     updateArrowButtons();
     return;
   }
 
-  // --- FIX: CORE LOGIC CHANGE IS HERE ---
-  // On Desktop, OR if the user explicitly clicked an item, show the details.
-  if (!isMobileView() || userInitiatedClick) {
+  // --- REVISED LOGIC ---
+  // If the URL specifies a particular item, OR if we're on desktop (where we always select the first item of a section),
+  // then we must show the details for that item.
+  if (hasSpecificItemInUrl || !isMobileView()) {
     contentUI.showItemDetails(itemToSelect.id);
   } else {
-    // On Mobile section navigation, just clear selection and update UI state.
+    // This block now ONLY runs on mobile when navigating to a section-level URL (e.g., /#/taittiriya/1).
+    // This is the only case where we want to clear selection and scroll to the top.
+    contentUI.resetContentScroll(); // (This function was added in the previous fix)
     contentUI.clearSelection();
     navUI.updateNavigatorState();
     updateArrowButtons();
