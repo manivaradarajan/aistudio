@@ -1,0 +1,12 @@
+{
+  "text_name": "बृहदारण्यकोपनिषत्",
+  "structure_levels": ["Adhyaya", "Brahmana", "Mantra"],
+  "content": [
+    {
+      "type": "Adhyaya",
+      "number": 8,
+      "name": "अष्टमोऽध्यायः",
+      "file": "data/brihadaranyaka/brihadaranyaka-8.json"
+    }
+  ]
+}

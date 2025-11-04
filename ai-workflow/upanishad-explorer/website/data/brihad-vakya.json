@@ -1,0 +1,18 @@
+{
+  "text_name": "बृहद्-वाक्य उपनिषत्",
+  "structure_levels": ["Adhyaya", "Brahmana", "Mantra"],
+  "content": [
+    {
+      "type": "Adhyaya",
+      "number": 1,
+      "name": "प्रथमः अध्यायः",
+      "file": "data/brihad-vakya/adhyaya-1.json"
+    },
+    {
+      "type": "Adhyaya",
+      "number": 2,
+      "name": "द्वितीयः अध्यायः",
+      "file": "data/brihad-vakya/adhyaya-2.json"
+    }
+  ]
+}

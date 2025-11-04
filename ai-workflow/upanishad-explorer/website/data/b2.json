@@ -1,0 +1,42 @@
+{
+  "text_name": "बृहदारण्यकोपनिषत्",
+  "structure_levels": ["Adhyaya", "Brahmana", "Mantra"],
+  "content": [
+    {
+      "type": "Adhyaya",
+      "number": 3,
+      "name": "तृतीयोऽध्यायः",
+      "file": "data/brihadaranyaka/brihadaranyaka-3.json"
+    },
+    {
+      "type": "Adhyaya",
+      "number": 4,
+      "name": "चतुर्थोऽध्यायः",
+      "file": "data/brihadaranyaka/brihadaranyaka-4.json"
+    },
+    {
+      "type": "Adhyaya",
+      "number": 5,
+      "name": "पञ्चमोऽध्यायः",
+      "file": "data/brihadaranyaka/brihadaranyaka-5.json"
+    },
+    {
+      "type": "Adhyaya",
+      "number": 6,
+      "name": "षष्ठोऽध्यायः",
+      "file": "data/brihadaranyaka/brihadaranyaka-6.json"
+    },
+    {
+      "type": "Adhyaya",
+      "number": 7,
+      "name": "सप्तमोऽध्यायः",
+      "file": "data/brihadaranyaka/brihadaranyaka-7.json"
+    },
+    {
+      "type": "Adhyaya",
+      "number": 8,
+      "name": "अष्टमोऽध्यायः",
+      "file": "data/brihadaranyaka/brihadaranyaka-8.json"
+    }
+  ]
+}
