@@ -104,18 +104,25 @@ h2 {
 #navigator-content li {
   margin-bottom: 0.25rem;
 }
+
+/* UPDATED Navigator Link Styling */
 #navigator-content a {
+  display: flex;
+  align-items: baseline;
+  width: 100%;
   text-decoration: none;
-  color: var(--accent-color);
+  color: inherit; /* Inherit color, spans will set their own */
 }
-#navigator-content a:hover {
+#navigator-content a:hover .nav-item-title,
+#navigator-content a:hover .nav-item-preview {
   text-decoration: underline;
 }
+
 #navigator-content a.active {
   background-color: #e9ecef;
   font-weight: 700;
   color: var(--text-color);
-  display: block;
+  display: flex; /* Override block from old style */
   margin: -0.25rem -0.5rem;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -146,6 +153,29 @@ h2 {
 }
 .accordion-group summary::-webkit-details-marker {
   display: none;
+}
+
+/* NEW: Navigator Link Content Styling */
+.nav-item-title {
+  flex-shrink: 0;
+  padding-right: 0.4em;
+  white-space: nowrap;
+  color: var(--accent-color);
+}
+.nav-item-preview {
+  flex-shrink: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-color-muted);
+}
+#navigator-content a.active .nav-item-title {
+  color: var(--text-color);
+}
+#navigator-content a.active .nav-item-preview {
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
 /* Item Display (replaces .mantra-container) */
