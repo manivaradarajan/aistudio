@@ -113,6 +113,15 @@ def _run_steps(
             )
         elif step_type == "gather_files":
             handlers.handle_gather_files_step(merged_step, workflow_context, prefix)
+        elif step_type == "foreach":
+            current_input_path = handlers.handle_foreach_step(
+                merged_step,
+                config,
+                prefix,
+                current_input_path,
+                workflow_context,
+                force_regeneration,
+            )
         elif step_type == "run_if":
             current_input_path = handle_run_if_step(
                 merged_step,

@@ -9,7 +9,13 @@ from aksharamukha import transliterate
 
 from .config import Config
 from .gemini_utils import _call_gemini_api
-from .file_utils import _get_output_path, _gather_files, is_stale, OUTPUT_DIR
+from .file_utils import (
+    _get_output_path,
+    _gather_files,
+    is_stale,
+    OUTPUT_DIR,
+    _resolve_dynamic_path,
+)
 from .ui import Spinner
 
 try:
@@ -262,7 +268,13 @@ def _process_chat_turn(
         f"-- Chat Turn {turn_index + 1}/{len(_get_chat_turns(config.get('workflow')[0]))} --"
     )
 
-    output_path = _get_output_path(prefix, turn)
+    # Check if the 'foreach' handler provided a specific output path
+    if "output_path_override" in turn and turn_index == 0:
+        output_path = turn["output_path_override"]
+        logging.info(f"Using overridden output path from foreach: {output_path}")
+    else:
+        # Original behavior
+        output_path = _get_output_path(prefix, turn)
 
     # Auto-detect output extension based on json flag
     if turn.get("json") and output_path.suffix != ".json":
@@ -663,6 +675,72 @@ def handle_chat_step(
             del context["initial_file_handle"]
 
     return current_chat_input_path
+
+
+def handle_foreach_step(
+    step: Dict,
+    config: Config,
+    prefix: str,
+    input_path: Path,
+    context: Dict,
+    force: bool,
+) -> Path:
+    """Handles the 'foreach' workflow step for batch processing."""
+    logging.info("\n[Workflow Step: foreach]")
+
+    fileset_config = step.get("in_fileset")
+    do_config = step.get("do")
+
+    if not fileset_config or not do_config:
+        raise ValueError("'foreach' step must contain 'in_fileset' and 'do' keys.")
+
+    # 1. Gather the files to iterate over
+    base_dir_name = fileset_config.get("base_dir", ".")
+    base_dir = Path(base_dir_name)
+    files_to_process = _gather_files(fileset_config, base_dir, prefix)
+
+    if not files_to_process:
+        logging.warning("Foreach step found no files to process. Skipping.")
+        return input_path
+
+    logging.info(f"Found {len(files_to_process)} files to process in foreach loop.")
+
+    # 2. Loop through each file and execute the 'do' action
+    for i, file_path in enumerate(files_to_process):
+        logging.info(
+            f"\n--- Foreach Iteration {i+1}/{len(files_to_process)}: Processing '{file_path.name}' ---"
+        )
+
+        # Create a specific prefix for this iteration's intermediate files
+        iter_prefix = f"{prefix}-{file_path.stem}"
+
+        # Build the dynamic chat step for this iteration
+        iter_chat_step = do_config.copy()
+
+        # Resolve the dynamic output path and inject it into the step config
+        output_pattern = do_config.get("output")
+        if not output_pattern:
+            raise ValueError(
+                "The 'do' block in a 'foreach' step must specify an 'output' path pattern."
+            )
+
+        output_path = _resolve_dynamic_path(output_pattern, file_path)
+        iter_chat_step["output_path_override"] = output_path
+
+        # 3. Call the existing chat handler with the constructed step
+        handle_chat_step(
+            step=iter_chat_step,
+            config=config,
+            prefix=iter_prefix,
+            input_path=file_path,
+            context=context.copy(),  # Pass a copy of context to prevent cross-contamination
+            force=force,
+        )
+
+    logging.info(f"\n--- Foreach step completed for {len(files_to_process)} files ---")
+
+    # This step type doesn't produce a single output to chain, so we return the original input path
+    return input_path
 
 
 def handle_gather_files_step(step: Dict, context: Dict, prefix: str):

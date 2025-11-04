@@ -1,9 +1,23 @@
+# File: process-brihadaranyaka.yaml
+
 model: gemini-flash-latest
-run_name: brihadaranyaka-3
+run_name: brihadaranyaka-batch-process
 
 workflow:
-  - type: chat
-    prompt: prompt-task.txt
-    json: true
-    schema: text_schema.json
-    input_file: input-files/brihadaranyaka/bRhadAraNyakopaniSat-tRtIya.md
+  - type: foreach
+
+    # Define the set of files to loop over.
+    in_fileset:
+      base_dir: "input-files/brihadaranyaka"
+      include:
+        - "bRhadAraNyakopaniSat-*.md"
+
+    # Define the action to perform for each file found by the fileset.
+    do:
+      type: chat
+      prompt: "prompt-task.txt"
+      json: true
+
+      # The dynamic output path for each processed file.
+      # {basename} is a placeholder for the input filename without its extension.
+      output: "output/brihadaranyaka/{basename}.json"

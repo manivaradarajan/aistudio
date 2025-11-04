@@ -28,5 +28,10 @@
     "name": "ऐतरेयोपनिषत्",
     "file": "data/aitareya.json",
     "slug": "aitareya"
+  },
+  {
+    "name": "बृहदारण्यकोपनिषत्",
+    "file": "data/brihadaranyaka.json",
+    "slug": "brihadaranyaka"
   }
 ]
