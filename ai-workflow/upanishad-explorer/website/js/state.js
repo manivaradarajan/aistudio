@@ -11,6 +11,7 @@ const _state = {
   userInitiatedClick: false,
   uiStatus: UI_STATUS.IDLE,
   navigationRequestId: 0,
+  showExternalRefs: false,
 };
 
 export const getState = () => ({ ..._state });
@@ -46,3 +47,11 @@ export function setCurrentText(slug, upanishadData, dataMap) {
 export function setCurrentLocation(location) { _state.currentLocation = location; }
 export function setUserInitiatedClick(wasUserClick) { _state.userInitiatedClick = wasUserClick; }
 export function setUiStatus(status) { _state.uiStatus = status; }
+
+/**
+ * Sets the visibility state for external reference links.
+ * @param {boolean} shouldShow - True to show, false to hide/disable.
+ */
+export function setShowExternalRefs(shouldShow) {
+  _state.showExternalRefs = shouldShow;
+}

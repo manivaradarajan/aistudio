@@ -33,15 +33,17 @@ The architecture has four distinct pillars:
 
 #### 2.1. Data Layer (The "Brain")
 
-- **Source of Truth:** All textual content is stored in structured, generic JSON files. A root `texts.json` manifest file lists all available texts and points to their respective data files.
+- **Canonical Library:** The master source of truth is a set of JSON files (`library-internal.json`, `library-external.json`) that define every text the application is aware of. This "library" lists each text's canonical slug, display names in multiple scripts, and a list of aliases to handle inconsistent references. A build script combines these into a single `library.json` for the application to consume.
 
-- **Hierarchy-Driven Presentation:** The content is completely separated from the presentation. The application's code has no hard-coded knowledge of any specific Upanishad. The structure of the navigation is determined entirely by the _hierarchy of the data itself_.
+- **Hierarchy-Driven Presentation:** The content is completely separated from the presentation. The application's code has no hard-coded knowledge of any specific Upanishad. The structure of the navigation and titles is determined entirely by the _hierarchy of the data itself_.
 
   - **The Rule:** If a data node has a `children` array, it is rendered as a collapsible accordion (`<details>`). If a node does _not_ have a `children` array, it is rendered as a clickable link (`<a>`).
-  - **Example A (Flat):** For a text with `structure_levels: ["Mantra"]`, each mantra object in the `content` array has no `children`. The app renders a simple list of links.
-  - **Example B (Hierarchical):** For a text with `structure_levels: ["Khanda", "Mantra"]`, the "Khanda" nodes have a `children` array containing mantras. The app renders "Khanda" nodes as accordions, and the "Mantra" nodes within them as links. This logic scales to any depth of nesting.
+  - **Example A (Flat):** For a text with `structure_levels` defining one level, each object in the `content` array has no `children`. The app renders a simple list of links.
+  - **Example B (Hierarchical):** For a text with multiple `structure_levels`, parent nodes have a `children` array. The app renders parent nodes as accordions, and the child nodes within them as links. This logic scales to any depth of nesting.
 
-- **Generic Schema:** A recursive, node-based schema (`type`, `name`, `number`, `children`, `text`, `commentary_text`) allows the application to handle any text hierarchy. The `structure_levels` array primarily provides human-readable labels for each level of the hierarchy.
+- **Data-Driven UI Labels:** The `structure_levels` array in each text's JSON file is an array of objects, containing not just a `key` (e.g., "Valli") but also its display names in various scripts (`scriptNames`). This removes hardcoded labels from the application code and makes each text self-describing.
+
+- **Semantic and Decoupled References:** Citations within the commentary text are not hardcoded URLs. They use a special, abstract format (`[Display Text](ref:slug/path)`). This decouples the reference from the application's routing implementation. A client-side resolver (`handleReferenceClick`) parses these semantic links and translates them into the appropriate action (e.g., internal navigation or displaying information about an external text).
 
 - **Lazy Loading:** The schema supports a `file` property on structural nodes to optimize initial load times. This allows sections of a text to be defined in separate JSON files and fetched on-demand.
 
@@ -64,13 +66,13 @@ The architecture has four distinct pillars:
 - **Unidirectional & Resilient Data Flow:** A `hashchange` event listener is the primary driver. It calls a single `handleRouteChange` function, which acts as a central controller that:
 
   1.  Parses the URL.
-  2.  **Handles Race Conditions:** Implements a request-stamping mechanism to prevent asynchronous rendering functions from finishing out of order during rapid navigation, thus eliminating content "flashing". It achieves this by issuing a unique `navigationRequestId` for each route change and having the rendering function yield to the event loop (`await Promise.resolve()`) before checking if its ID is still the most recent one.
+  2.  **Handles Race Conditions:** Implements a request-stamping mechanism (`navigationRequestId`) to prevent asynchronous rendering functions from finishing out of order during rapid navigation, thus eliminating content "flashing".
   3.  Loads the correct data (including lazy-loaded files).
   4.  Calls generic rendering functions (`renderNavigator`, `renderSectionItems`) to build the DOM.
 
-- **State Management:** A simple global `_state` object (managed via `js/state.js`) caches loaded data and tracks the application's status. Key properties include `allTexts`, `currentTextSlug`, `dataMap` (an ID-to-node lookup for fast access), and `navigationRequestId` (for race condition handling).
+- **State Management:** A simple global `_state` object (managed via `js/state.js`) caches loaded data and tracks the application's status. Key properties include the full `libraryData`, an `aliasMap` for fast reference lookups, `currentTextSlug`, and `dataMap` (an ID-to-node lookup for the current text).
 
-- **Generic Navigation Logic:** The navigation renderer (`createNavElement`) and the arrow button logic (`navigateArrows`) are written to be data-agnostic. They operate on the data's hierarchical structure, not on hard-coded assumptions about any specific text.
+- **Clean Dependency Graph:** The architecture follows a unidirectional flow. The main `app.js` orchestrates calls to UI modules, but UI modules (like `content.js`) do not import from the main app, preventing circular dependencies. Shared UI logic is centralized in `common.js`.
 
 ---
 
@@ -78,12 +80,17 @@ The architecture has four distinct pillars:
 
 These are the core architectural decisions that must remain constant to ensure the project remains scalable and maintainable.
 
-1.  **The Schema is the Contract:** All code will be written to conform to the generic JSON schema. To support a new text or change its presentation hierarchy, you modify the **data's structure (JSON)**, not the application code. The presence or absence of a `children` array on a node is the primary driver of the UI.
+1.  **The Schema is the Contract:** All code will be written to conform to the generic JSON schema. To support a new text or change its presentation hierarchy, you modify the **data's structure (JSON)**, not the application code.
 
 2.  **The URL is State:** The application is functionally stateless. Any view can be perfectly reconstructed just from the URL. All navigation actions must result in a URL hash change.
 
-3.  **Generic Before Specific:** Functions will continue to be written generically. Instead of `loadAnuvaka`, we have `loadAndRenderSection`. Instead of `.mantra-container`, we use `.item-container`. This is the key to scalability.
+3.  **Data is Decoupled:**
 
-4.  **Separation of Concerns:** HTML (structure), CSS (style), JavaScript (behavior), and JSON (content) will remain in their own separate files. DOM elements are built programmatically in JavaScript for security and maintainability.
+    - **Content:** The JSON data for texts contains the content and its structure, but no presentation logic.
+    - **References:** References within the data are semantic (`ref:slug/path`), not presentational (`href="#/slug/path"`). This allows the application's routing or behavior to change without requiring data updates.
 
-5.  **User Experience is Paramount:** Features should be implemented with both desktop (study) and mobile (reading) use cases in mind. Bug fixes, like mobile scrolling issues or race condition flashes, should be prioritized as they directly impact the core reading experience.
+4.  **Generic Before Specific:** Functions will continue to be written generically. Instead of `loadAnuvaka`, we have `renderContentForRoute`. Instead of `.mantra-container`, we use `.item-container`. This is the key to scalability.
+
+5.  **Separation of Concerns:** HTML (structure), CSS (style), JavaScript (behavior), and JSON (content) will remain in their own separate files. The data layer (`library.json`, `data/*.json`) is the single source of truth for all content.
+
+6.  **User Experience is Paramount:** Features should be implemented with both desktop (study) and mobile (reading) use cases in mind. Bug fixes, like mobile scrolling issues or race condition flashes, should be prioritized as they directly impact the core reading experience.

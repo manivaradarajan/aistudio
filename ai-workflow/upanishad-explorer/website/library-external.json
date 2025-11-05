@@ -1,0 +1,833 @@
+[
+  {
+    "slug": "agnirahasya",
+    "name": "Agnirahasya",
+    "scriptNames": {
+      "devanagari": "Agnirahasya",
+      "iast": "Agnirahasya"
+    },
+    "aliases": [
+      "agnirahasya"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "ahirbudhnya-samhita",
+    "name": "Ahirbudhnya Samhita",
+    "scriptNames": {
+      "devanagari": "Ahirbudhnya Samhita",
+      "iast": "Ahirbudhnya Samhita"
+    },
+    "aliases": [
+      "ahirbudhnya-samhita"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "aitareya-brahmana",
+    "name": "ऐतरेय ब्राह्मणम्",
+    "scriptNames": {
+      "devanagari": "ऐतरेय ब्राह्मणम्",
+      "iast": "Aitareya Brāhmaṇam"
+    },
+    "aliases": [
+      "aitareya-brahmana"
+    ],
+    "type": "brahmana",
+    "isInternal": false
+  },
+  {
+    "slug": "amarakosha",
+    "name": "अमरकोशः",
+    "scriptNames": {
+      "devanagari": "अमरकोशः",
+      "iast": "Amarakośaḥ"
+    },
+    "aliases": [
+      "amarakosha"
+    ],
+    "type": "kosha",
+    "isInternal": false
+  },
+  {
+    "slug": "apastamba-shrauta-sutra",
+    "name": "Apastamba Shrauta Sutra",
+    "scriptNames": {
+      "devanagari": "Apastamba Shrauta Sutra",
+      "iast": "Apastamba Shrauta Sutra"
+    },
+    "aliases": [
+      "apastamba-shrauta-sutra"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "atma-upanishad",
+    "name": "Atma Upanishad",
+    "scriptNames": {
+      "devanagari": "Atma Upanishad",
+      "iast": "Atma Upanishad"
+    },
+    "aliases": [
+      "atma-upanishad"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "bhagavad-gita",
+    "name": "श्रीमद्भगवद्गीता",
+    "scriptNames": {
+      "devanagari": "श्रीमद्भगवद्गीता",
+      "iast": "Śrīmadbhagavadgītā"
+    },
+    "aliases": [
+      "bhagavad-gita",
+      "gita"
+    ],
+    "type": "smriti",
+    "isInternal": false
+  },
+  {
+    "slug": "bhagavata-purana",
+    "name": "श्रीमद्भागवतपुराणम्",
+    "scriptNames": {
+      "devanagari": "श्रीमद्भागवतपुराणम्",
+      "iast": "Śrīmadbhāgavatapurāṇam"
+    },
+    "aliases": [
+      "bhagavata-purana",
+      "bhagavata"
+    ],
+    "type": "purana",
+    "isInternal": false
+  },
+  {
+    "slug": "brahma-sutra",
+    "name": "ब्रह्मसूत्रम्",
+    "scriptNames": {
+      "devanagari": "ब्रह्मसूत्रम्",
+      "iast": "Brahmasūtram"
+    },
+    "aliases": [
+      "brahma-sutra"
+    ],
+    "type": "sutra",
+    "isInternal": false
+  },
+  {
+    "slug": "brihadaranyaka",
+    "name": "बृहदारण्यकोपनिषत्",
+    "scriptNames": {
+      "devanagari": "बृहदारण्यकोपनिषत्",
+      "iast": "Bṛhadāraṇyakopaniṣat"
+    },
+    "aliases": [
+      "brihadaranyaka-upanishad",
+      "brihadaranyaka"
+    ],
+    "type": "upanishad",
+    "isInternal": false
+  },
+  {
+    "slug": "chandogya",
+    "name": "छान्दोग्योपनिषत्",
+    "scriptNames": {
+      "devanagari": "छान्दोग्योपनिषत्",
+      "iast": "Chāndogyopaniṣat"
+    },
+    "aliases": [
+      "chandogya-upanishad",
+      "chandogya"
+    ],
+    "type": "upanishad",
+    "isInternal": false
+  },
+  {
+    "slug": "daksha-smriti",
+    "name": "Daksha Smriti",
+    "scriptNames": {
+      "devanagari": "Daksha Smriti",
+      "iast": "Daksha Smriti"
+    },
+    "aliases": [
+      "daksha-smriti"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "devarajapanchaka",
+    "name": "Devarajapanchaka",
+    "scriptNames": {
+      "devanagari": "Devarajapanchaka",
+      "iast": "Devarajapanchaka"
+    },
+    "aliases": [
+      "devarajapanchaka"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "devarajashtaka",
+    "name": "Devarajashtaka",
+    "scriptNames": {
+      "devanagari": "Devarajashtaka",
+      "iast": "Devarajashtaka"
+    },
+    "aliases": [
+      "devarajashtaka"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "dhatu-patha",
+    "name": "धातुपाठः",
+    "scriptNames": {
+      "devanagari": "धातुपाठः",
+      "iast": "Dhātupāṭhaḥ"
+    },
+    "aliases": [
+      "dhatu-patha",
+      "panini-dhatupatha"
+    ],
+    "type": "vyakarana",
+    "isInternal": false
+  },
+  {
+    "slug": "garuda-purana",
+    "name": "Garuda Purana",
+    "scriptNames": {
+      "devanagari": "Garuda Purana",
+      "iast": "Garuda Purana"
+    },
+    "aliases": [
+      "garuda-purana"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "harivamsha",
+    "name": "Harivamsha",
+    "scriptNames": {
+      "devanagari": "Harivamsha",
+      "iast": "Harivamsha"
+    },
+    "aliases": [
+      "harivamsha"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "harivamsha-vishnu-parva",
+    "name": "Harivamsha Vishnu Parva",
+    "scriptNames": {
+      "devanagari": "Harivamsha Vishnu Parva",
+      "iast": "Harivamsha Vishnu Parva"
+    },
+    "aliases": [
+      "harivamsha-vishnu-parva"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "hayagriva-samhita",
+    "name": "Hayagriva Samhita",
+    "scriptNames": {
+      "devanagari": "Hayagriva Samhita",
+      "iast": "Hayagriva Samhita"
+    },
+    "aliases": [
+      "hayagriva-samhita"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "jaiminiya-brahmana",
+    "name": "जैमिनीय ब्राह्मणम्",
+    "scriptNames": {
+      "devanagari": "जैमिनीय ब्राह्मणम्",
+      "iast": "Jaiminīya Brāhmaṇam"
+    },
+    "aliases": [
+      "jaiminiya-brahmana"
+    ],
+    "type": "brahmana",
+    "isInternal": false
+  },
+  {
+    "slug": "jitanta-stotra",
+    "name": "Jitanta Stotra",
+    "scriptNames": {
+      "devanagari": "Jitanta Stotra",
+      "iast": "Jitanta Stotra"
+    },
+    "aliases": [
+      "jitanta-stotra"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "kaushitaki",
+    "name": "कौषीतक्युपनिषत्",
+    "scriptNames": {
+      "devanagari": "कौषीतक्युपनिषत्",
+      "iast": "Kauṣītakyupaniṣat"
+    },
+    "aliases": [
+      "kaushitaki-upanishad",
+      "kaushitaki"
+    ],
+    "type": "upanishad",
+    "isInternal": false
+  },
+  {
+    "slug": "kena-upanishad",
+    "name": "Kena Upanishad",
+    "scriptNames": {
+      "devanagari": "Kena Upanishad",
+      "iast": "Kena Upanishad"
+    },
+    "aliases": [
+      "kena-upanishad"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "mahabharata",
+    "name": "Mahabharata",
+    "scriptNames": {
+      "devanagari": "Mahabharata",
+      "iast": "Mahabharata"
+    },
+    "aliases": [
+      "mahabharata"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "mahabharata-shanti-parva",
+    "name": "महाभारतम् शान्तिपर्व",
+    "scriptNames": {
+      "devanagari": "महाभारतम् शान्तिपर्व",
+      "iast": "Mahābhāratam Śāntiparva"
+    },
+    "aliases": [
+      "mahabharata-shanti-parva"
+    ],
+    "type": "itihasa",
+    "isInternal": false
+  },
+  {
+    "slug": "mahanarayana",
+    "name": "महानारायणोपनिषत्",
+    "scriptNames": {
+      "devanagari": "महानारायणोपनिषत्",
+      "iast": "Mahānārāyaṇopaniṣat"
+    },
+    "aliases": [
+      "mahanarayana-upanishad",
+      "mahanarayana",
+      "taittiriya-narayana"
+    ],
+    "type": "upanishad",
+    "isInternal": false
+  },
+  {
+    "slug": "mahopanishad",
+    "name": "Mahopanishad",
+    "scriptNames": {
+      "devanagari": "Mahopanishad",
+      "iast": "Mahopanishad"
+    },
+    "aliases": [
+      "mahopanishad"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "manu-smriti",
+    "name": "Manu Smriti",
+    "scriptNames": {
+      "devanagari": "Manu Smriti",
+      "iast": "Manu Smriti"
+    },
+    "aliases": [
+      "manu-smriti"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "manusmriti",
+    "name": "Manusmriti",
+    "scriptNames": {
+      "devanagari": "Manusmriti",
+      "iast": "Manusmriti"
+    },
+    "aliases": [
+      "manusmriti"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "narada-parivrajaka-upanishad",
+    "name": "Narada Parivrajaka Upanishad",
+    "scriptNames": {
+      "devanagari": "Narada Parivrajaka Upanishad",
+      "iast": "Narada Parivrajaka Upanishad"
+    },
+    "aliases": [
+      "narada-parivrajaka-upanishad"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "padma-purana-uttara-khanda",
+    "name": "Padma Purana Uttara Khanda",
+    "scriptNames": {
+      "devanagari": "Padma Purana Uttara Khanda",
+      "iast": "Padma Purana Uttara Khanda"
+    },
+    "aliases": [
+      "padma-purana-uttara-khanda"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "panini",
+    "name": "Panini",
+    "scriptNames": {
+      "devanagari": "Panini",
+      "iast": "Panini"
+    },
+    "aliases": [
+      "panini"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "panini-sutra",
+    "name": "अष्टाध्यायी",
+    "scriptNames": {
+      "devanagari": "अष्टाध्यायी",
+      "iast": "Aṣṭādhyāyī"
+    },
+    "aliases": [
+      "panini-sutra"
+    ],
+    "type": "vyakarana",
+    "isInternal": false
+  },
+  {
+    "slug": "paniniya-shiksha",
+    "name": "पाणिनीयशिक्षा",
+    "scriptNames": {
+      "devanagari": "पाणिनीयशिक्षा",
+      "iast": "Pāṇinīyaśikṣā"
+    },
+    "aliases": [
+      "paniniya-shiksha"
+    ],
+    "type": "shiksha",
+    "isInternal": false
+  },
+  {
+    "slug": "patanjali-yoga-sutra",
+    "name": "Patanjali Yoga Sutra",
+    "scriptNames": {
+      "devanagari": "Patanjali Yoga Sutra",
+      "iast": "Patanjali Yoga Sutra"
+    },
+    "aliases": [
+      "patanjali-yoga-sutra"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "prashna",
+    "name": "प्रश्नोपनिषत्",
+    "scriptNames": {
+      "devanagari": "प्रश्नोपनिषत्",
+      "iast": "Praśnopaniṣat"
+    },
+    "aliases": [
+      "prashna-upanishad",
+      "prashna"
+    ],
+    "type": "upanishad",
+    "isInternal": false
+  },
+  {
+    "slug": "prasna-upanishad",
+    "name": "Prasna Upanishad",
+    "scriptNames": {
+      "devanagari": "Prasna Upanishad",
+      "iast": "Prasna Upanishad"
+    },
+    "aliases": [
+      "prasna-upanishad"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "pu-mi-su",
+    "name": "Pu Mi Su",
+    "scriptNames": {
+      "devanagari": "Pu Mi Su",
+      "iast": "Pu Mi Su"
+    },
+    "aliases": [
+      "pu-mi-su"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "purusha-sukta",
+    "name": "Purusha Sukta",
+    "scriptNames": {
+      "devanagari": "Purusha Sukta",
+      "iast": "Purusha Sukta"
+    },
+    "aliases": [
+      "purusha-sukta"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "purva-mimamsa",
+    "name": "Purva Mimamsa",
+    "scriptNames": {
+      "devanagari": "Purva Mimamsa",
+      "iast": "Purva Mimamsa"
+    },
+    "aliases": [
+      "purva-mimamsa"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "ramayana",
+    "name": "Ramayana",
+    "scriptNames": {
+      "devanagari": "Ramayana",
+      "iast": "Ramayana"
+    },
+    "aliases": [
+      "ramayana"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "rigveda",
+    "name": "ऋग्वेदः",
+    "scriptNames": {
+      "devanagari": "ऋग्वेदः",
+      "iast": "Ṛgvedaḥ"
+    },
+    "aliases": [
+      "rigveda",
+      "rig-veda-samhita"
+    ],
+    "type": "samhita",
+    "isInternal": false
+  },
+  {
+    "slug": "sahasranama",
+    "name": "विष्णुसहस्रनाम",
+    "scriptNames": {
+      "devanagari": "विष्णुसहस्रनाम",
+      "iast": "Viṣṇusahasranāma"
+    },
+    "aliases": [
+      "sahasranama"
+    ],
+    "type": "stotra",
+    "isInternal": false
+  },
+  {
+    "slug": "shatapatha-brahmana",
+    "name": "Shatapatha Brahmana",
+    "scriptNames": {
+      "devanagari": "Shatapatha Brahmana",
+      "iast": "Shatapatha Brahmana"
+    },
+    "aliases": [
+      "shatapatha-brahmana"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "shri-gunaratna-kosha",
+    "name": "Shri Gunaratna Kosha",
+    "scriptNames": {
+      "devanagari": "Shri Gunaratna Kosha",
+      "iast": "Shri Gunaratna Kosha"
+    },
+    "aliases": [
+      "shri-gunaratna-kosha"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "shvetashvatara",
+    "name": "श्वेताश्वतरोपनिषत्",
+    "scriptNames": {
+      "devanagari": "श्वेताश्वतरोपनिषत्",
+      "iast": "Śvetāśvataropaniṣat"
+    },
+    "aliases": [
+      "shvetashvatara-upanishad",
+      "shvetashvatara"
+    ],
+    "type": "upanishad",
+    "isInternal": false
+  },
+  {
+    "slug": "sri-bhashya",
+    "name": "Sri Bhashya",
+    "scriptNames": {
+      "devanagari": "Sri Bhashya",
+      "iast": "Sri Bhashya"
+    },
+    "aliases": [
+      "sri-bhashya"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "stotra-ratna",
+    "name": "Stotra Ratna",
+    "scriptNames": {
+      "devanagari": "Stotra Ratna",
+      "iast": "Stotra Ratna"
+    },
+    "aliases": [
+      "stotra-ratna"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "subala",
+    "name": "सुबालोपनिषत्",
+    "scriptNames": {
+      "devanagari": "सुबालोपनिषत्",
+      "iast": "Subālopaniṣat"
+    },
+    "aliases": [
+      "subala-upanishad",
+      "subala"
+    ],
+    "type": "upanishad",
+    "isInternal": false
+  },
+  {
+    "slug": "svetasvatara-upanishad",
+    "name": "Svetasvatara Upanishad",
+    "scriptNames": {
+      "devanagari": "Svetasvatara Upanishad",
+      "iast": "Svetasvatara Upanishad"
+    },
+    "aliases": [
+      "svetasvatara-upanishad"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "taittiriya-aranyaka",
+    "name": "तैत्तिरीय आरण्यकम्",
+    "scriptNames": {
+      "devanagari": "तैत्तिरीय आरण्यकम्",
+      "iast": "Taittirīya Āraṇyakam"
+    },
+    "aliases": [
+      "taittiriya-aranyaka"
+    ],
+    "type": "aranyaka",
+    "isInternal": false
+  },
+  {
+    "slug": "taittiriya-brahmana",
+    "name": "तैत्तिरीय ब्राह्मणम्",
+    "scriptNames": {
+      "devanagari": "तैत्तिरीय ब्राह्मणम्",
+      "iast": "Taittirīya Brāhmaṇam"
+    },
+    "aliases": [
+      "taittiriya-brahmana"
+    ],
+    "type": "brahmana",
+    "isInternal": false
+  },
+  {
+    "slug": "taittiriya-narayana-upanishad",
+    "name": "Taittiriya Narayana Upanishad",
+    "scriptNames": {
+      "devanagari": "Taittiriya Narayana Upanishad",
+      "iast": "Taittiriya Narayana Upanishad"
+    },
+    "aliases": [
+      "taittiriya-narayana-upanishad"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "taittiriya-samhita",
+    "name": "तैत्तिरीयसंहिता",
+    "scriptNames": {
+      "devanagari": "तैत्तिरीयसंहिता",
+      "iast": "Taittirīyasaṃhitā"
+    },
+    "aliases": [
+      "taittiriya-samhita"
+    ],
+    "type": "samhita",
+    "isInternal": false
+  },
+  {
+    "slug": "varaha-purana",
+    "name": "Varaha Purana",
+    "scriptNames": {
+      "devanagari": "Varaha Purana",
+      "iast": "Varaha Purana"
+    },
+    "aliases": [
+      "varaha-purana"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "varaha-upanishad",
+    "name": "Varaha Upanishad",
+    "scriptNames": {
+      "devanagari": "Varaha Upanishad",
+      "iast": "Varaha Upanishad"
+    },
+    "aliases": [
+      "varaha-upanishad"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "vishnu-dharma-purana",
+    "name": "Vishnu Dharma Purana",
+    "scriptNames": {
+      "devanagari": "Vishnu Dharma Purana",
+      "iast": "Vishnu Dharma Purana"
+    },
+    "aliases": [
+      "vishnu-dharma-purana"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "vishnu-dharmottara-purana",
+    "name": "Vishnu Dharmottara Purana",
+    "scriptNames": {
+      "devanagari": "Vishnu Dharmottara Purana",
+      "iast": "Vishnu Dharmottara Purana"
+    },
+    "aliases": [
+      "vishnu-dharmottara-purana"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "vishnu-purana",
+    "name": "विष्णुपुराणम्",
+    "scriptNames": {
+      "devanagari": "विष्णुपुराणम्",
+      "iast": "Viṣṇupurāṇam"
+    },
+    "aliases": [
+      "vishnu-purana"
+    ],
+    "type": "purana",
+    "isInternal": false
+  },
+  {
+    "slug": "vishnu-sahasranama",
+    "name": "Vishnu Sahasranama",
+    "scriptNames": {
+      "devanagari": "Vishnu Sahasranama",
+      "iast": "Vishnu Sahasranama"
+    },
+    "aliases": [
+      "vishnu-sahasranama"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "vyasa-smriti",
+    "name": "Vyasa Smriti",
+    "scriptNames": {
+      "devanagari": "Vyasa Smriti",
+      "iast": "Vyasa Smriti"
+    },
+    "aliases": [
+      "vyasa-smriti"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "yajnavalkya-shiksha",
+    "name": "Yajnavalkya Shiksha",
+    "scriptNames": {
+      "devanagari": "Yajnavalkya Shiksha",
+      "iast": "Yajnavalkya Shiksha"
+    },
+    "aliases": [
+      "yajnavalkya-shiksha"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  },
+  {
+    "slug": "yajnavalkya-smriti",
+    "name": "Yajnavalkya Smriti",
+    "scriptNames": {
+      "devanagari": "Yajnavalkya Smriti",
+      "iast": "Yajnavalkya Smriti"
+    },
+    "aliases": [
+      "yajnavalkya-smriti"
+    ],
+    "type": "unknown",
+    "isInternal": false
+  }
+]

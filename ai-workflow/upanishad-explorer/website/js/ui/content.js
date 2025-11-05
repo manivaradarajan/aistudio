@@ -39,9 +39,10 @@ export function resetContentScroll() {
 
 export function setContentTitle(title) { dom.contentTitle.textContent = title; }
 
-// --- MODIFIED FUNCTION ---
 export function renderCommentary(itemData) {
   const rawMarkdown = itemData.commentary_text || "<p>No commentary available.</p>";
+  const { showExternalRefs } = state.getState(); // Get the current setting
+
   const refRegex = /\[([^\]]+)\]\(ref:([^\)]+)\)/g;
 
   const processedMarkdown = rawMarkdown.replace(refRegex, (match, displayText, refPath) => {
@@ -51,29 +52,30 @@ export function renderCommentary(itemData) {
     const libraryEntry = state.getTextFromLibrary(slugOrAlias);
 
     if (libraryEntry) {
-      // --- LOGIC FOR TITLE ATTRIBUTE ---
-      let destinationPath = '';
       if (libraryEntry.isInternal) {
-        destinationPath = `/#/${libraryEntry.slug}/${remainingPath}`;
-      } else {
-        destinationPath = `(External) ${libraryEntry.slug}/${remainingPath}`;
-      }
-      // Use a newline character (\n) to create a multi-line tooltip.
-      const titleText = `${libraryEntry.name}\n${destinationPath}`;
-      // --- END LOGIC ---
+        // --- Internal links are always rendered as active links ---
+        const destinationPath = `/#/${libraryEntry.slug}/${remainingPath}`;
+        const titleText = `${libraryEntry.name}\n${destinationPath}`;
+        return `<a href="#" data-ref-slug="${libraryEntry.slug}" data-ref-path="${remainingPath}" class="commentary-ref internal-ref" title="${titleText}">${displayText}</a>`;
 
-      return `<a href="#"
-                 data-ref-slug="${libraryEntry.slug}"
-                 data-ref-path="${remainingPath}"
-                 class="commentary-ref ${libraryEntry.isInternal ? 'internal-ref' : 'external-ref'}"
-                 title="${titleText}">${displayText}</a>`; // Use the new titleText
+      } else {
+        // --- External links are rendered conditionally ---
+        if (showExternalRefs) {
+          const destinationPath = `(External) ${libraryEntry.slug}/${remainingPath}`;
+          const titleText = `${libraryEntry.name}\n${destinationPath}`;
+          return `<a href="#" data-ref-slug="${libraryEntry.slug}" data-ref-path="${remainingPath}" class="commentary-ref external-ref" title="${titleText}">${displayText}</a>`;
+        } else {
+          // Render as a non-clickable, styled span
+          return `<span class="external-ref-disabled" title="${libraryEntry.name} (External reference disabled)">${displayText}</span>`;
+        }
+      }
     } else {
       return `<span class="invalid-ref" title="Unknown reference: ${slugOrAlias}">${displayText}</span>`;
     }
   });
+
   dom.commentaryText.innerHTML = marked.parse(processedMarkdown);
 }
-
 
 export function clearSelection() {
   dom.mantraDisplay

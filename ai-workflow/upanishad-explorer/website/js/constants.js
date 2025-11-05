@@ -1,3 +1,5 @@
+// js/constants.js
+
 export const DOM_SELECTORS = {
   body: document.body,
   textSelector: "#text-selector",
@@ -17,10 +19,12 @@ export const DOM_SELECTORS = {
   itemContainer: ".item-container",
   activeNavLink: "a.active",
   selectedItem: ".selected",
+  refToggle: "#toggle-external-refs",
 };
 
 export const CONFIG = {
-  TEXTS_MANIFEST: "library.json",
+  INTERNAL_MANIFEST: "library-internal.json",
+  EXTERNAL_MANIFEST: "library-external.json",
   MOBILE_BREAKPOINT: 800,
   SPLIT_CONFIG: {
     sizes: [25, 45, 30],

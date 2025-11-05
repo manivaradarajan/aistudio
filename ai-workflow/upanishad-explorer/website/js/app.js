@@ -1,6 +1,7 @@
-import { DOM_SELECTORS } from "./constants.js";
+// js/app.js
+import { DOM_SELECTORS, CONFIG } from "./constants.js"; // Import CONFIG
 import * as state from "./state.js";
-import { loadTextsManifest } from "./api.js";
+import { loadTextData } from "./api.js"; // Note: loadTextsManifest is no longer used here
 import { cacheDomElements, isMobileView } from "./utils.js";
 import { handleRouteChange, navigateTo } from "./router.js";
 import { initMobileUI, openMobileOverlay, closeMobileOverlays } from "./ui/mobile.js";
@@ -17,11 +18,21 @@ async function init() {
   addEventListeners();
 
   try {
-    const libraryData = await loadTextsManifest();
-    state.setLibraryData(libraryData);
-    const internalTexts = libraryData.filter(text => text.isInternal);
-    state.setAllTexts(internalTexts);
-    commonUI.populateTextSelector(internalTexts);
+    // 1. Fetch both library files in parallel
+    const [internalData, externalData] = await Promise.all([
+      fetch(CONFIG.INTERNAL_MANIFEST).then(res => res.json()),
+      fetch(CONFIG.EXTERNAL_MANIFEST).then(res => res.json())
+    ]);
+
+    // 2. Combine them into a single library for the alias map
+    const fullLibraryData = [...internalData, ...externalData];
+    state.setLibraryData(fullLibraryData);
+
+    // 3. The internal data is used directly for the dropdown and routing
+    state.setAllTexts(internalData);
+    commonUI.populateTextSelector(internalData);
+
+    // 4. Handle initial route
     await handleRouteChange();
   } catch (error) {
     console.error("Initialization failed:", error);
@@ -39,6 +50,7 @@ function initModules() {
 function addEventListeners() {
   window.addEventListener("hashchange", handleRouteChange);
   dom.textSelector.addEventListener("change", handleTextChange);
+  dom.refToggle.addEventListener("change", handleRefToggleChange);
   dom.navigatorContent.addEventListener("click", handleNavigatorClick);
   dom.mantraDisplay.addEventListener("click", handleMantraClick);
   dom.commentaryText.addEventListener("click", handleReferenceClick);
@@ -51,6 +63,20 @@ function addEventListeners() {
 }
 
 function handleTextChange(e) { navigateTo(`/${e.target.value}`); }
+
+function handleRefToggleChange(e) {
+  const shouldShow = e.target.checked;
+  state.setShowExternalRefs(shouldShow);
+  const selectedItem = dom.mantraDisplay.querySelector(".selected");
+  if (selectedItem) {
+    const itemId = selectedItem.dataset.id;
+    const itemData = state.getNodeById(itemId);
+    if (itemData) {
+      contentUI.renderCommentary(itemData);
+    }
+  }
+}
+
 function handleNavigatorClick(e) { if (e.target.closest("a")) { closeMobileOverlays(); } }
 
 function handleMantraClick(e) {

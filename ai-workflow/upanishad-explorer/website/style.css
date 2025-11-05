@@ -48,6 +48,11 @@ body.mobile-overlay-active {
 }
 .pane-header,
 .main-header {
+  /* MODIFIED: Changed to flex for toggle alignment */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* End Modification */
   padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
@@ -55,6 +60,10 @@ body.mobile-overlay-active {
 h1,
 h2 {
   font-size: 1.25rem;
+}
+/* NEW: Added to push toggle right */
+.pane-header h2 {
+  flex-grow: 1;
 }
 .pane-content {
   padding: calc(var(--spacing-unit) * 1.5);
@@ -178,6 +187,16 @@ h2 {
   opacity: 0.8;
 }
 
+/* NEW: Commentary Link Styling */
+.commentary-ref {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.commentary-ref:hover {
+  text-decoration: underline;
+}
+
 /* Item Display (replaces .mantra-container) */
 .item-container {
   display: flex;
@@ -205,6 +224,34 @@ h2 {
 .item-text {
   font-size: 1.2rem;
   line-height: 2;
+}
+
+/* MODIFIED: Reference Toggle Styling */
+#ref-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-color-muted);
+}
+
+#ref-toggle-container label {
+  font-family: var(--font-family-devanagari), var(--font-family-latin);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#toggle-external-refs {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* MODIFIED: Style for Disabled External Links */
+.external-ref-disabled {
+  color: var(--text-color-muted);
+  text-decoration: none;
+  cursor: default;
+  /* Dotted underline removed */
 }
 
 /* Splitter & Mobile Hiding */
@@ -235,9 +282,7 @@ h2 {
   .pane-content {
     padding: var(--spacing-unit);
   }
-  /* --- FIX IS HERE --- */
   #mantra-display.pane-content {
-    /* Add padding to allow the last item to be scrolled to the center */
     padding-bottom: 50vh;
   }
   .main-header {
@@ -318,6 +363,12 @@ h2 {
   .commentary-pane.active {
     transform: translateY(0);
   }
+
+  /* NEW: Fix for mobile close button positioning */
+  .commentary-pane .pane-header {
+    position: relative;
+  }
+
   .commentary-pane .pane-content {
     font-size: 1.1rem;
     line-height: 1.8;
