@@ -101,7 +101,7 @@ function populateLinkWithPreview(link, item, title) {
   const previewNode = item;
   if (previewNode?.text) {
     const previewText = previewNode.text.trim().split("\n")[0];
-    if (/S/.test(previewText)) {
+    if (/\S/.test(previewText)) {
       const titleSpan = document.createElement("span");
       titleSpan.className = "nav-item-title";
       titleSpan.textContent = title + " - ";
@@ -112,9 +112,11 @@ function populateLinkWithPreview(link, item, title) {
       link.appendChild(previewSpan);
     } else {
       link.textContent = title;
+      link.classList.add("nav-item-title");
     }
   } else {
     link.textContent = title;
+    link.classList.add("nav-item-title");
   }
 }
 

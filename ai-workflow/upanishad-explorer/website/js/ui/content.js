@@ -80,7 +80,6 @@ export function renderCommentary(itemData) {
     itemData.commentary_text || "<p>No commentary available.</p>";
   const { showExternalRefs } = state.getState();
 
-  //const refRegex = /\ \[([^\\]+)\]\(ref:([^\\]+)\)\/g;
   const refRegex = /\[([^\]]+)\]\(ref:([^\)]+)\)/g;
 
   const processedMarkdown = rawMarkdown.replace(

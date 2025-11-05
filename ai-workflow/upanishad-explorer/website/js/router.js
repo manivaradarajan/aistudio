@@ -2,7 +2,6 @@
 
 /**
  * @file This file handles routing and navigation for the application.
- * It maps URL hash changes to content updates, loading data as needed.
  * @module router
  */
 
@@ -32,7 +31,7 @@ export function navigateTo(path) {
  */
 export async function handleRouteChange() {
   const requestId = state.getNewNavigationRequestId();
-  state.setUiStatus("loading");
+  state.updateState({ uiStatus: "loading" });
 
   const { allTexts } = state.getState();
   const pathParts = window.location.hash.slice(1).split("/").filter(Boolean);
@@ -49,7 +48,7 @@ export async function handleRouteChange() {
     try {
       const rawData = await loadTextData(targetText.file);
       const { processedData, dataMap } = processTextData(rawData, textSlug);
-      state.setCurrentText(textSlug, processedData, dataMap);
+      state.updateState({ currentTextSlug: textSlug, currentUpanishadData: processedData, dataMap });
       /** @type {HTMLSelectElement} */ (document.getElementById("text-selector")).value = textSlug;
       navUI.renderNavigator();
       initializeSplitPanes();
@@ -57,7 +56,7 @@ export async function handleRouteChange() {
       if (error.name !== "AbortError") {
         console.error("Failed to load text:", error);
         commonUI.showError("Failed to load the selected text.");
-        state.setUiStatus("error");
+        state.updateState({ uiStatus: "error" });
       }
       return;
     }
@@ -65,8 +64,7 @@ export async function handleRouteChange() {
 
   await renderContentForRoute(pathParts, requestId);
 
-  state.setUserInitiatedClick(false);
-  state.setUiStatus("idle");
+  state.updateState({ userInitiatedClick: false, uiStatus: "idle" });
 }
 
 /**
@@ -143,7 +141,7 @@ async function renderContentForRoute(pathParts, requestId) {
   }
 
   const { targetItems, titleParts, location } = traversalResult;
-  state.setCurrentLocation(location);
+  state.updateState({ currentLocation: location });
 
   contentUI.setContentTitle(titleParts.join(" - "));
   contentUI.renderSectionItems(targetItems);

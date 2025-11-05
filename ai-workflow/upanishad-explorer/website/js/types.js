@@ -1,7 +1,41 @@
 /**
  * @file This file contains JSDoc type definitions for the core data structures used in the application.
- * These types provide a "schema" for the data, which helps with code completion, type checking, and overall code clarity.
  * @module types
+ */
+
+/**
+ * @typedef {Object.<string, (HTMLElement|string)>} DomSelectorMap
+ * @property {HTMLElement} body
+ * @property {string} textSelector
+ * @property {string} navigatorPane
+ * @property {string} commentaryPane
+ * @property {string} mainPane
+ * @property {string} navigatorContent
+ * @property {string} contentTitle
+ * @property {string} mantraDisplay
+ * @property {string} commentaryText
+ * @property {string} mobileNavToggle
+ * @property {string} mobileNavClose
+ * @property {string} mobileCommentaryClose
+ * @property {string} mobileOverlay
+ * @property {string} prevBtn
+ * @property {string} nextBtn
+ * @property {string} itemContainer
+ * @property {string} activeNavLink
+ * @property {string} selectedItem
+ * @property {string} refToggle
+ */
+
+/**
+ * @typedef {object} AppConfig
+ * @property {string} INTERNAL_MANIFEST
+ * @property {string} EXTERNAL_MANIFEST
+ * @property {number} MOBILE_BREAKPOINT
+ * @property {object} SPLIT_CONFIG
+ * @property {number[]} SPLIT_CONFIG.sizes
+ * @property {number[]} SPLIT_CONFIG.minSize
+ * @property {number} SPLIT_CONFIG.gutterSize
+ * @property {string} SPLIT_CONFIG.cursor
  */
 
 /**
