@@ -27,7 +27,7 @@
   },
   {
     "slug": "aitareya-brahmana",
-    "name": "ऐतरेय ब्राह्मणम्",
+    "name": "Aitareya Brāhmaṇam",
     "scriptNames": {
       "devanagari": "ऐतरेय ब्राह्मणम्",
       "iast": "Aitareya Brāhmaṇam"
@@ -40,7 +40,7 @@
   },
   {
     "slug": "amarakosha",
-    "name": "अमरकोशः",
+    "name": "Amarakośaḥ",
     "scriptNames": {
       "devanagari": "अमरकोशः",
       "iast": "Amarakośaḥ"
@@ -78,22 +78,21 @@
     "isInternal": false
   },
   {
-    "slug": "bhagavad-gita",
-    "name": "श्रीमद्भगवद्गीता",
+    "slug": "gita",
+    "name": "Śrīmadbhagavadgītā",
     "scriptNames": {
       "devanagari": "श्रीमद्भगवद्गीता",
       "iast": "Śrīmadbhagavadgītā"
     },
     "aliases": [
-      "bhagavad-gita",
-      "gita"
+      "bhagavad-gita"
     ],
     "type": "smriti",
     "isInternal": false
   },
   {
     "slug": "bhagavata-purana",
-    "name": "श्रीमद्भागवतपुराणम्",
+    "name": "Śrīmadbhāgavatapurāṇam",
     "scriptNames": {
       "devanagari": "श्रीमद्भागवतपुराणम्",
       "iast": "Śrīmadbhāgavatapurāṇam"
@@ -107,7 +106,7 @@
   },
   {
     "slug": "brahma-sutra",
-    "name": "ब्रह्मसूत्रम्",
+    "name": "Brahmasūtram",
     "scriptNames": {
       "devanagari": "ब्रह्मसूत्रम्",
       "iast": "Brahmasūtram"
@@ -120,7 +119,7 @@
   },
   {
     "slug": "brihadaranyaka",
-    "name": "बृहदारण्यकोपनिषत्",
+    "name": "Bṛhadāraṇyakopaniṣat",
     "scriptNames": {
       "devanagari": "बृहदारण्यकोपनिषत्",
       "iast": "Bṛhadāraṇyakopaniṣat"
@@ -134,7 +133,7 @@
   },
   {
     "slug": "chandogya",
-    "name": "छान्दोग्योपनिषत्",
+    "name": "Chāndogyopaniṣat",
     "scriptNames": {
       "devanagari": "छान्दोग्योपनिषत्",
       "iast": "Chāndogyopaniṣat"
@@ -187,7 +186,7 @@
   },
   {
     "slug": "dhatu-patha",
-    "name": "धातुपाठः",
+    "name": "Dhātupāṭhaḥ",
     "scriptNames": {
       "devanagari": "धातुपाठः",
       "iast": "Dhātupāṭhaḥ"
@@ -220,19 +219,7 @@
       "iast": "Harivamsha"
     },
     "aliases": [
-      "harivamsha"
-    ],
-    "type": "unknown",
-    "isInternal": false
-  },
-  {
-    "slug": "harivamsha-vishnu-parva",
-    "name": "Harivamsha Vishnu Parva",
-    "scriptNames": {
-      "devanagari": "Harivamsha Vishnu Parva",
-      "iast": "Harivamsha Vishnu Parva"
-    },
-    "aliases": [
+      "harivamsha",
       "harivamsha-vishnu-parva"
     ],
     "type": "unknown",
@@ -253,7 +240,7 @@
   },
   {
     "slug": "jaiminiya-brahmana",
-    "name": "जैमिनीय ब्राह्मणम्",
+    "name": "Jaiminīya Brāhmaṇam",
     "scriptNames": {
       "devanagari": "जैमिनीय ब्राह्मणम्",
       "iast": "Jaiminīya Brāhmaṇam"
@@ -279,7 +266,7 @@
   },
   {
     "slug": "kaushitaki",
-    "name": "कौषीतक्युपनिषत्",
+    "name": "Kauṣītakyupaniṣat",
     "scriptNames": {
       "devanagari": "कौषीतक्युपनिषत्",
       "iast": "Kauṣītakyupaniṣat"
@@ -319,7 +306,7 @@
   },
   {
     "slug": "mahabharata-shanti-parva",
-    "name": "महाभारतम् शान्तिपर्व",
+    "name": "Mahābhāratam Śāntiparva",
     "scriptNames": {
       "devanagari": "महाभारतम् शान्तिपर्व",
       "iast": "Mahābhāratam Śāntiparva"
@@ -332,7 +319,7 @@
   },
   {
     "slug": "mahanarayana",
-    "name": "महानारायणोपनिषत्",
+    "name": "Mahānārāyaṇopaniṣat",
     "scriptNames": {
       "devanagari": "महानारायणोपनिषत्",
       "iast": "Mahānārāyaṇopaniṣat"
@@ -340,7 +327,8 @@
     "aliases": [
       "mahanarayana-upanishad",
       "mahanarayana",
-      "taittiriya-narayana"
+      "taittiriya-narayana",
+      "taittiriya-narayana-upanishad"
     ],
     "type": "upanishad",
     "isInternal": false
@@ -366,19 +354,7 @@
       "iast": "Manu Smriti"
     },
     "aliases": [
-      "manu-smriti"
-    ],
-    "type": "unknown",
-    "isInternal": false
-  },
-  {
-    "slug": "manusmriti",
-    "name": "Manusmriti",
-    "scriptNames": {
-      "devanagari": "Manusmriti",
-      "iast": "Manusmriti"
-    },
-    "aliases": [
+      "manu-smriti",
       "manusmriti"
     ],
     "type": "unknown",
@@ -425,7 +401,7 @@
   },
   {
     "slug": "panini-sutra",
-    "name": "अष्टाध्यायी",
+    "name": "Aṣṭādhyāyī",
     "scriptNames": {
       "devanagari": "अष्टाध्यायी",
       "iast": "Aṣṭādhyāyī"
@@ -438,7 +414,7 @@
   },
   {
     "slug": "paniniya-shiksha",
-    "name": "पाणिनीयशिक्षा",
+    "name": "Pāṇinīyaśikṣā",
     "scriptNames": {
       "devanagari": "पाणिनीयशिक्षा",
       "iast": "Pāṇinīyaśikṣā"
@@ -463,20 +439,6 @@
     "isInternal": false
   },
   {
-    "slug": "prashna",
-    "name": "प्रश्नोपनिषत्",
-    "scriptNames": {
-      "devanagari": "प्रश्नोपनिषत्",
-      "iast": "Praśnopaniṣat"
-    },
-    "aliases": [
-      "prashna-upanishad",
-      "prashna"
-    ],
-    "type": "upanishad",
-    "isInternal": false
-  },
-  {
     "slug": "prasna-upanishad",
     "name": "Prasna Upanishad",
     "scriptNames": {
@@ -484,7 +446,9 @@
       "iast": "Prasna Upanishad"
     },
     "aliases": [
-      "prasna-upanishad"
+      "prasna-upanishad",
+      "prashna",
+      "prashna-upanishad"
     ],
     "type": "unknown",
     "isInternal": false
@@ -543,7 +507,7 @@
   },
   {
     "slug": "rigveda",
-    "name": "ऋग्वेदः",
+    "name": "Ṛgvedaḥ",
     "scriptNames": {
       "devanagari": "ऋग्वेदः",
       "iast": "Ṛgvedaḥ"
@@ -553,19 +517,6 @@
       "rig-veda-samhita"
     ],
     "type": "samhita",
-    "isInternal": false
-  },
-  {
-    "slug": "sahasranama",
-    "name": "विष्णुसहस्रनाम",
-    "scriptNames": {
-      "devanagari": "विष्णुसहस्रनाम",
-      "iast": "Viṣṇusahasranāma"
-    },
-    "aliases": [
-      "sahasranama"
-    ],
-    "type": "stotra",
     "isInternal": false
   },
   {
@@ -592,20 +543,6 @@
       "shri-gunaratna-kosha"
     ],
     "type": "unknown",
-    "isInternal": false
-  },
-  {
-    "slug": "shvetashvatara",
-    "name": "श्वेताश्वतरोपनिषत्",
-    "scriptNames": {
-      "devanagari": "श्वेताश्वतरोपनिषत्",
-      "iast": "Śvetāśvataropaniṣat"
-    },
-    "aliases": [
-      "shvetashvatara-upanishad",
-      "shvetashvatara"
-    ],
-    "type": "upanishad",
     "isInternal": false
   },
   {
@@ -636,7 +573,7 @@
   },
   {
     "slug": "subala",
-    "name": "सुबालोपनिषत्",
+    "name": "Subālopaniṣat",
     "scriptNames": {
       "devanagari": "सुबालोपनिषत्",
       "iast": "Subālopaniṣat"
@@ -656,14 +593,16 @@
       "iast": "Svetasvatara Upanishad"
     },
     "aliases": [
-      "svetasvatara-upanishad"
+      "svetasvatara-upanishad",
+      "shvetashvatara",
+      "shvetashvatara-upanishad"
     ],
     "type": "unknown",
     "isInternal": false
   },
   {
     "slug": "taittiriya-aranyaka",
-    "name": "तैत्तिरीय आरण्यकम्",
+    "name": "Taittirīya Āraṇyakam",
     "scriptNames": {
       "devanagari": "तैत्तिरीय आरण्यकम्",
       "iast": "Taittirīya Āraṇyakam"
@@ -676,7 +615,7 @@
   },
   {
     "slug": "taittiriya-brahmana",
-    "name": "तैत्तिरीय ब्राह्मणम्",
+    "name": "Taittirīya Brāhmaṇam",
     "scriptNames": {
       "devanagari": "तैत्तिरीय ब्राह्मणम्",
       "iast": "Taittirīya Brāhmaṇam"
@@ -688,21 +627,8 @@
     "isInternal": false
   },
   {
-    "slug": "taittiriya-narayana-upanishad",
-    "name": "Taittiriya Narayana Upanishad",
-    "scriptNames": {
-      "devanagari": "Taittiriya Narayana Upanishad",
-      "iast": "Taittiriya Narayana Upanishad"
-    },
-    "aliases": [
-      "taittiriya-narayana-upanishad"
-    ],
-    "type": "unknown",
-    "isInternal": false
-  },
-  {
     "slug": "taittiriya-samhita",
-    "name": "तैत्तिरीयसंहिता",
+    "name": "Taittirīyasaṃhitā",
     "scriptNames": {
       "devanagari": "तैत्तिरीयसंहिता",
       "iast": "Taittirīyasaṃhitā"
@@ -767,7 +693,7 @@
   },
   {
     "slug": "vishnu-purana",
-    "name": "विष्णुपुराणम्",
+    "name": "Viṣṇupurāṇam",
     "scriptNames": {
       "devanagari": "विष्णुपुराणम्",
       "iast": "Viṣṇupurāṇam"
@@ -786,7 +712,8 @@
       "iast": "Vishnu Sahasranama"
     },
     "aliases": [
-      "vishnu-sahasranama"
+      "vishnu-sahasranama",
+      "sahasranama"
     ],
     "type": "unknown",
     "isInternal": false
