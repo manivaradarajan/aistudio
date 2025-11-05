@@ -4,6 +4,10 @@ This document outlines the roadmap for evolving the Upanishad Explorer from its 
 
 ---
 
+## Text
+
+[ ] Is Mundaka 1.1.7 spurious? Copy of Svetasvatara sloka? http://localhost:8000/#/mundaka/1/1/7
+
 ## Phase 3: Core UX Polish & Accessibility
 
 _Goal: Implement high-impact features that make the application more professional, accessible, and comfortable for long study sessions. These are foundational improvements._
