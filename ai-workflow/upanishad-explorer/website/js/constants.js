@@ -1,5 +1,3 @@
-// js/constants.js
-
 export const DOM_SELECTORS = {
   body: document.body,
   textSelector: "#text-selector",
@@ -22,7 +20,7 @@ export const DOM_SELECTORS = {
 };
 
 export const CONFIG = {
-  TEXTS_MANIFEST: "library.json", // This was the previous change
+  TEXTS_MANIFEST: "library.json",
   MOBILE_BREAKPOINT: 800,
   SPLIT_CONFIG: {
     sizes: [25, 45, 30],
@@ -30,7 +28,6 @@ export const CONFIG = {
     gutterSize: 2,
     cursor: "col-resize",
   },
-  // DEVANAGARI_LABELS object has been REMOVED
 };
 
 export const UI_STATUS = {
