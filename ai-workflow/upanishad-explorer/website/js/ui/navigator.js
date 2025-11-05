@@ -1,13 +1,31 @@
 // js/ui/navigator.js
+
+/**
+ * @file This file handles the rendering and state management of the navigation pane (the table of contents).
+ * @module navigator
+ */
+
 import { buildPathFromNode } from "../utils.js";
 import * as state from "../state.js";
+import "../types.js"; // Import JSDoc type definitions
 
+/**
+ * A cached map of DOM elements used by the module.
+ * @type {Object.<string, HTMLElement>}
+ */
 let dom;
 
+/**
+ * Initializes the navigator module with essential DOM elements.
+ * @param {Object.<string, HTMLElement>} domElements - A map of cached DOM elements.
+ */
 export function initNavigator(domElements) {
   dom = domElements;
 }
 
+/**
+ * Renders the entire navigation tree based on the currently loaded Upanishad data.
+ */
 export function renderNavigator() {
   const upanishadData = state.getCurrentUpanishadData();
   if (!upanishadData) return;
@@ -26,22 +44,24 @@ export function renderNavigator() {
   dom.navigatorContent.appendChild(fragment);
 }
 
+/**
+ * Recursively creates a navigation element (a list item) for a given node.
+ * @param {UpanishadNode} node - The content node to create a navigation element for.
+ * @param {number} depth - The current depth of the node in the hierarchy.
+ * @param {Array<object|string>} structureLevels - An array defining the names of each level.
+ * @returns {HTMLLIElement} The created list item element.
+ */
 function createNavElement(node, depth, structureLevels) {
   const li = document.createElement("li");
 
   const levelInfo = structureLevels[depth];
-  let label = `Level ${depth}`; // Default fallback
+  let label = `Level ${depth}`;
 
-  // --- TRULY ROBUST FIX IS HERE ---
-  // First, check if levelInfo exists, THEN check its properties.
   if (levelInfo && typeof levelInfo === 'object' && levelInfo.scriptNames) {
-    // New format: { key: "Valli", scriptNames: { devanagari: "वल्ली" } }
     label = levelInfo.scriptNames.devanagari || levelInfo.key;
   } else if (typeof levelInfo === 'string') {
-    // Old format fallback: "Valli"
     label = levelInfo;
   }
-  // --- END FIX ---
 
   if (node.children && node.children.length > 0) {
     const details = document.createElement("details");
@@ -71,12 +91,17 @@ function createNavElement(node, depth, structureLevels) {
   return li;
 }
 
-// ... (rest of the file is unchanged) ...
+/**
+ * Populates a navigation link with a title and a text preview.
+ * @param {HTMLAnchorElement} link - The anchor element to populate.
+ * @param {UpanishadNode} item - The content item associated with the link.
+ * @param {string} title - The title of the navigation item.
+ */
 function populateLinkWithPreview(link, item, title) {
   const previewNode = item;
   if (previewNode?.text) {
     const previewText = previewNode.text.trim().split("\n")[0];
-    if (/\S/.test(previewText)) {
+    if (/S/.test(previewText)) {
       const titleSpan = document.createElement("span");
       titleSpan.className = "nav-item-title";
       titleSpan.textContent = title + " - ";
@@ -92,27 +117,35 @@ function populateLinkWithPreview(link, item, title) {
     link.textContent = title;
   }
 }
+
+/**
+ * Updates the navigator's state to reflect the currently selected content item.
+ */
 export function updateNavigatorState() {
   dom.navigatorContent
     .querySelectorAll("a.active")
     .forEach((el) => el.classList.remove("active"));
-  const currentItemId = dom.mantraDisplay.querySelector(
+
+  const currentItemId = /** @type {HTMLElement} */ (dom.mantraDisplay.querySelector(
     ".item-container.selected"
-  )?.dataset.id;
+  ))?.dataset.id;
   if (!currentItemId) return;
+
   const allLinks = dom.navigatorContent.querySelectorAll("a[data-section-id]");
+  /** @type {HTMLAnchorElement | null} */
   let activeLink = null;
   for (const link of allLinks) {
-    const sectionId = link.dataset.sectionId;
+    const sectionId = /** @type {HTMLAnchorElement} */ (link).dataset.sectionId;
     if (currentItemId.startsWith(sectionId)) {
       if (
         !activeLink ||
         sectionId.length > activeLink.dataset.sectionId.length
       ) {
-        activeLink = link;
+        activeLink = /** @type {HTMLAnchorElement} */ (link);
       }
     }
   }
+
   if (activeLink) {
     activeLink.classList.add("active");
     let parent = activeLink.closest("details");

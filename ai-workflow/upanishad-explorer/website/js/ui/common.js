@@ -1,11 +1,22 @@
 // js/ui/common.js
-import * as state from "../state.js"; // Add this import
-
-let dom; // To be initialized in app.js
 
 /**
- * Initializes the common UI module with cached DOM elements.
- * @param {object} domElements - Cached DOM elements.
+ * @file This file contains common UI utility functions that are used across different modules.
+ * @module common
+ */
+
+import * as state from "../state.js";
+import "../types.js"; // Import JSDoc type definitions
+
+/**
+ * A cached map of DOM elements used by the module.
+ * @type {Object.<string, HTMLElement>}
+ */
+let dom;
+
+/**
+ * Initializes the common UI module with essential DOM elements.
+ * @param {Object.<string, HTMLElement>} domElements - A map of cached DOM elements from the main application file.
  */
 export function initCommonUI(domElements) {
   dom = domElements;
@@ -31,7 +42,7 @@ export function showLoading(message = "Loading...") {
 
 /**
  * Populates the main text selector dropdown.
- * @param {Array<object>} allTexts - Array of text manifest objects.
+ * @param {LibraryEntry[]} allTexts - Array of text manifest objects.
  */
 export function populateTextSelector(allTexts) {
   dom.textSelector.innerHTML = "";
@@ -43,31 +54,29 @@ export function populateTextSelector(allTexts) {
   });
 }
 
-
-// --- FUNCTION MOVED HERE ---
 /**
  * Updates the enabled/disabled state of the previous/next arrow buttons
  * based on the current application state.
  */
 export function updateArrowButtons() {
-  if (!dom) return; // Guard against calls before initialization
+  if (!dom) return;
 
   const { currentLocation, currentUpanishadData } = state.getState();
   if (!currentUpanishadData || !currentLocation) {
-    dom.prevBtn.disabled = true;
-    dom.nextBtn.disabled = true;
+    /** @type {HTMLButtonElement} */ (dom.prevBtn).disabled = true;
+    /** @type {HTMLButtonElement} */ (dom.nextBtn).disabled = true;
     return;
   }
 
   const topLevelSections = currentUpanishadData.content;
-  const currentIndex = currentLocation.level0; // Assumes arrows navigate top-level sections
+  const currentIndex = currentLocation.level0;
 
   if (topLevelSections.length <= 1) {
-    dom.prevBtn.disabled = true;
-    dom.nextBtn.disabled = true;
+    /** @type {HTMLButtonElement} */ (dom.prevBtn).disabled = true;
+    /** @type {HTMLButtonElement} */ (dom.nextBtn).disabled = true;
     return;
   }
 
-  dom.prevBtn.disabled = currentIndex <= 0;
-  dom.nextBtn.disabled = currentIndex >= topLevelSections.length - 1;
+  /** @type {HTMLButtonElement} */ (dom.prevBtn).disabled = currentIndex <= 0;
+  /** @type {HTMLButtonElement} */ (dom.nextBtn).disabled = currentIndex >= topLevelSections.length - 1;
 }

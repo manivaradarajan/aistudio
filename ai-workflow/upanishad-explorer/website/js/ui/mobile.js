@@ -1,10 +1,19 @@
 // js/ui/mobile.js
 
-let dom; // To be initialized in app.js
+/**
+ * @file This file manages the user interface for the mobile view, specifically the overlay panes for navigation and commentary.
+ * @module mobile
+ */
 
 /**
- * Initializes the mobile UI module with cached DOM elements.
- * @param {object} domElements - Cached DOM elements.
+ * A cached map of DOM elements used by the module.
+ * @type {Object.<string, HTMLElement>}
+ */
+let dom;
+
+/**
+ * Initializes the mobile UI module with essential DOM elements.
+ * @param {Object.<string, HTMLElement>} domElements - A map of cached DOM elements.
  */
 export function initMobileUI(domElements) {
   dom = domElements;

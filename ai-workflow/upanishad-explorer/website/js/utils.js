@@ -1,36 +1,46 @@
 // js/utils.js
-import { CONFIG } from "./constants.js";
 
 /**
- * Caches DOM element references.
- * @param {object} selectors - An object mapping keys to CSS selectors.
- * @returns {object} An object with the same keys mapped to DOM elements.
+ * @file This file contains utility functions that are used across the application.
+ * @module utils
+ */
+
+import { CONFIG } from "./constants.js";
+import "./types.js"; // Import JSDoc type definitions
+
+/**
+ * Caches DOM element references for efficient and repeated access.
+ * It takes an object of selectors and returns an object with the corresponding DOM elements.
+ * @param {DomSelectorMap} selectors - An object mapping keys to CSS selectors.
+ * @returns {Object.<string, HTMLElement>} An object with the same keys mapped to the queried DOM elements.
  */
 export function cacheDomElements(selectors) {
   const dom = {};
   for (const [key, selector] of Object.entries(selectors)) {
     if (key === "body") {
-      dom[key] = selector;
+      // The body element is passed directly, not as a selector string.
+      dom[key] = /** @type {HTMLElement} */ (selector);
     } else {
-      dom[key] = document.querySelector(selector);
+      dom[key] = document.querySelector(/** @type {string} */ (selector));
     }
   }
   return dom;
 }
 
 /**
- * Checks if the current view is considered mobile.
- * @returns {boolean} True if window width is at or below the mobile breakpoint.
+ * Checks if the current viewport width is at or below the mobile breakpoint defined in the configuration.
+ * @returns {boolean} True if the current view is considered mobile, false otherwise.
  */
 export function isMobileView() {
   return window.innerWidth <= CONFIG.MOBILE_BREAKPOINT;
 }
 
 /**
- * Builds a URL hash path from a data node's metadata.
- * @param {string} textSlug - The slug for the current text.
- * @param {object} node - The data node containing a `numberPath`.
- * @returns {string} The full hash path, e.g., `#/slug/1/2/5`.
+ * Constructs a URL hash path for a given content node.
+ * This path is used for routing and direct navigation.
+ * @param {string} textSlug - The slug of the current text (e.g., "kena").
+ * @param {UpanishadNode} node - The data node, which must have a `numberPath` property.
+ * @returns {string} The full hash path (e.g., "/kena/1/2/5").
  */
 export function buildPathFromNode(textSlug, node) {
   return `/${textSlug}/${node.numberPath.join("/")}`;

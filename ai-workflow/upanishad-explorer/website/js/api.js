@@ -1,13 +1,25 @@
 // js/api.js
-import { CONFIG } from "./constants.js";
 
+/**
+ * @file This file handles all network requests for the application, such as fetching text data and manifests.
+ * It includes a mechanism to abort pending requests to prevent race conditions.
+ * @module api
+ */
+
+import { CONFIG } from "./constants.js";
+import "./types.js"; // Import JSDoc type definitions
+
+/**
+ * A controller to manage and abort fetch requests.
+ * @type {AbortController}
+ */
 let fetchController;
 
 /**
- * Fetches a JSON resource with abort signal support to prevent race conditions.
- * @param {string} url - The URL to fetch.
- * @returns {Promise<any>} The JSON response.
- * @throws {Error} If the fetch fails or is aborted.
+ * Fetches a JSON resource with support for aborting previous, unfinished requests.
+ * @param {string} url - The URL of the JSON resource to fetch.
+ * @returns {Promise<any>} A promise that resolves to the parsed JSON response.
+ * @throws {Error} Throws an error if the network response is not ok, or if the fetch is aborted.
  */
 async function fetchWithAbort(url) {
   if (fetchController) {
@@ -21,14 +33,6 @@ async function fetchWithAbort(url) {
     throw new Error(`HTTP error! status: ${response.status} for ${url}`);
   }
   return response.json();
-}
-
-/**
- * Loads the main manifest of all available texts.
- * @returns {Promise<Array<object>>} A list of text manifest objects.
- */
-export async function loadTextsManifest() {
-  return fetchWithAbort(CONFIG.TEXTS_MANIFEST);
 }
 
 /**
@@ -46,7 +50,6 @@ export async function loadTextData(filePath) {
  * @returns {Promise<object>} The raw section data.
  */
 export async function loadLazySection(filePath) {
-  // We use a separate fetch function here to not abort the main text loading
   const response = await fetch(filePath);
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status} for ${filePath}`);

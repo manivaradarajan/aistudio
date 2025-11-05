@@ -1,4 +1,11 @@
 // js/router.js
+
+/**
+ * @file This file handles routing and navigation for the application.
+ * It maps URL hash changes to content updates, loading data as needed.
+ * @module router
+ */
+
 import { loadTextData, loadLazySection } from "./api.js";
 import * as state from "./state.js";
 import { processTextData } from "./data-processor.js";
@@ -8,32 +15,42 @@ import * as commonUI from "./ui/common.js";
 import { initializeSplitPanes } from "./ui/split-pane.js";
 import { updateArrowButtons } from "./ui/common.js";
 import { isMobileView } from "./utils.js";
+import "./types.js"; // Import JSDoc type definitions
 
-// ... (navigateTo and handleRouteChange are unchanged) ...
+/**
+ * Navigates to a new path by updating the window's URL hash.
+ * @param {string} path - The new path to navigate to (e.g., "/text-slug/1/2").
+ */
 export function navigateTo(path) {
   if (window.location.hash !== `#${path}`) {
     window.location.hash = path;
   }
 }
 
+/**
+ * The main routing function that handles changes to the URL hash.
+ */
 export async function handleRouteChange() {
   const requestId = state.getNewNavigationRequestId();
   state.setUiStatus("loading");
+
   const { allTexts } = state.getState();
   const pathParts = window.location.hash.slice(1).split("/").filter(Boolean);
   const textSlug = pathParts[0] || allTexts[0]?.slug;
+
   const targetText = allTexts.find((t) => t.slug === textSlug);
   if (!targetText) {
     const fallback = allTexts[0]?.slug;
     if (fallback) navigateTo(`/${fallback}`);
     return;
   }
+
   if (textSlug !== state.getCurrentTextSlug()) {
     try {
       const rawData = await loadTextData(targetText.file);
       const { processedData, dataMap } = processTextData(rawData, textSlug);
       state.setCurrentText(textSlug, processedData, dataMap);
-      document.getElementById("text-selector").value = textSlug;
+      /** @type {HTMLSelectElement} */ (document.getElementById("text-selector")).value = textSlug;
       navUI.renderNavigator();
       initializeSplitPanes();
     } catch (error) {
@@ -45,12 +62,19 @@ export async function handleRouteChange() {
       return;
     }
   }
+
   await renderContentForRoute(pathParts, requestId);
+
   state.setUserInitiatedClick(false);
   state.setUiStatus("idle");
 }
 
-
+/**
+ * Traverses the content hierarchy to find the section specified by the URL path.
+ * @param {string[]} pathParts - The parts of the URL path.
+ * @param {object} upanishadData - The data for the current Upanishad.
+ * @returns {Promise<object|null>} A promise that resolves to an object containing the target items, title parts, and location, or null if interrupted.
+ */
 async function traverseToSection(pathParts, upanishadData) {
     const currentRequestId = state.getCurrentNavigationRequestId();
     const navLevels = upanishadData.structure_levels.slice(0, -1);
@@ -86,50 +110,55 @@ async function traverseToSection(pathParts, upanishadData) {
             }
         }
 
-        // --- TRULY ROBUST FIX IS HERE ---
         const levelInfo = navLevels[i];
-        let label = `Level ${i}`; // Default fallback
+        let label = `Level ${i}`;
         if (levelInfo && typeof levelInfo === 'object' && levelInfo.scriptNames) {
-            // New format
             label = levelInfo.scriptNames.devanagari || levelInfo.key;
         } else if (typeof levelInfo === 'string') {
-            // Old format
             label = levelInfo;
         }
-        // --- END FIX ---
 
         titleParts.push(node.name || `${label} ${node.number}`);
-
         dataTraversal = node.children;
     }
 
     return { targetItems: dataTraversal, titleParts, location };
 }
 
-// ... (renderContentForRoute is unchanged) ...
+/**
+ * Renders the content for a given route.
+ * @param {string[]} pathParts - The parts of the URL path.
+ * @param {number} requestId - The ID of the current navigation request.
+ */
 async function renderContentForRoute(pathParts, requestId) {
   await Promise.resolve();
   if (requestId !== state.getCurrentNavigationRequestId()) {
     return;
   }
+
   const upanishadData = state.getCurrentUpanishadData();
   const traversalResult = await traverseToSection(pathParts, upanishadData);
   if (!traversalResult) {
     return;
   }
+
   const { targetItems, titleParts, location } = traversalResult;
   state.setCurrentLocation(location);
+
   contentUI.setContentTitle(titleParts.join(" - "));
   contentUI.renderSectionItems(targetItems);
+
   const hasSpecificItemInUrl = pathParts.length > upanishadData.structure_levels.length;
   const itemNumberInUrl = hasSpecificItemInUrl ? parseInt(pathParts[pathParts.length - 1], 10) : undefined;
   const itemToSelect = itemNumberInUrl !== undefined ? targetItems?.find((item) => item.number === itemNumberInUrl) : targetItems?.[0];
+
   if (!itemToSelect) {
     contentUI.clearSelection();
     navUI.updateNavigatorState();
     updateArrowButtons();
     return;
   }
+
   if (hasSpecificItemInUrl) {
     contentUI.showItemDetails(itemToSelect.id);
   } else {
