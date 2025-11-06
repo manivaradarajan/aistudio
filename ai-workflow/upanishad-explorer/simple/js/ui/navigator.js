@@ -91,6 +91,8 @@ function createNavElement(node, depth, structureLevels) {
   return li;
 }
 
+import { getTransformedText } from '../data-processor.js';
+
 /**
  * Populates a navigation link with a title and a text preview.
  * @param {HTMLAnchorElement} link - The anchor element to populate.
@@ -98,22 +100,18 @@ function createNavElement(node, depth, structureLevels) {
  * @param {string} title - The title of the navigation item.
  */
 function populateLinkWithPreview(link, item, title) {
-  const previewNode = item;
-  if (previewNode?.text) {
-    const previewText = previewNode.text.trim().split("\n")[0];
-    if (/\S/.test(previewText)) {
-      const titleSpan = document.createElement("span");
-      titleSpan.className = "nav-item-title";
-      titleSpan.textContent = title + " - ";
-      const previewSpan = document.createElement("span");
-      previewSpan.className = "nav-item-preview";
-      previewSpan.textContent = previewText;
-      link.appendChild(titleSpan);
-      link.appendChild(previewSpan);
-    } else {
-      link.textContent = title;
-      link.classList.add("nav-item-title");
-    }
+  const { script } = state.getState();
+  const previewText = getTransformedText(item.content, script).trim().split('\n')[0];
+
+  if (previewText && /\S/.test(previewText)) {
+    const titleSpan = document.createElement("span");
+    titleSpan.className = "nav-item-title";
+    titleSpan.textContent = title + " - ";
+    const previewSpan = document.createElement("span");
+    previewSpan.className = "nav-item-preview";
+    previewSpan.textContent = previewText;
+    link.appendChild(titleSpan);
+    link.appendChild(previewSpan);
   } else {
     link.textContent = title;
     link.classList.add("nav-item-title");

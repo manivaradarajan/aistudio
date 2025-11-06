@@ -35,6 +35,7 @@ export async function handleRouteChange() {
 
   const { allTexts } = state.getState();
   const pathParts = window.location.hash.slice(1).split("/").filter(Boolean);
+  localStorage.setItem('lastVisitedPath', window.location.hash);
   const textSlug = pathParts[0] || allTexts[0]?.slug;
 
   const targetText = allTexts.find((t) => t.slug === textSlug);

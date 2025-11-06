@@ -44,8 +44,25 @@
  * @property {string} id - A unique identifier for the node (e.g., "kena-1-2").
  * @property {number} number - The number of the node within its level (e.g., 2).
  * @property {string} [name] - The name of the node, if applicable (e.g., "Kena Upanishad").
- * @property {string} [text] - The text content of the node, if it is a leaf node.
- * @property {string} [commentary_text] - The commentary text associated with the node.
+ * @property {object} [content] - The content of the node.
+ * @property {object} [content.sanskrit] - The Sanskrit content.
+ * @property {string} [content.sanskrit.devanagari] - The Devanagari script.
+ * @property {string} [content.sanskrit.roman] - The Roman script.
+ * @property {string} [content.sanskrit.kannada] - The Kannada script.
+ * @property {string} [content.english_translation] - The English translation.
+ * @property {Array<object>} [commentaries] - An array of commentaries on the node.
+ * @property {string} [commentaries.commentary_id] - The ID of the commentary (e.g., "vedanta_desika").
+ * @property {object} [commentaries.sanskrit] - The Sanskrit commentary.
+ * @property {string} [commentaries.sanskrit.devanagari] - The Devanagari script.
+ * @property {string} [commentaries.sanskrit.roman] - The Roman script.
+ * @property {string} [commentaries.sanskrit.kannada] - The Kannada script.
+ * @property {string} [commentaries.english_translation] - The English translation of the commentary.
+ * @property {object} [variants] - An object containing variant readings of the text.
+ * @property {Array<object>} [footnotes] - An array of footnotes.
+ * @property {string} [footnotes.id] - The ID of the footnote.
+ * @property {Array<string>} [footnotes.applies_to] - An array of passage refs this footnote applies to.
+ * @property {string} [footnotes.type] - The type of footnote.
+ * @property {object} [footnotes.content] - The content of the footnote.
  * @property {Array<UpanishadNode>} [children] - An array of child nodes.
  * @property {string} [file] - The path to a file containing lazy-loadable children.
  * @property {Array<number>} numberPath - The path of numbers from the root to this node (e.g., [1, 2]).

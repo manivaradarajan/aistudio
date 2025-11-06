@@ -14,11 +14,14 @@ import { isMobileView } from "../utils.js";
  * It also ensures that any previously created splitters are removed before creating new ones.
  */
 export function initializeSplitPanes() {
-  // Do not initialize on mobile, as it uses an overlay layout.
-  if (!window.Split || isMobileView()) return;
+  // Do not initialize on mobile or tablet, as they use different layouts.
+  if (!window.Split || window.innerWidth <= 1024) return;
 
   // Clean up any existing splitter elements to prevent duplicates.
   document.querySelectorAll(".gutter").forEach((g) => g.remove());
+
+  const savedSizes = localStorage.getItem('splitSizes');
+  const sizes = savedSizes ? JSON.parse(savedSizes) : CONFIG.SPLIT_CONFIG.sizes;
 
   // Initialize Split.js with the panes and configuration.
   window.Split(
@@ -27,6 +30,12 @@ export function initializeSplitPanes() {
       DOM_SELECTORS.mainPane,
       DOM_SELECTORS.commentaryPane,
     ],
-    CONFIG.SPLIT_CONFIG
+    {
+      ...CONFIG.SPLIT_CONFIG,
+      sizes,
+      onDragEnd: function (sizes) {
+        localStorage.setItem('splitSizes', JSON.stringify(sizes));
+      },
+    }
   );
 }

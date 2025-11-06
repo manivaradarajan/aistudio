@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upanishad Explorer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="app-container">
+      <nav id="nav-pane" class="navigator-pane">
+        <!-- HEADER COMES FIRST -->
+        <header class="pane-header">
+          <h2>अनुक्रमणिका</h2>
+          <button id="help-button" class="menu-button">?</button>
+          <button id="mobile-nav-close" class="close-button">&times;</button>
+        </header>
+
+        <div id="help-modal" class="modal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2>Help</h2>
+              <button id="help-modal-close" class="close-button">&times;</button>
+            </div>
+            <div id="help-modal-body" class="modal-body">
+              <!-- Help content will go here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- TEXT SELECTOR COMES AFTER THE HEADER -->
+        <div id="text-selector-container">
+          <select id="text-selector"></select>
+        </div>
+
+        <!-- NAVIGATOR CONTENT COMES LAST -->
+        <div id="navigator-content" class="pane-content"></div>
+      </nav>
+
+      <main id="main-pane" class="main-content-pane">
+        <header class="main-header">
+          <button id="mobile-nav-toggle" class="menu-button">&#9776;</button>
+          <button id="prev-section" class="nav-arrow prev-arrow">&lt;</button>
+          <h1 id="content-title">Loading...</h1>
+          <button id="next-section" class="nav-arrow next-arrow">&gt;</button>
+          <button id="settings-toggle" class="menu-button">⚙️</button>
+        </header>
+        <div id="settings-panel" class="settings-panel">
+          <div class="settings-header">
+            <h3>Settings</h3>
+            <button id="settings-close" class="close-button">&times;</button>
+          </div>
+          <div class="settings-content">
+            <div class="setting-item">
+              <label for="dark-mode-toggle">Dark Mode</label>
+              <input type="checkbox" id="dark-mode-toggle" />
+            </div>
+            <div class="setting-item">
+              <label for="script-selector">Script</label>
+              <select id="script-selector">
+                <option value="devanagari">Devanagari</option>
+                <option value="roman">Roman (IAST)</option>
+                <option value="kannada">Kannada</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label for="language-selector">Language</label>
+              <select id="language-selector">
+                <option value="sanskrit">Sanskrit Only</option>
+                <option value="english">English Only</option>
+                <option value="both">Both</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label for="font-size-slider">Font Size</label>
+              <input type="range" id="font-size-slider" min="80" max="150" value="100">
+              <span id="font-size-value">100%</span>
+            </div>
+          </div>
+        </div>
+        <div id="mantra-display" class="pane-content"></div>
+      </main>
+
+      <aside id="commentary-pane" class="commentary-pane">
+        <header class="pane-header">
+          <h2>भाष्यम्</h2>
+
+          <div id="commentary-selection-container">
+            <div class="commentary-toggle-item">
+              <input type="checkbox" id="toggle-vedanta-desika" value="vedanta_desika" checked>
+              <label for="toggle-vedanta-desika">Vedanta Desika</label>
+            </div>
+            <div class="commentary-toggle-item">
+              <input type="checkbox" id="toggle-rangaramanuja" value="rangaramanuja">
+              <label for="toggle-rangaramanuja">Rangaramanuja</label>
+            </div>
+            <div class="commentary-toggle-item">
+              <input type="checkbox" id="toggle-kuranarayana" value="kuranarayana">
+              <label for="toggle-kuranarayana">Kuranarayana</label>
+            </div>
+          </div>
+
+          <div id="ref-toggle-container" style="display: none;">
+            <label for="toggle-external-refs">बाह्योल्लेखाः</label>
+            <input type="checkbox" id="toggle-external-refs" />
+          </div>
+
+          <button id="mobile-commentary-close" class="close-button">
+            &times;
+          </button>
+        </header>
+        <div id="commentary-text" class="pane-content"></div>
+      </aside>
+
+      <div id="mobile-overlay" class="mobile-overlay"></div>
+
+    <div id="variant-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Variant Readings</h2>
+          <button id="variant-modal-close" class="close-button">&times;</button>
+        </div>
+        <div id="variant-modal-body" class="modal-body">
+          <!-- Variant options will be injected here -->
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+      defer
+    ></script>
+    <script src="https://unpkg.com/split.js/dist/split.min.js" defer></script>
+    <script src="js/app.js" type="module" defer></script>
+    <div id="tooltip" class="tooltip"></div>
+  </body>
+</html>

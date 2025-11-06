@@ -25,6 +25,7 @@ const _state = {
   uiStatus: UI_STATUS.IDLE,
   navigationRequestId: 0,
   showExternalRefs: false,
+  selectedVariants: {},
 };
 
 /**

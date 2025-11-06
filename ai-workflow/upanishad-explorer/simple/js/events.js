@@ -46,6 +46,26 @@ export function handleNavigatorClick(e) { if (/** @type {HTMLElement} */ (e.targ
  * @param {Event} e - The click event object.
  */
 export function handleMantraClick(e) {
+  if (e.target.classList.contains('footnote-ref')) {
+    const footnoteId = e.target.dataset.footnoteId;
+    const itemId = e.target.closest('.item-container').dataset.id;
+    const itemData = state.getNodeById(itemId);
+    const footnote = itemData.footnotes.find(f => f.id === footnoteId);
+    if (footnote) {
+      contentUI.showTooltip(e.target, footnote.content.sanskrit.devanagari);
+    }
+    return;
+  }
+
+  if (e.target.classList.contains('variant-badge')) {
+    const itemId = e.target.dataset.itemId;
+    const itemData = state.getNodeById(itemId);
+    if (itemData) {
+      contentUI.openVariantModal(itemData);
+    }
+    return;
+  }
+
   const container = /** @type {HTMLElement} */ (e.target).closest(DOM_SELECTORS.itemContainer);
   if (!container) return;
 
@@ -71,6 +91,17 @@ export function handleMantraClick(e) {
  * @param {Event} e - The click event object.
  */
 export function handleReferenceClick(e) {
+  if (e.target.classList.contains('footnote-ref')) {
+    const footnoteId = e.target.dataset.footnoteId;
+    const itemId = state.getState().currentLocation.level1;
+    const itemData = state.getNodeById(itemId);
+    const footnote = itemData.footnotes.find(f => f.id === footnoteId);
+    if (footnote) {
+      contentUI.showTooltip(e.target, footnote.content.sanskrit.devanagari);
+    }
+    return;
+  }
+
   const refLink = /** @type {HTMLElement} */ (e.target).closest("a.commentary-ref");
   if (!refLink) return;
 

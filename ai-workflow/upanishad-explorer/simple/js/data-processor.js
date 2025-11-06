@@ -50,3 +50,16 @@ export function processTextData(rawData, textSlug) {
 
   return { processedData, dataMap };
 }
+
+/**
+ * Retrieves the transformed text for a given script from a content object.
+ * @param {object} content - The content object containing different script versions.
+ * @param {string} script - The desired script (eg., 'devanagari', 'roman', 'kannada').
+ * @returns {string} The text in the specified script, or an empty string if not found.
+ */
+export function getTransformedText(content, script) {
+  if (content && content.sanskrit && content.sanskrit[script]) {
+    return content.sanskrit[script];
+  }
+  return '';
+}
