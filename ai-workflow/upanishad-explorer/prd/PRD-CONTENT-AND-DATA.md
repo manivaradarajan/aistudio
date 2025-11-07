@@ -51,16 +51,15 @@ Commentaries are NOT selectable as independent granthas in Phase 0 (primary text
   - Unicode U+0900–U+097F
   - Web font or system font with fallback
   - Font loads reliably; special characters render correctly
-- **Script conversion (Phase 1+):** Roman (IAST) and Kannada support deferred
+- **Script conversion (Phase 1+):** Roman (IAST) and Kannada support is deferred. The corresponding data fields (`roman`, `kannada`) may be present in the JSON schema but should be considered optional and may be `null`.
 - **Source:** Best available digital versions (may not all be from formally published critical editions)
 - **Quality:** All Sanskrit verified for basic accuracy and completeness; known gaps noted in metadata
-- **Storage:** Sanskrit stored in Devanagari; no client-side conversion needed in Phase 0
+- **Storage:** Sanskrit is stored in Devanagari. This field may be `null` in cases where content is not available (e.g., a commentary does not cover a specific verse). No client-side conversion is needed in Phase 0.
 
 **English:**
 
-- **Phase 0:** No English translations
-- **Phase 1+:** English translations and commentaries to be added
-- Commentary text reads: "English translation not available in Phase 0"
+- **Phase 0:** No English translations are required. The `english_translation` field is optional and may be `null` or an empty string.
+- **Phase 1+:** English translations and commentaries will be added.
 
 **Multi-Script Support (Phase 1+):**
 
@@ -76,7 +75,7 @@ Commentaries are NOT selectable as independent granthas in Phase 0 (primary text
 
 - Passages identified by explicit `ref` field (not inferred from hierarchy)
 - Arbitrary depth: e.g., "1.1", "2.3.4", "2.3.4.5" (variable depth)
-- Refs are hierarchical but stored as strings; numerically sortable
+- Refs are hierarchical but stored as strings. Both simple integer strings (e.g., "1", "2") and dot-notation strings (e.g., "1.1", "1.2.1") are acceptable formats.
 - Examples:
   - Isha Upanishad: refs like "0.0" (prefatory), "1.1", "1.2", etc.
   - Brihad Aranyaka: refs like "0.0" (prefatory), "1.1.1", "1.1.2", "1.2.1", etc.
@@ -318,9 +317,9 @@ Commentaries are NOT selectable as independent granthas in Phase 0 (primary text
       "content": {
         "sanskrit": {
           "devanagari": "ॐ शान्तिः शान्तिः शान्तिः",
-          "roman": "Oṁ śāntiḥ śāntiḥ śāntiḥ"
+          "roman": null
         },
-        "english_translation": "Om peace peace peace"
+        "english_translation": null
       }
     }
   ],
@@ -332,9 +331,9 @@ Commentaries are NOT selectable as independent granthas in Phase 0 (primary text
         "canonical": {
           "sanskrit": {
             "devanagari": "ईशावास्यमिदँ सर्वं...",
-            "roman": "īśā vāsyam idaṁ sarvaṁ..."
+            "roman": null
           },
-          "english_translation": "All this (universe) is indwelt and pervaded by the Lord..."
+          "english_translation": null
         },
         "shakha_1": {
           "sanskrit": {
