@@ -58,7 +58,7 @@
 **Phase 1+ Features:**
 
 - English translations for all texts/commentaries
-- Script conversion (Roman, Kannada)
+- Script conversion (Roman/IAST, Kannada, and other scripts)
 - Full-text search
 - User accounts & sync
 - Commentaries-as-granthas

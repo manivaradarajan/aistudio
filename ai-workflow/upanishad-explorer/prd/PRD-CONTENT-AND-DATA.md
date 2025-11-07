@@ -86,7 +86,7 @@ Commentaries are NOT selectable as independent granthas in Phase 0 (primary text
 - `ref`: Unique reference (e.g., "1.1")
 - `passage_type`: "main" | "prefatory" | "concluding"
 - `content`: Object containing Sanskrit and English
-  - `sanskrit`: Object with `devanagari`, `roman`, `kannada` (all three scripts)
+  - `sanskrit`: Object with `devanagari` (Phase 0), `roman` (Phase 1+)
   - `english_translation`: String (primary English translation)
 - `variants` (if applicable): Object mapping variant names to alternate Sanskrit
   - Example: `{"canonical": {...}, "shakha_1": {...}}`
@@ -318,8 +318,7 @@ Commentaries are NOT selectable as independent granthas in Phase 0 (primary text
       "content": {
         "sanskrit": {
           "devanagari": "ॐ शान्तिः शान्तिः शान्तिः",
-          "roman": "Oṁ śāntiḥ śāntiḥ śāntiḥ",
-          "kannada": "[kannada text]"
+          "roman": "Oṁ śāntiḥ śāntiḥ śāntiḥ"
         },
         "english_translation": "Om peace peace peace"
       }
@@ -333,8 +332,7 @@ Commentaries are NOT selectable as independent granthas in Phase 0 (primary text
         "canonical": {
           "sanskrit": {
             "devanagari": "ईशावास्यमिदँ सर्वं...",
-            "roman": "īśā vāsyam idaṁ sarvaṁ...",
-            "kannada": "[kannada text]"
+            "roman": "īśā vāsyam idaṁ sarvaṁ..."
           },
           "english_translation": "All this (universe) is indwelt and pervaded by the Lord..."
         },
@@ -404,8 +402,7 @@ Commentaries are NOT selectable as independent granthas in Phase 0 (primary text
               "content": {
                 "sanskrit": {
                   "devanagari": "तत्र प्रथमम्...",
-                  "roman": "tatra prathamam...",
-                  "kannada": "[kannada]"
+                  "roman": "tatra prathamam..."
                 },
                 "english": "First, the commentator remarks..."
               }
@@ -414,8 +411,7 @@ Commentaries are NOT selectable as independent granthas in Phase 0 (primary text
           "content": {
             "sanskrit": {
               "devanagari": "[Full commentary Sanskrit]",
-              "roman": "[Full commentary Roman]",
-              "kannada": "[kannada]"
+              "roman": "[Full commentary Roman]"
             },
             "english": "[Full commentary English translation]"
           }

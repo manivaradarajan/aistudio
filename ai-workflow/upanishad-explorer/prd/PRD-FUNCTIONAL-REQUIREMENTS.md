@@ -103,9 +103,10 @@ _Tablet:_
 **FR-2.4: Multi-Script Rendering**
 
 - Sanskrit content stored once in database/JSON (canonical form)
-- Client-side script conversion: Devanagari ↔ Roman ↔ Kannada (instant, no server round-trip)
-- Special characters and diacritics render correctly in all scripts
-- Unicode support: Full Devanagari (U+0900–U+097F), Latin with combining marks, Kannada (U+0C80–U+0CFF)
+- Phase 0: Devanagari only (no conversion needed)
+- Phase 1+: Client-side script conversion: Devanagari ↔ Roman (instant, no server round-trip)
+- Special characters and diacritics render correctly
+- Unicode support: Full Devanagari (U+0900–U+097F), Latin with combining marks (Phase 1+)
 - Fonts load via web fonts (CDN); fallback to system fonts if unavailable
 
 ### 5.3 Comparison Views
@@ -202,8 +203,8 @@ _Desktop (Intra-Grantha References - Same Text):_
 **FR-6.1: Passage Fragment Display**
 
 - Each verse in left nav shows: "Verse Number - [first ~50 characters of Sanskrit text]..."
-- Fragment displays in user's currently selected script (Devanagari, Roman, or Kannada)
-- Fragment updates when user changes script
+- Phase 0: Fragment displays in Devanagari only
+- Phase 1+: Fragment updates when user changes script (Devanagari/Roman)
 - Fragment is truncated with "..." if longer than display space
 - Fragment helps user recognize and navigate to specific verses
 
@@ -272,8 +273,8 @@ _Desktop (Intra-Grantha References - Same Text):_
 - App remembers all user preferences automatically (no login required)
 - Persisted settings:
   - Last visited grantha and verse
-  - Script preference (Devanagari | Roman | Kannada)
-  - Language/translation toggle state (Sanskrit only | English only | Both)
+  - Script preference (Phase 0: Devanagari only; Phase 1+: Roman option)
+  - Language/translation toggle state (Phase 1+: Sanskrit only | English only | Both)
   - Selected commentaries (which are checked)
   - Commentary selection (last selected commentary defaults next visit)
   - Font size preference

@@ -49,7 +49,7 @@ Serious students struggle to:
 A unified, beautifully designed digital library where:
 
 - Sacred texts are the "hero" of the experience
-- Users access Sanskrit originals in multiple scripts (Devanagari, Roman, Kannada, etc.)
+- Users access Sanskrit originals in multiple scripts (Devanagari, with Roman and other scripts in future phases)
 - Alongside high-quality translations (primarily English, expanding to other languages)
 - With multiple authoritative commentaries that can be read, compared, and cross-referenced
 - Cross-links between texts (e.g., "Brihad Aranyaka 6.4.22" as a clickable reference)
@@ -85,7 +85,7 @@ A unified, beautifully designed digital library where:
 
 **Languages & Scripts:**
 
-- Sanskrit: Devanagari, Roman (IAST), Kannada
+- Sanskrit: Devanagari only (Roman/IAST deferred to Phase 1+)
 - English: Primary translation (to be determined; support for multiple translations in architecture)
 
 **Core Features:**
