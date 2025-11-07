@@ -65,6 +65,8 @@ _Desktop:_
   - ☑ Vedanta Desika (checked by default)
   - ☐ Rangaramanuja (unchecked)
   - ☐ Kuranarayana (unchecked)
+- Default commentaries vary by grantha (defined in grantha JSON data)
+- URL commentary parameters (`?c=`) override defaults on page load (see FR-7.3)
 - User can check/uncheck any combination; all selected commentaries stack vertically in right column
 - Commentaries scroll independently from primary text
 - Below each verse in primary text: "▼ [Commentary Name]" indicator (visual affordance, not clickable on desktop)
@@ -231,12 +233,51 @@ _Desktop (Intra-Grantha References - Same Text):_
 **FR-7.3: Shareable URLs**
 
 - Every passage view has a unique, persistent URL
-- URL encodes: grantha ID, passage reference, selected commentaries (as query params), script, language toggle states
-- Example: `https://app.com/isha-upanishad/1.1?commentaries=vedanta-desika,rangaramanuja&script=devanagari&language=both`
+- URL format: Hash fragment with grantha ID, verse reference, and selected commentaries
+- Base format: `#[granthaId]:[verseRef]?c=[commentaryIds]`
+- Example: `https://app.com/#kena-upanishad:1.1?c=rangaramanuja`
+- Multiple commentaries: `https://app.com/#kena-upanishad:1.1?c=rangaramanuja,vedanta_desika`
+- Commentary IDs use full `commentary_id` from grantha JSON (e.g., "rangaramanuja", "vedanta_desika")
+- Display preferences (script, language, dark mode, font size) are NOT included in URL by default
+- Display preferences persist via localStorage only (see FR-10.1)
+- "Share My View" feature (see FR-7.4) optionally includes display preferences in URL
 - URL can be shared in emails, academic papers, social media
-- Clicking shared URL loads exact study configuration
-- If a requested commentary doesn't exist for a verse, it's silently skipped (graceful degradation)
+- Clicking shared URL navigates to specified verse with specified commentaries
+- **URL commentary parameters:** Override localStorage AND save as new defaults
+- **URL display preferences:** Override localStorage temporarily (session only, do not save)
+- URL updates automatically when user clicks a verse in navigation sidebar or changes commentary selection
+- If no verse is specified in URL, app automatically displays first verse and updates URL
+- If commentary doesn't exist for that grantha, it's silently skipped (graceful degradation)
+- Navigation is instant with no page reload or flicker
 - Link preview shows passage snippet (for social sharing)
+
+**FR-7.4: Share Functionality**
+
+- Two share modes available to users
+- **Primary: "Share" button** (default sharing mode)
+  - Copies URL with grantha, verse, and currently selected commentaries only
+  - Does NOT include display preferences (script, language, dark mode, font size)
+  - Example: `https://app.com/#kena-upanishad:1.1?c=rangaramanuja`
+  - Recipient sees the verse with their own display preferences
+  - Use case: Academic citations, sharing specific passages for discussion
+- **Secondary: "Share My View" button**
+  - Copies URL with complete study configuration
+  - Includes: grantha, verse, commentaries, AND all display preferences
+  - Format: `#[granthaId]:[verseRef]?c=[commentaries]&s=[script]&l=[language]&dark=[0|1]&size=[fontSize]`
+  - Example: `https://app.com/#kena-upanishad:1.1?c=rangaramanuja&s=roman&l=san&dark=1&size=120`
+  - Recipient sees exact view configuration
+  - Use case: Teaching, sharing specific reading configurations, accessibility
+- **Location:** Settings panel [⚙] or near citation/metadata section
+- **Behavior:**
+  - Single click copies URL to clipboard
+  - Toast notification confirms: "Link copied to clipboard"
+  - No modal or additional steps required
+- **URL Parameter Reference:**
+  - `c`: Commentary IDs (comma-separated, e.g., `c=rangaramanuja,vedanta_desika`)
+  - `s`: Script (`deva` for Devanagari, `roman` for Roman/IAST)
+  - `l`: Language display (`both`, `san` for Sanskrit only, `eng` for English only)
+  - `dark`: Dark mode (`1` for on, `0` for off)
+  - `size`: Font size percentage (80-150, e.g., `size=120`)
 
 ### 5.8 Prefatory & Concluding Material
 
@@ -282,6 +323,12 @@ _Desktop (Intra-Grantha References - Same Text):_
   - Column widths (desktop)
 - On return visit, app loads grantha, opens to last verse, applies all preferences
 - Preferences stored in browser localStorage (or similar persistent mechanism)
+- **URL/localStorage Interaction:**
+  - **Commentary params (`?c=`):** Override localStorage AND save as new defaults
+  - **Display preference params (`?s=`, `?l=`, `?dark=`, `?size=`):** Override localStorage for session only (do not save)
+  - Display preferences only update in localStorage when explicitly changed via UI controls
+  - Example: User with localStorage `{commentaries: ["vedanta_desika"]}` clicks URL with `?c=rangaramanuja` → sees Rangaramanuja commentary AND localStorage updates to `{commentaries: ["rangaramanuja"]}`
+  - Example: User with localStorage `{script: "deva"}` clicks URL with `?s=roman` → sees Roman script temporarily, localStorage stays `{script: "deva"}`
 
 **FR-10.2: Return Visit Experience**
 
