@@ -14,8 +14,8 @@
 **FR-1.2: Script & Language Selection**
 
 - Location: Settings panel [⚙ icon] (top right of sticky header)
-- Script selector: Devanagari | Roman (IAST) | Kannada (dropdown or radio buttons)
-- Language/translation toggle: Sanskrit only | English only | Both (toggle or radio buttons)
+- Script selector: Devanagari | Roman (IAST) (dropdown or radio buttons)
+- Phase 1: Language/translation toggle: Sanskrit only | English only | Both (toggle or radio buttons)
 - All changes apply instantly (client-side, no reload)
 - User's last selected script persists across sessions (stored in localStorage)
 - User's last selected language persists across sessions
@@ -53,7 +53,7 @@
 - User can adjust font size (slider in settings): default 100%, range 80%-150%
 - Font size preference persists across sessions
 - Line spacing: Generous (1.8-2.0 line height for readability)
-- Fonts: Appropriate Unicode-supporting fonts for each script (Devanagari, Roman, Kannada)
+- Fonts: Appropriate Unicode-supporting fonts for each script (Devanagari, Roman)
 - Web fonts load reliably; fallback system fonts available
 
 **FR-2.2: Commentary Display by Device**
