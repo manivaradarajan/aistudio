@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2025-11-08T17:09:17.974Z",
+    "generated": "2025-11-08T17:43:52.155Z",
     "generator": "scripts/generate-granthas-json.ts",
     "warning": "This file is auto-generated at build time. DO NOT EDIT manually. Edit source files in public/data/ instead."
   },
