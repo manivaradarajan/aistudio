@@ -1,12 +1,12 @@
 1:"$Sreact.fragment"
-2:I[97367,["/upanishad-explorer/_next/static/chunks/42879de7b8087bc9.js"],"ViewportBoundary"]
-4:I[97367,["/upanishad-explorer/_next/static/chunks/42879de7b8087bc9.js"],"MetadataBoundary"]
+2:I[97367,["/aistudio/_next/static/chunks/42879de7b8087bc9.js"],"ViewportBoundary"]
+4:I[97367,["/aistudio/_next/static/chunks/42879de7b8087bc9.js"],"MetadataBoundary"]
 5:"$Sreact.suspense"
-:HL["/upanishad-explorer/_next/static/chunks/5c120b1dead1b38b.css","style"]
-:HL["/upanishad-explorer/_next/static/media/8b8596bd16cf8eee-s.p.69823c15.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-:HL["/upanishad-explorer/_next/static/media/b0db33b4a6649cdd-s.p.331a88e7.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-:HL["/upanishad-explorer/_next/static/media/e92fa6abd9c612ef-s.p.33b29fdc.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-:HL["/upanishad-explorer/_next/static/media/f7390eb5cfa0b4e3-s.p.fd95561c.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
-0:{"buildId":"8GZsPdq05JD52pWzlCdN1","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":true},"head":["$","$1","h",{"children":[null,["$","$L2",null,{"children":"$@3"}],["$","div",null,{"hidden":true,"children":["$","$L4",null,{"children":["$","$5",null,{"name":"Next.Metadata","children":"$@6"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isHeadPartial":false,"staleTime":300}
+:HL["/aistudio/_next/static/chunks/5c120b1dead1b38b.css","style"]
+:HL["/aistudio/_next/static/media/8b8596bd16cf8eee-s.p.69823c15.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/aistudio/_next/static/media/b0db33b4a6649cdd-s.p.331a88e7.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/aistudio/_next/static/media/e92fa6abd9c612ef-s.p.33b29fdc.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/aistudio/_next/static/media/f7390eb5cfa0b4e3-s.p.fd95561c.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+0:{"buildId":"uOXgksXrCRsrynxyBnuPC","tree":{"name":"","paramType":null,"paramKey":"","hasRuntimePrefetch":false,"slots":{"children":{"name":"__PAGE__","paramType":null,"paramKey":"__PAGE__","hasRuntimePrefetch":false,"slots":null,"isRootLayout":false}},"isRootLayout":true},"head":["$","$1","h",{"children":[null,["$","$L2",null,{"children":"$@3"}],["$","div",null,{"hidden":true,"children":["$","$L4",null,{"children":["$","$5",null,{"name":"Next.Metadata","children":"$@6"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}],"isHeadPartial":false,"staleTime":300}
 3:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
 6:[["$","title","0",{"children":"Grantha Vibhrama - Upanishad Explorer"}],["$","meta","1",{"name":"description","content":"Explore classical Upanishad texts with Sanskrit commentary in an interactive reader"}]]
