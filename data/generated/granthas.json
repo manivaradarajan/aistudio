@@ -1,0 +1,51 @@
+{
+  "_meta": {
+    "generated": "2025-11-08T16:56:09.906Z",
+    "generator": "scripts/generate-granthas-json.ts",
+    "warning": "This file is auto-generated at build time. DO NOT EDIT manually. Edit source files in public/data/ instead."
+  },
+  "granthas": [
+    {
+      "id": "isavasya-upanishad",
+      "title": "Isavasya Upanishad",
+      "title_deva": "ईशावास्योपनिषत्",
+      "title_iast": "Isavasya Upanishad"
+    },
+    {
+      "id": "kena-upanishad",
+      "title": "Kenopanishad",
+      "title_deva": "केनोपनिषत्",
+      "title_iast": "Kenopanishad"
+    },
+    {
+      "id": "katha-upanishad",
+      "title": "Katha Upanishad",
+      "title_deva": "कठोपनिषत्",
+      "title_iast": "Katha Upanishad"
+    },
+    {
+      "id": "mundaka-upanishad",
+      "title": "Mundaka Upanishad",
+      "title_deva": "मुण्डकोपनिषत्",
+      "title_iast": "Mundaka Upanishad"
+    },
+    {
+      "id": "mandukya-rangaramanuja-upanishad",
+      "title": "Mandukya Rangaramanuja Upanishad",
+      "title_deva": "माण्डूक्योपनिषत्",
+      "title_iast": "Mandukya Rangaramanuja Upanishad"
+    },
+    {
+      "id": "aitareya-upanishad",
+      "title": "Aitareya Upanishad",
+      "title_deva": "ऐतरेयोपनिषत्",
+      "title_iast": "Aitareya Upanishad"
+    },
+    {
+      "id": "taittiriya-upanishad",
+      "title": "Taittiriya Upanishad",
+      "title_deva": "तैत्तिरीयोपनिषत्",
+      "title_iast": "Taittiriya Upanishad"
+    }
+  ]
+}
